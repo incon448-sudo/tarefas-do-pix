@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#1A5F2A">
+    <meta name="theme-color" content="#0F766E">
     <title>Tarefas do Pix</title>
     
     <!-- Firebase SDK -->
@@ -21,141 +21,137 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #F5F5F5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #F0F4F8;
             min-height: 100vh;
-            overflow-x: hidden;
+            color: #1A202C;
         }
         
-        html {
-            touch-action: pan-x pan-y;
+        /* Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        .header {
-            background: #1A5F2A;
-            color: white;
-            padding: 16px;
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
         }
         
-        .header h1 {
-            font-size: 20px;
-            font-weight: bold;
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
         }
         
-        .logout-btn {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 12px;
+        @keyframes slideIn {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
         }
         
+        /* Telas */
         .screen {
             display: none;
-            animation: fadeIn 0.3s;
+            min-height: 100vh;
         }
         
         .screen.active {
             display: block;
+            animation: fadeIn 0.4s ease-out;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        /* Tela de Login Google */
-        .auth-container {
-            background: linear-gradient(135deg, #1A5F2A 0%, #2d8a3e 100%);
-            min-height: 100vh;
+        /* ========== TELA DE LOGIN ========== */
+        .login-screen {
+            background: linear-gradient(135deg, #0F766E 0%, #14B8A6 100%);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
         }
         
-        .auth-logo {
-            text-align: center;
-            margin-bottom: 40px;
+        .login-screen::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.3;
         }
         
-        .auth-logo h1 {
-            color: white;
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-        
-        .auth-logo p {
-            color: rgba(255,255,255,0.9);
-            font-size: 16px;
-        }
-        
-        .login-card {
-            background: white;
-            border-radius: 20px;
-            padding: 32px;
+        .login-container {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 40px 32px;
             width: 100%;
-            max-width: 360px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 400px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .login-logo {
             text-align: center;
+            margin-bottom: 32px;
         }
         
-        .login-card h2 {
-            color: #333;
+        .login-logo-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #14B8A6 0%, #0F766E 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 40px;
+            box-shadow: 0 10px 30px rgba(20,184,166,0.3);
+        }
+        
+        .login-logo h1 {
+            font-size: 28px;
+            color: #0F766E;
+            font-weight: 800;
             margin-bottom: 8px;
-            font-size: 24px;
         }
         
-        .login-card p {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 24px;
+        .login-logo p {
+            color: #64748B;
+            font-size: 15px;
+            line-height: 1.5;
         }
         
-        /* Botão Google */
         .btn-google {
             width: 100%;
-            padding: 16px;
-            background: white;
-            color: #757575;
-            border: 2px solid #dadce0;
+            padding: 16px 24px;
+            background: #FFFFFF;
+            border: 2px solid #E2E8F0;
             border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
+            color: #1A202C;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
             transition: all 0.3s;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
         
         .btn-google:hover {
-            background: #f8f9fa;
-            border-color: #d2e3fc;
-            box-shadow: 0 2px 8px rgba(66,133,244,0.2);
-        }
-        
-        .btn-google:active {
-            transform: scale(0.98);
+            border-color: #CBD5E1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: translateY(-1px);
         }
         
         .btn-google:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
         }
         
         .google-icon {
@@ -163,268 +159,498 @@
             height: 24px;
         }
         
-        .btn-guest {
-            width: 100%;
-            padding: 14px;
-            background: transparent;
-            color: #00B894;
-            border: 2px solid #00B894;
+        .login-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        
+        .feature-item {
+            text-align: center;
+            padding: 16px 12px;
+            background: #F8FAFC;
             border-radius: 12px;
+            border: 1px solid #E2E8F0;
+        }
+        
+        .feature-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .feature-text {
+            font-size: 12px;
+            color: #64748B;
+            font-weight: 500;
+        }
+        
+        .error-box {
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            color: #DC2626;
+            padding: 12px 16px;
+            border-radius: 10px;
             font-size: 14px;
+            margin-bottom: 16px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .error-box.show {
+            display: flex;
+        }
+        
+        /* ========== APP BAR ========== */
+        .app-bar {
+            background: linear-gradient(135deg, #0F766E 0%, #14B8A6 100%);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(15,118,110,0.3);
+        }
+        
+        .app-bar-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .app-bar-icon {
+            font-size: 24px;
+        }
+        
+        .btn-logout {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.2s;
         }
         
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: #00B894;
-            animation: spin 1s linear infinite;
+        .btn-logout:hover {
+            background: rgba(255,255,255,0.25);
         }
         
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        /* ========== CONTEÚDO PRINCIPAL ========== */
+        .main-content {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
         }
         
-        .terms {
-            margin-top: 20px;
-            font-size: 12px;
-            color: #999;
-            line-height: 1.5;
-        }
-        
-        .terms a {
-            color: #00B894;
-            text-decoration: none;
-        }
-        
-        /* Saldo */
-        .saldo-card {
-            background: linear-gradient(135deg, #00B894 0%, #00A383 100%);
-            margin: 16px;
-            border-radius: 16px;
+        /* Card de Perfil/Saldo */
+        .profile-card {
+            background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
+            border-radius: 24px;
             padding: 24px;
-            color: white;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,184,148,0.3);
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #E2E8F0;
         }
         
-        .user-info {
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid #14B8A6;
+            object-fit: cover;
+            background: #E2E8F0;
+        }
+        
+        .avatar-placeholder {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #14B8A6 0%, #0F766E 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            margin-bottom: 16px;
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
         }
         
-        .user-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: 3px solid rgba(255,255,255,0.3);
+        .profile-info h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1A202C;
+            margin-bottom: 4px;
         }
         
-        .user-name {
-            font-size: 16px;
-            font-weight: 600;
-            text-align: left;
+        .profile-info p {
+            font-size: 13px;
+            color: #64748B;
         }
         
-        .user-email {
-            font-size: 12px;
-            opacity: 0.9;
+        .saldo-section {
+            text-align: center;
         }
         
         .saldo-label {
-            font-size: 14px;
-            opacity: 0.9;
+            font-size: 13px;
+            color: #64748B;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
             margin-bottom: 8px;
         }
         
         .saldo-valor {
-            font-size: 42px;
-            font-weight: bold;
-            margin-bottom: 16px;
+            font-size: 48px;
+            font-weight: 800;
+            color: #0F766E;
+            margin-bottom: 20px;
+            font-feature-settings: "tnum";
+            font-variant-numeric: tabular-nums;
         }
         
         .btn-saque {
-            background: white;
-            color: #00B894;
-            border: none;
-            padding: 14px 32px;
-            border-radius: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 14px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .btn-saque:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        /* Tarefa Card */
-        .tarefa-card {
-            background: white;
-            margin: 16px;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        
-        .tarefa-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .tarefa-badge {
-            background: #E8F5E9;
-            color: #1A5F2A;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            display: inline-block;
-            margin-bottom: 16px;
-        }
-        
-        .app-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 20px;
-            margin: 0 auto 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-        }
-        
-        .tarefa-nome {
-            font-size: 22px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 8px;
-        }
-        
-        .tarefa-desc {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 12px;
-        }
-        
-        .tarefa-valor {
-            font-size: 36px;
-            font-weight: bold;
-            color: #00B894;
-        }
-        
-        .btn-tarefa {
             width: 100%;
-            padding: 18px;
-            background: #1A5F2A;
+            padding: 16px;
+            background: linear-gradient(135deg, #0F766E 0%, #14B8A6 100%);
             color: white;
             border: none;
             border-radius: 12px;
             font-size: 16px;
-            font-weight: bold;
+            font-weight: 700;
             cursor: pointer;
-            margin-top: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(15,118,110,0.3);
         }
         
-        .btn-tarefa:disabled {
-            background: #ccc;
+        .btn-saque:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(15,118,110,0.4);
+        }
+        
+        .btn-saque:disabled {
+            background: #CBD5E1;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        /* Card de Tarefa */
+        .task-card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #E2E8F0;
+        }
+        
+        .task-header {
+            background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #BBF7D0;
+        }
+        
+        .task-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #22C55E;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+        
+        .task-badge.completed {
+            background: #6B7280;
+        }
+        
+        .task-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .task-badge.completed::before {
+            animation: none;
+            background: #D1D5DB;
+        }
+        
+        .app-icon-large {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+            border-radius: 24px;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            box-shadow: 0 10px 30px rgba(102,126,234,0.3);
+        }
+        
+        .task-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1A202C;
+            margin-bottom: 8px;
+        }
+        
+        .task-desc {
+            color: #64748B;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        
+        .task-reward {
+            font-size: 36px;
+            font-weight: 800;
+            color: #0F766E;
+        }
+        
+        .task-body {
+            padding: 24px;
+        }
+        
+        /* Estados da Tarefa */
+        .task-state {
+            display: none;
+        }
+        
+        .task-state.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        .btn-action {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #0F766E 0%, #14B8A6 100%);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(15,118,110,0.3);
+        }
+        
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(15,118,110,0.4);
+        }
+        
+        .btn-action:disabled {
+            background: #CBD5E1;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         
         /* Timer */
         .timer-container {
             text-align: center;
-            padding: 20px;
+            padding: 10px 0;
         }
         
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #E0E0E0;
-            border-radius: 4px;
+        .timer-progress {
+            background: #E2E8F0;
+            height: 12px;
+            border-radius: 6px;
             overflow: hidden;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
+            position: relative;
         }
         
-        .progress-fill {
+        .timer-progress-bar {
             height: 100%;
-            background: #00B894;
-            border-radius: 4px;
+            background: linear-gradient(90deg, #0F766E 0%, #14B8A6 100%);
+            border-radius: 6px;
             transition: width 1s linear;
+            position: relative;
+            overflow: hidden;
         }
         
-        .timer-text {
-            font-size: 24px;
-            font-weight: bold;
-            color: #00B894;
-            margin-bottom: 8px;
+        .timer-progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
         }
         
-        .timer-warning {
-            color: #E74C3C;
-            font-size: 13px;
+        .timer-display {
+            font-size: 48px;
+            font-weight: 800;
+            color: #0F766E;
+            margin-bottom: 12px;
+            font-feature-settings: "tnum";
         }
         
-        /* Estados */
-        .status-concluido {
+        .timer-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: #FEF3C7;
+            border: 1px solid #FCD34D;
+            border-radius: 10px;
+            color: #92400E;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .timer-status.paused {
+            background: #FEE2E2;
+            border-color: #FCA5A5;
+            color: #991B1B;
+        }
+        
+        .timer-status.success {
+            background: #D1FAE5;
+            border-color: #6EE7B7;
+            color: #065F46;
+        }
+        
+        /* Status Concluído */
+        .status-success {
             text-align: center;
-            padding: 20px;
+            padding: 20px 0;
         }
         
-        .status-icon {
-            width: 60px;
-            height: 60px;
-            background: #00B894;
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 16px;
+            margin: 0 auto 20px;
             color: white;
-            font-size: 30px;
+            font-size: 40px;
+            box-shadow: 0 10px 30px rgba(34,197,94,0.3);
+            animation: pulse 0.5s ease-out;
         }
         
-        .status-bloqueado {
+        .status-success h3 {
+            font-size: 20px;
+            color: #065F46;
+            margin-bottom: 8px;
+        }
+        
+        .status-success p {
+            color: #64748B;
+            font-size: 14px;
+        }
+        
+        /* Status Bloqueado */
+        .status-blocked {
             text-align: center;
-            padding: 20px;
-            color: #666;
+            padding: 30px 20px;
+            color: #6B7280;
         }
         
-        /* Info */
-        .info-card {
-            background: #FFF3E0;
-            margin: 16px;
-            border-radius: 12px;
-            padding: 20px;
-            border-left: 4px solid #FF9800;
+        .blocked-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
         }
         
-        .info-card h3 {
-            color: #E65100;
+        .status-blocked h3 {
+            font-size: 18px;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        
+        /* Como Funciona */
+        .info-section {
+            margin-top: 20px;
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #E2E8F0;
+        }
+        
+        .info-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #0F766E;
+            margin-bottom: 16px;
+        }
+        
+        .steps-list {
+            list-style: none;
+        }
+        
+        .steps-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #F1F5F9;
             font-size: 14px;
-            margin-bottom: 12px;
+            color: #475569;
+            line-height: 1.5;
         }
         
-        .info-card ol {
-            padding-left: 20px;
-            color: #555;
-            font-size: 14px;
-            line-height: 1.8;
+        .steps-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .step-number {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #0F766E 0%, #14B8A6 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            flex-shrink: 0;
         }
         
         /* Modal Saque */
@@ -435,7 +661,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
             z-index: 200;
             align-items: center;
             justify-content: center;
@@ -444,115 +671,201 @@
         
         .modal-overlay.active {
             display: flex;
+            animation: fadeIn 0.3s ease-out;
         }
         
         .modal-content {
             background: white;
-            border-radius: 16px;
-            padding: 24px;
+            border-radius: 24px;
+            padding: 28px;
             width: 100%;
-            max-width: 360px;
+            max-width: 400px;
             max-height: 90vh;
             overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        }
+        
+        .modal-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .modal-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #0F766E 0%, #14B8A6 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 28px;
         }
         
         .modal-title {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            text-align: center;
+            font-size: 22px;
+            font-weight: 700;
+            color: #1A202C;
+            margin-bottom: 4px;
         }
         
-        .valor-options {
-            display: flex;
+        .modal-subtitle {
+            font-size: 14px;
+            color: #64748B;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        
+        .valor-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 12px;
-            margin-bottom: 20px;
         }
         
-        .valor-btn {
-            flex: 1;
+        .valor-option {
             padding: 16px;
-            border: 2px solid #E0E0E0;
-            background: white;
+            border: 2px solid #E2E8F0;
             border-radius: 12px;
-            cursor: pointer;
             text-align: center;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        
-        .valor-btn.selected {
-            border-color: #00B894;
-            background: #E8F5E9;
-            color: #00B894;
-        }
-        
-        .valor-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-        
-        .tipo-chave {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-        
-        .tipo-btn {
-            padding: 8px 16px;
-            border: 1px solid #DDD;
+            cursor: pointer;
+            transition: all 0.2s;
             background: white;
-            border-radius: 20px;
+        }
+        
+        .valor-option:hover:not(.disabled) {
+            border-color: #14B8A6;
+        }
+        
+        .valor-option.selected {
+            border-color: #0F766E;
+            background: #F0FDF4;
+        }
+        
+        .valor-option.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            background: #F1F5F9;
+        }
+        
+        .valor-option .amount {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1A202C;
+        }
+        
+        .valor-option.selected .amount {
+            color: #0F766E;
+        }
+        
+        .tipo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        
+        .tipo-option {
+            padding: 12px 8px;
+            border: 2px solid #E2E8F0;
+            border-radius: 10px;
+            text-align: center;
             cursor: pointer;
             font-size: 13px;
+            font-weight: 600;
+            color: #64748B;
+            transition: all 0.2s;
+            background: white;
         }
         
-        .tipo-btn.selected {
-            background: #00B894;
-            color: white;
-            border-color: #00B894;
+        .tipo-option:hover {
+            border-color: #14B8A6;
+        }
+        
+        .tipo-option.selected {
+            border-color: #0F766E;
+            background: #F0FDF4;
+            color: #0F766E;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #E2E8F0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #14B8A6;
+            box-shadow: 0 0 0 3px rgba(20,184,166,0.1);
         }
         
         .modal-actions {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 12px;
-            margin-top: 20px;
+            margin-top: 24px;
         }
         
-        .modal-actions button {
-            flex: 1;
+        .btn {
             padding: 14px;
             border-radius: 12px;
-            border: none;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
-            font-weight: bold;
+            transition: all 0.2s;
+            border: none;
         }
         
-        .btn-cancelar {
-            background: #F5F5F5;
-            color: #666;
+        .btn-secondary {
+            background: #F1F5F9;
+            color: #64748B;
         }
         
-        .btn-confirmar {
-            background: #00B894;
+        .btn-secondary:hover {
+            background: #E2E8F0;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #0F766E 0%, #14B8A6 100%);
             color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(15,118,110,0.3);
         }
         
         /* Toast */
         .toast {
             position: fixed;
-            bottom: 20px;
+            bottom: 24px;
             left: 50%;
             transform: translateX(-50%) translateY(100px);
-            background: #333;
+            background: #1A202C;
             color: white;
             padding: 16px 24px;
             border-radius: 12px;
             font-size: 14px;
+            font-weight: 500;
             z-index: 300;
             opacity: 0;
             transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .toast.show {
@@ -561,173 +874,293 @@
         }
         
         .toast.success {
-            background: #00B894;
+            background: #065F46;
         }
         
         .toast.error {
-            background: #E74C3C;
+            background: #991B1B;
         }
         
-        /* Error message */
-        .error-message {
-            background: #FEF2F2;
-            border: 1px solid #E74C3C;
-            color: #E74C3C;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 16px;
+        /* Loading */
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Verificação de App */
+        .verify-section {
+            background: #F0FDF4;
+            border: 2px dashed #86EFAC;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .verify-section h4 {
+            color: #166534;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        
+        .verify-section p {
+            color: #22C55E;
             font-size: 13px;
-            display: none;
         }
         
-        .error-message.show {
-            display: block;
+        .btn-verify {
+            width: 100%;
+            padding: 16px;
+            background: #22C55E;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+        
+        /* Responsivo */
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 16px;
+            }
+            
+            .saldo-valor {
+                font-size: 40px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- TELA DE LOGIN COM GOOGLE -->
-    <div id="authScreen" class="screen active">
-        <div class="auth-container">
-            <div class="auth-logo">
-                <h1>💰 Tarefas do Pix</h1>
-                <p>Ganhe dinheiro realizando tarefas simples</p>
+    <!-- TELA DE LOGIN -->
+    <div id="loginScreen" class="screen login-screen active">
+        <div class="login-container">
+            <div class="login-logo">
+                <div class="login-logo-icon">💰</div>
+                <h1>Tarefas do Pix</h1>
+                <p>Ganhe dinheiro realizando tarefas simples e rápidas</p>
             </div>
             
-            <div class="login-card">
-                <h2>Bem-vindo!</h2>
-                <p>Entre com sua conta Google para começar</p>
-                
-                <div class="error-message" id="loginError"></div>
-                
-                <button class="btn-google" onclick="loginComGoogle()" id="btnGoogle">
-                    <svg class="google-icon" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                    </svg>
-                    Entrar com Google
-                </button>
-                
-                <p class="terms">
-                    Ao entrar, você concorda com nossos<br>
-                    <a href="#">Termos de Uso</a> e <a href="#">Política de Privacidade</a>
-                </p>
+            <div class="error-box" id="loginError">
+                <span>⚠️</span>
+                <span id="errorText">Erro ao conectar</span>
+            </div>
+            
+            <button class="btn-google" onclick="loginComGoogle()" id="btnGoogle">
+                <svg class="google-icon" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Entrar com Google
+            </button>
+            
+            <div class="login-features">
+                <div class="feature-item">
+                    <div class="feature-icon">⚡</div>
+                    <div class="feature-text">Rápido e fácil</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🔒</div>
+                    <div class="feature-text">100% Seguro</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">💸</div>
+                    <div class="feature-text">Saque via Pix</div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">✅</div>
+                    <div class="feature-text">Tarefas verificadas</div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- TELA PRINCIPAL -->
-    <div id="homeScreen" class="screen">
-        <div class="header">
-            <h1>💰 Tarefas do Pix</h1>
-            <button class="logout-btn" onclick="fazerLogout()">Sair</button>
+    <div id="mainScreen" class="screen">
+        <div class="app-bar">
+            <div class="app-bar-title">
+                <span class="app-bar-icon">💰</span>
+                <span>Tarefas do Pix</span>
+            </div>
+            <button class="btn-logout" onclick="fazerLogout()">Sair</button>
         </div>
         
-        <!-- Saldo -->
-        <div class="saldo-card">
-            <div class="user-info">
-                <img src="" alt="Foto" class="user-avatar" id="userAvatar" style="display: none;">
-                <div>
-                    <div class="user-name" id="userName">Usuário</div>
-                    <div class="user-email" id="userEmail">email@exemplo.com</div>
-                </div>
-            </div>
-            <div class="saldo-label">Seu Saldo</div>
-            <div class="saldo-valor" id="saldoValor">R$ 0,00</div>
-            <button class="btn-saque" id="btnSaque" onclick="abrirModalSaque()" disabled>
-                💸 SACAR VIA PIX
-            </button>
-        </div>
-        
-        <!-- Tarefa -->
-        <div class="tarefa-card" id="tarefaCard">
-            <div class="tarefa-header">
-                <span class="tarefa-badge">TAREFA DISPONÍVEL</span>
-                <div class="app-icon">🎵</div>
-                <div class="tarefa-nome">Baixe o App Melolo</div>
-                <div class="tarefa-desc">Fique 30 segundos no app e ganhe</div>
-                <div class="tarefa-valor">R$ 0,30</div>
-            </div>
-            
-            <!-- Estado: Disponível -->
-            <div id="estadoDisponivel">
-                <button class="btn-tarefa" onclick="iniciarTarefa()">
-                    📲 BAIXAR APP E COMEÇAR
-                </button>
-            </div>
-            
-            <!-- Estado: Validando -->
-            <div id="estadoValidando" style="display: none;">
-                <div class="timer-container">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        <div class="main-content">
+            <!-- Perfil e Saldo -->
+            <div class="profile-card">
+                <div class="profile-header">
+                    <img src="" alt="Foto" class="avatar" id="userAvatar" style="display: none;">
+                    <div class="avatar-placeholder" id="avatarPlaceholder">U</div>
+                    <div class="profile-info">
+                        <h2 id="userName">Usuário</h2>
+                        <p id="userEmail">email@exemplo.com</p>
                     </div>
-                    <div class="timer-text" id="timerText">30s</div>
-                    <div class="timer-warning">⚠️ Não saia do app Melolo!</div>
+                </div>
+                
+                <div class="saldo-section">
+                    <div class="saldo-label">Seu Saldo Disponível</div>
+                    <div class="saldo-valor" id="saldoValor">R$ 0,00</div>
+                    <button class="btn-saque" id="btnSaque" onclick="abrirModalSaque()" disabled>
+                        <span>💸</span>
+                        <span>Sacar via Pix</span>
+                    </button>
                 </div>
             </div>
             
-            <!-- Estado: Concluído -->
-            <div id="estadoConcluido" style="display: none;">
-                <div class="status-concluido">
-                    <div class="status-icon">✓</div>
-                    <h3 style="color: #00B894; margin-bottom: 8px;">Tarefa Concluída!</h3>
-                    <p style="color: #666;">R$ 0,30 adicionados ao seu saldo</p>
+            <!-- Card de Tarefa -->
+            <div class="task-card">
+                <div class="task-header">
+                    <div class="task-badge" id="taskBadge">Tarefa Disponível</div>
+                    <div class="app-icon-large">🎵</div>
+                    <div class="task-title">Baixe o App Melolo</div>
+                    <div class="task-desc">Instale e fique 30 segundos no app</div>
+                    <div class="task-reward">+ R$ 0,30</div>
+                </div>
+                
+                <div class="task-body">
+                    <!-- Estado: Disponível -->
+                    <div id="stateDisponivel" class="task-state active">
+                        <button class="btn-action" onclick="iniciarTarefa()">
+                            <span>📲</span>
+                            <span>Baixar App e Começar</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Estado: Verificação -->
+                    <div id="stateVerificando" class="task-state">
+                        <div class="verify-section">
+                            <h4>⚠️ Verificação Necessária</h4>
+                            <p>Para evitar fraudes, precisamos confirmar que você realmente baixou o app.</p>
+                            <button class="btn-verify" onclick="verificarInstalacao()">
+                                ✅ Já instalei o app
+                            </button>
+                        </div>
+                        <button class="btn-action" onclick="voltarParaDownload()" style="background: #64748B;">
+                            <span>←</span>
+                            <span>Voltar</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Estado: Timer -->
+                    <div id="stateTimer" class="task-state">
+                        <div class="timer-container">
+                            <div class="timer-progress">
+                                <div class="timer-progress-bar" id="timerBar" style="width: 100%"></div>
+                            </div>
+                            <div class="timer-display" id="timerText">30s</div>
+                            <div class="timer-status" id="timerStatus">
+                                <span>⏱️</span>
+                                <span>Mantenha o app Melolo aberto</span>
+                            </div>
+                        </div>
+                        <p style="text-align: center; color: #64748B; font-size: 13px; margin-top: 16px;">
+                            Não feche esta página nem o app Melolo
+                        </p>
+                    </div>
+                    
+                    <!-- Estado: Concluído -->
+                    <div id="stateConcluido" class="task-state">
+                        <div class="status-success">
+                            <div class="success-icon">✓</div>
+                            <h3>Tarefa Concluída!</h3>
+                            <p>R$ 0,30 foi adicionado ao seu saldo</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Estado: Bloqueado -->
+                    <div id="stateBloqueado" class="task-state">
+                        <div class="status-blocked">
+                            <div class="blocked-icon">✓</div>
+                            <h3>Tarefa já realizada</h3>
+                            <p>Você já completou esta tarefa.<br>Novas tarefas em breve!</p>
+                        </div>
+                    </div>
                 </div>
             </div>
             
-            <!-- Estado: Já Feita -->
-            <div id="estadoBloqueado" style="display: none;">
-                <div class="status-bloqueado">
-                    <div style="font-size: 48px; margin-bottom: 16px;">✓</div>
-                    <h3 style="margin-bottom: 8px;">Você já completou esta tarefa</h3>
-                    <p>Aguarde novas tarefas em breve!</p>
+            <!-- Como Funciona -->
+            <div class="info-section">
+                <div class="info-title">
+                    <span>📋</span>
+                    <span>Como funciona</span>
                 </div>
+                <ol class="steps-list">
+                    <li>
+                        <span class="step-number">1</span>
+                        <span>Clique em "Baixar App" para ir à Play Store</span>
+                    </li>
+                    <li>
+                        <span class="step-number">2</span>
+                        <span>Instale o app Melolo no seu celular</span>
+                    </li>
+                    <li>
+                        <span class="step-number">3</span>
+                        <span>Abra o app e aguarde 30 segundos</span>
+                    </li>
+                    <li>
+                        <span class="step-number">4</span>
+                        <span>Volte para esta página automaticamente</span>
+                    </li>
+                    <li>
+                        <span class="step-number">5</span>
+                        <span>Receba R$ 0,30 no seu saldo!</span>
+                    </li>
+                </ol>
             </div>
-        </div>
-        
-        <!-- Instruções -->
-        <div class="info-card">
-            <h3>📋 Como funciona:</h3>
-            <ol>
-                <li>Clique em BAIXAR APP</li>
-                <li>Instale o Melolo na Play Store</li>
-                <li>Abra o app e fique 30 segundos</li>
-                <li>Volte aqui automaticamente</li>
-                <li>Receba R$ 0,30 no seu saldo!</li>
-            </ol>
         </div>
     </div>
 
     <!-- MODAL SAQUE -->
     <div id="modalSaque" class="modal-overlay" onclick="fecharModalSaque(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-title">💸 Sacar via Pix</div>
-            
-            <label style="display: block; margin-bottom: 12px; font-weight: 500;">Escolha o valor:</label>
-            <div class="valor-options">
-                <button class="valor-btn selected" id="val30" onclick="selecionarValor(0.30)">R$ 0,30</button>
-                <button class="valor-btn" id="val50" onclick="selecionarValor(0.50)">R$ 0,50</button>
+            <div class="modal-header">
+                <div class="modal-icon">💸</div>
+                <div class="modal-title">Sacar via Pix</div>
+                <div class="modal-subtitle">Escolha o valor e tipo de chave</div>
             </div>
             
-            <label style="display: block; margin-bottom: 12px; font-weight: 500;">Tipo de chave:</label>
-            <div class="tipo-chave">
-                <button class="tipo-btn selected" onclick="selecionarTipo('CPF')">CPF</button>
-                <button class="tipo-btn" onclick="selecionarTipo('EMAIL')">E-mail</button>
-                <button class="tipo-btn" onclick="selecionarTipo('TELEFONE')">Celular</button>
+            <div class="form-group">
+                <label class="form-label">Valor do saque</label>
+                <div class="valor-grid">
+                    <div class="valor-option selected" id="val30" onclick="selecionarValor(0.30)">
+                        <div class="amount">R$ 0,30</div>
+                    </div>
+                    <div class="valor-option" id="val50" onclick="selecionarValor(0.50)">
+                        <div class="amount">R$ 0,50</div>
+                    </div>
+                </div>
             </div>
             
-            <div class="input-group">
-                <label>Digite sua chave Pix</label>
-                <input type="text" id="chavePixInput" placeholder="123.456.789-00">
+            <div class="form-group">
+                <label class="form-label">Tipo de chave Pix</label>
+                <div class="tipo-grid">
+                    <div class="tipo-option selected" onclick="selecionarTipo('CPF', this)">CPF</div>
+                    <div class="tipo-option" onclick="selecionarTipo('EMAIL', this)">E-mail</div>
+                    <div class="tipo-option" onclick="selecionarTipo('TELEFONE', this)">Celular</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Chave Pix</label>
+                <input type="text" class="form-input" id="chavePixInput" placeholder="123.456.789-00">
             </div>
             
             <div class="modal-actions">
-                <button class="btn-cancelar" onclick="fecharModalSaque()">Cancelar</button>
-                <button class="btn-confirmar" onclick="confirmarSaque()">Confirmar</button>
+                <button class="btn btn-secondary" onclick="fecharModalSaque()">Cancelar</button>
+                <button class="btn btn-primary" onclick="confirmarSaque()">Confirmar</button>
             </div>
         </div>
     </div>
@@ -747,7 +1180,6 @@
             appId: "1:236400248524:web:62bd73e6da2c07504fa469"
         };
         
-        // Inicializa Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const database = firebase.database();
@@ -759,32 +1191,53 @@
         let tipoChaveSelecionado = 'CPF';
         let timerInterval = null;
         let segundosRestantes = 30;
+        let appAberto = false;
+        let verificado = false;
+        let paginaVisivel = true;
+        
+        // ==================== PERSISTÊNCIA DE SESSÃO ====================
+        // Mantém o usuário logado mesmo atualizando a página
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+            .then(() => {
+                console.log('Persistência configurada: LOCAL');
+            })
+            .catch((error) => {
+                console.error('Erro na persistência:', error);
+            });
+        
+        // Detecta quando usuário volta para a página
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                paginaVisivel = false;
+                if (timerInterval && appAberto) {
+                    pausarTimer();
+                }
+            } else {
+                paginaVisivel = true;
+                if (timerInterval && appAberto && verificado) {
+                    retomarTimer();
+                }
+            }
+        });
         
         // ==================== LOGIN COM GOOGLE ====================
         function loginComGoogle() {
             const btn = document.getElementById('btnGoogle');
-            const errorEl = document.getElementById('loginError');
+            const errorBox = document.getElementById('loginError');
             
             btn.disabled = true;
-            btn.innerHTML = '<span class="loading-spinner"></span> Conectando...';
-            errorEl.classList.remove('show');
+            btn.innerHTML = '<div class="loading-spinner"></div> Conectando...';
+            errorBox.classList.remove('show');
             
             const provider = new firebase.auth.GoogleAuthProvider();
+            provider.setCustomParameters({ 'prompt': 'select_account' });
             
-            // Opções para melhor UX no mobile
-            provider.setCustomParameters({
-                'prompt': 'select_account'
-            });
-            
-            // Usa popup (melhor para mobile)
             auth.signInWithPopup(provider)
                 .then((result) => {
-                    const user = result.user;
-                    console.log('Login Google OK:', user.email);
-                    verificarOuCriarUsuario(user);
+                    console.log('Login OK:', result.user.email);
                 })
                 .catch((error) => {
-                    console.error('Erro Google Sign-In:', error);
+                    console.error('Erro login:', error);
                     btn.disabled = false;
                     btn.innerHTML = `
                         <svg class="google-icon" viewBox="0 0 24 24">
@@ -797,30 +1250,33 @@
                     `;
                     
                     let msg = 'Erro ao conectar. Tente novamente.';
-                    if (error.code === 'auth/popup-closed-by-user') msg = 'Você fechou a janela de login. Tente novamente.';
-                    if (error.code === 'auth/popup-blocked') msg = 'Popup bloqueado. Permita popups para este site.';
-                    if (error.code === 'auth/cancelled-popup-request') msg = 'Múltiplas tentativas. Aguarde um momento.';
-                    if (error.code === 'auth/network-request-failed') msg = 'Sem conexão. Verifique sua internet.';
-                    if (error.code === 'auth/operation-not-supported-in-this-environment') msg = 'Ambiente não suportado. Use HTTPS ou localhost.';
+                    if (error.code === 'auth/popup-closed-by-user') msg = 'Você fechou a janela de login.';
+                    if (error.code === 'auth/popup-blocked') msg = 'Popup bloqueado. Permita popups.';
+                    if (error.code === 'auth/network-request-failed') msg = 'Sem conexão com internet.';
                     
-                    errorEl.textContent = msg;
-                    errorEl.classList.add('show');
+                    document.getElementById('errorText').textContent = msg;
+                    errorBox.classList.add('show');
                 });
         }
         
-        // Verifica se usuário existe no DB, se não cria
+        // ==================== VERIFICAÇÃO DE USUÁRIO ====================
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                usuarioAtual = user;
+                verificarOuCriarUsuario(user);
+            } else {
+                mostrarTela('loginScreen');
+            }
+        });
+        
         function verificarOuCriarUsuario(user) {
             const userRef = database.ref('usuarios/' + user.uid);
             
             userRef.once('value')
                 .then((snapshot) => {
                     if (snapshot.exists()) {
-                        // Usuário já existe, carrega dados
-                        console.log('Usuário existente, carregando...');
                         carregarDadosUsuario(user);
                     } else {
-                        // Cria novo usuário no Database
-                        console.log('Criando novo usuário no Database...');
                         const userData = {
                             nome: user.displayName || 'Usuário',
                             email: user.email,
@@ -828,34 +1284,17 @@
                             saldo: 0,
                             jaFeTarefa: false,
                             dataCadastro: Date.now(),
-                            provedor: 'google',
-                            chavePix: '',
-                            tipoChavePix: ''
+                            provedor: 'google'
                         };
-                        
                         return userRef.set(userData).then(() => {
                             carregarDadosUsuario(user);
                         });
                     }
-                })
-                .catch((error) => {
-                    console.error('Erro ao verificar usuário:', error);
-                    showToast('Erro ao carregar dados', 'error');
-                    auth.signOut();
                 });
         }
         
-        // ==================== NAVEGAÇÃO ====================
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-        }
-        
-        // ==================== DADOS DO USUÁRIO ====================
         function carregarDadosUsuario(user) {
-            usuarioAtual = user;
-            
-            // Atualiza UI com dados do Google
+            // Atualiza UI
             document.getElementById('userName').textContent = user.displayName || 'Usuário';
             document.getElementById('userEmail').textContent = user.email;
             
@@ -863,52 +1302,243 @@
                 const avatar = document.getElementById('userAvatar');
                 avatar.src = user.photoURL;
                 avatar.style.display = 'block';
+                document.getElementById('avatarPlaceholder').style.display = 'none';
+            } else {
+                const initial = (user.displayName || 'U').charAt(0).toUpperCase();
+                document.getElementById('avatarPlaceholder').textContent = initial;
             }
             
-            // Escuta mudanças no Database
+            // Escuta mudanças no DB
             database.ref('usuarios/' + user.uid).on('value', (snapshot) => {
                 dadosUsuario = snapshot.val();
                 atualizarInterface();
-                showScreen('homeScreen');
+                mostrarTela('mainScreen');
             });
         }
         
         function atualizarInterface() {
             if (!dadosUsuario) return;
             
-            // Atualiza saldo
             const saldo = dadosUsuario.saldo || 0;
             document.getElementById('saldoValor').textContent = 'R$ ' + saldo.toFixed(2).replace('.', ',');
             
-            // Botão de saque
             const btnSaque = document.getElementById('btnSaque');
             btnSaque.disabled = saldo < 0.30;
             
-            // Estados da tarefa
+            // Atualiza estado da tarefa
             const jaFeTarefa = dadosUsuario.jaFeTarefa || false;
-            
-            document.getElementById('estadoDisponivel').style.display = 'none';
-            document.getElementById('estadoValidando').style.display = 'none';
-            document.getElementById('estadoConcluido').style.display = 'none';
-            document.getElementById('estadoBloqueado').style.display = 'none';
+            const badge = document.getElementById('taskBadge');
             
             if (jaFeTarefa) {
-                document.getElementById('estadoBloqueado').style.display = 'block';
-                document.querySelector('.tarefa-badge').textContent = 'TAREFA CONCLUÍDA';
-                document.querySelector('.tarefa-badge').style.background = '#E0E0E0';
-                document.querySelector('.tarefa-badge').style.color = '#666';
-            } else {
-                document.getElementById('estadoDisponivel').style.display = 'block';
+                mostrarEstado('stateBloqueado');
+                badge.textContent = 'Tarefa Concluída';
+                badge.classList.add('completed');
             }
+        }
+        
+        // ==================== NAVEGAÇÃO ====================
+        function mostrarTela(telaId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(telaId).classList.add('active');
+        }
+        
+        function mostrarEstado(estadoId) {
+            document.querySelectorAll('.task-state').forEach(s => s.classList.remove('active'));
+            document.getElementById(estadoId).classList.add('active');
+        }
+        
+        // ==================== TAREFA COM PROTEÇÃO ====================
+        function iniciarTarefa() {
+            // Abre a Play Store
+            window.open('https://play.google.com/store/apps/details?id=com.melolo.app', '_blank');
+            
+            appAberto = true;
+            verificado = false;
+            
+            // Vai para tela de verificação
+            mostrarEstado('stateVerificando');
+        }
+        
+        function voltarParaDownload() {
+            appAberto = false;
+            mostrarEstado('stateDisponivel');
+        }
+        
+        function verificarInstalacao() {
+            // Só inicia o timer se confirmar que instalou
+            verificado = true;
+            iniciarTimer();
+        }
+        
+        function iniciarTimer() {
+            mostrarEstado('stateTimer');
+            
+            segundosRestantes = 30;
+            atualizarTimerVisual();
+            
+            timerInterval = setInterval(() => {
+                if (!paginaVisivel) return; // Pausa se saiu da página
+                
+                segundosRestantes--;
+                atualizarTimerVisual();
+                
+                if (segundosRestantes <= 0) {
+                    clearInterval(timerInterval);
+                    concluirTarefa();
+                }
+            }, 1000);
+        }
+        
+        function pausarTimer() {
+            const status = document.getElementById('timerStatus');
+            status.innerHTML = '<span>⏸️</span><span>Timer pausado. Volte para continuar.</span>';
+            status.classList.add('paused');
+        }
+        
+        function retomarTimer() {
+            const status = document.getElementById('timerStatus');
+            status.innerHTML = '<span>⏱️</span><span>Mantenha o app Melolo aberto</span>';
+            status.classList.remove('paused');
+        }
+        
+        function atualizarTimerVisual() {
+            const progresso = (segundosRestantes / 30) * 100;
+            document.getElementById('timerBar').style.width = progresso + '%';
+            document.getElementById('timerText').textContent = segundosRestantes + 's';
+        }
+        
+        function concluirTarefa() {
+            if (!usuarioAtual) return;
+            
+            const updates = {
+                jaFeTarefa: true,
+                saldo: (dadosUsuario.saldo || 0) + 0.30
+            };
+            
+            database.ref('usuarios/' + usuarioAtual.uid).update(updates)
+                .then(() => {
+                    mostrarEstado('stateConcluido');
+                    showToast('✓ R$ 0,30 adicionado ao saldo!', 'success');
+                    
+                    // Registra transação
+                    database.ref('transacoes/' + usuarioAtual.uid).push({
+                        tipo: 'RECOMPENSA',
+                        valor: 0.30,
+                        descricao: 'Tarefa: Melolo',
+                        data: Date.now()
+                    });
+                });
+        }
+        
+        // ==================== SAQUE ====================
+        function abrirModalSaque() {
+            const saldo = dadosUsuario?.saldo || 0;
+            
+            document.getElementById('val30').classList.toggle('disabled', saldo < 0.30);
+            document.getElementById('val50').classList.toggle('disabled', saldo < 0.50);
+            
+            if (saldo < 0.50) {
+                selecionarValor(0.30);
+            } else {
+                selecionarValor(0.50);
+            }
+            
+            document.getElementById('modalSaque').classList.add('active');
+        }
+        
+        function fecharModalSaque(event) {
+            if (!event || event.target.id === 'modalSaque') {
+                document.getElementById('modalSaque').classList.remove('active');
+                document.getElementById('chavePixInput').value = '';
+            }
+        }
+        
+        function selecionarValor(valor) {
+            if (document.getElementById(valor === 0.30 ? 'val30' : 'val50').classList.contains('disabled')) return;
+            
+            valorSaqueSelecionado = valor;
+            document.querySelectorAll('.valor-option').forEach(el => el.classList.remove('selected'));
+            document.getElementById(valor === 0.30 ? 'val30' : 'val50').classList.add('selected');
+        }
+        
+        function selecionarTipo(tipo, element) {
+            tipoChaveSelecionado = tipo;
+            document.querySelectorAll('.tipo-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            
+            const input = document.getElementById('chavePixInput');
+            const placeholders = {
+                'CPF': '123.456.789-00',
+                'EMAIL': 'seu@email.com',
+                'TELEFONE': '(11) 99999-9999'
+            };
+            input.placeholder = placeholders[tipo];
+        }
+        
+        function confirmarSaque() {
+            const chave = document.getElementById('chavePixInput').value.trim();
+            
+            if (!chave) {
+                showToast('Digite sua chave Pix', 'error');
+                return;
+            }
+            
+            const saldoAtual = dadosUsuario?.saldo || 0;
+            if (saldoAtual < valorSaqueSelecionado) {
+                showToast('Saldo insuficiente', 'error');
+                return;
+            }
+            
+            const novoSaldo = saldoAtual - valorSaqueSelecionado;
+            
+            Promise.all([
+                database.ref('usuarios/' + usuarioAtual.uid + '/saldo').set(novoSaldo),
+                database.ref('saques').push({
+                    userId: usuarioAtual.uid,
+                    nome: dadosUsuario.nome,
+                    email: dadosUsuario.email,
+                    valor: valorSaqueSelecionado,
+                    chavePix: chave,
+                    tipoChavePix: tipoChaveSelecionado,
+                    status: 'PENDENTE',
+                    dataSolicitacao: Date.now()
+                }),
+                database.ref('transacoes/' + usuarioAtual.uid).push({
+                    tipo: 'SAQUE',
+                    valor: -valorSaqueSelecionado,
+                    descricao: 'Saque via Pix',
+                    data: Date.now()
+                })
+            ])
+            .then(() => {
+                fecharModalSaque();
+                showToast('✓ Saque solicitado com sucesso!', 'success');
+            })
+            .catch(() => {
+                showToast('Erro ao solicitar saque', 'error');
+            });
         }
         
         // ==================== LOGOUT ====================
         function fazerLogout() {
             auth.signOut()
                 .then(() => {
+                    // Limpa dados
                     usuarioAtual = null;
                     dadosUsuario = null;
-                    showScreen('authScreen');
+                    
+                    // Reseta UI
+                    document.getElementById('userAvatar').style.display = 'none';
+                    document.getElementById('avatarPlaceholder').style.display = 'flex';
+                    document.getElementById('avatarPlaceholder').textContent = 'U';
+                    
+                    // Para timer se estiver rodando
+                    if (timerInterval) {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                    }
+                    
+                    mostrarTela('loginScreen');
                     
                     // Reseta botão
                     const btn = document.getElementById('btnGoogle');
@@ -926,182 +1556,19 @@
                 });
         }
         
-        // ==================== TAREFA ====================
-        function iniciarTarefa() {
-            window.open('https://www.melolo.org/x/Za8TMGVKE/', '_blank');
-            
-            document.getElementById('estadoDisponivel').style.display = 'none';
-            document.getElementById('estadoValidando').style.display = 'block';
-            
-            segundosRestantes = 30;
-            atualizarTimer();
-            
-            timerInterval = setInterval(() => {
-                segundosRestantes--;
-                atualizarTimer();
-                
-                if (segundosRestantes <= 0) {
-                    clearInterval(timerInterval);
-                    concluirTarefa();
-                }
-            }, 1000);
-        }
-        
-        function atualizarTimer() {
-            const progresso = ((30 - segundosRestantes) / 30) * 100;
-            document.getElementById('progressFill').style.width = progresso + '%';
-            document.getElementById('timerText').textContent = segundosRestantes + 's';
-        }
-        
-        function concluirTarefa() {
-            if (!usuarioAtual) return;
-            
-            const updates = {
-                jaFeTarefa: true,
-                saldo: (dadosUsuario.saldo || 0) + 0.30
-            };
-            
-            database.ref('usuarios/' + usuarioAtual.uid).update(updates)
-                .then(() => {
-                    const transacao = {
-                        tipo: 'RECOMPENSA',
-                        valor: 0.30,
-                        descricao: 'Tarefa: Melolo',
-                        data: Date.now()
-                    };
-                    return database.ref('transacoes/' + usuarioAtual.uid).push(transacao);
-                })
-                .then(() => {
-                    document.getElementById('estadoValidando').style.display = 'none';
-                    document.getElementById('estadoConcluido').style.display = 'block';
-                    showToast('Parabéns! R$ 0,30 adicionados', 'success');
-                })
-                .catch((error) => {
-                    showToast('Erro ao concluir tarefa', 'error');
-                    console.error(error);
-                });
-        }
-        
-        // ==================== SAQUE ====================
-        function abrirModalSaque() {
-            const saldo = dadosUsuario?.saldo || 0;
-            
-            const btn30 = document.getElementById('val30');
-            const btn50 = document.getElementById('val50');
-            
-            btn30.disabled = saldo < 0.30;
-            btn50.disabled = saldo < 0.50;
-            
-            if (saldo >= 0.50) {
-                selecionarValor(0.50);
-            } else {
-                selecionarValor(0.30);
-            }
-            
-            document.getElementById('modalSaque').classList.add('active');
-        }
-        
-        function fecharModalSaque(event) {
-            if (!event || event.target.id === 'modalSaque') {
-                document.getElementById('modalSaque').classList.remove('active');
-                document.getElementById('chavePixInput').value = '';
-            }
-        }
-        
-        function selecionarValor(valor) {
-            valorSaqueSelecionado = valor;
-            document.querySelectorAll('.valor-btn').forEach(btn => btn.classList.remove('selected'));
-            document.getElementById(valor === 0.30 ? 'val30' : 'val50').classList.add('selected');
-        }
-        
-        function selecionarTipo(tipo) {
-            tipoChaveSelecionado = tipo;
-            document.querySelectorAll('.tipo-btn').forEach(btn => btn.classList.remove('selected'));
-            event.target.classList.add('selected');
-            
-            const input = document.getElementById('chavePixInput');
-            if (tipo === 'CPF') input.placeholder = '123.456.789-00';
-            if (tipo === 'EMAIL') input.placeholder = 'seu@email.com';
-            if (tipo === 'TELEFONE') input.placeholder = '(11) 99999-9999';
-        }
-        
-        function confirmarSaque() {
-            const chave = document.getElementById('chavePixInput').value.trim();
-            
-            if (!chave) {
-                showToast('Digite sua chave Pix', 'error');
-                return;
-            }
-            
-            const saldoAtual = dadosUsuario?.saldo || 0;
-            if (saldoAtual < valorSaqueSelecionado) {
-                showToast('Saldo insuficiente', 'error');
-                return;
-            }
-            
-            const saque = {
-                userId: usuarioAtual.uid,
-                nome: dadosUsuario.nome,
-                email: dadosUsuario.email,
-                valor: valorSaqueSelecionado,
-                chavePix: chave,
-                tipoChavePix: tipoChaveSelecionado,
-                status: 'PENDENTE',
-                dataSolicitacao: Date.now()
-            };
-            
-            const novoSaldo = saldoAtual - valorSaqueSelecionado;
-            
-            Promise.all([
-                database.ref('usuarios/' + usuarioAtual.uid + '/saldo').set(novoSaldo),
-                database.ref('saques').push(saque),
-                database.ref('transacoes/' + usuarioAtual.uid).push({
-                    tipo: 'SAQUE',
-                    valor: -valorSaqueSelecionado,
-                    descricao: 'Saque via Pix - ' + tipoChaveSelecionado,
-                    data: Date.now()
-                })
-            ])
-            .then(() => {
-                fecharModalSaque();
-                showToast('Saque solicitado com sucesso!', 'success');
-            })
-            .catch((error) => {
-                showToast('Erro ao solicitar saque', 'error');
-                console.error(error);
-            });
-        }
-        
         // ==================== UTILITÁRIOS ====================
-        function showToast(message, type = 'success') {
+        function showToast(mensagem, tipo = 'success') {
             const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = 'toast ' + type;
+            toast.textContent = mensagem;
+            toast.className = 'toast ' + tipo;
             
             setTimeout(() => toast.classList.add('show'), 10);
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
         
-        // ==================== INICIALIZAÇÃO ====================
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                console.log('Usuário já logado:', user.email);
-                verificarOuCriarUsuario(user);
-            } else {
-                showScreen('authScreen');
-            }
-        });
-        
-        // Previne zoom em dispositivos móveis
-        document.addEventListener('gesturestart', function(e) {
-            e.preventDefault();
-        });
-        
-        document.addEventListener('dblclick', function(e) {
-            e.preventDefault();
-        });
+        // Previne zoom
+        document.addEventListener('gesturestart', (e) => e.preventDefault());
+        document.addEventListener('dblclick', (e) => e.preventDefault());
     </script>
 </body>
 </html>
