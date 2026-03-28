@@ -45,7 +45,7 @@
             to { opacity: 1; }
         }
         
-        /* Login Screen - MANTIDO */
+        /* Login Screen */
         .auth-container {
             background: #1A5F2A;
             min-height: 100vh;
@@ -434,10 +434,6 @@
             cursor: not-allowed;
         }
         
-        .btn-tarefa.verificando {
-            background: #F59E0B;
-        }
-        
         /* Estados */
         .estado {
             display: none;
@@ -505,9 +501,9 @@
             color: #92400E;
         }
         
-        .timer-status.sucesso {
-            background: #D1FAE5;
-            color: #065F46;
+        .timer-status.cancelado {
+            background: #FEE2E2;
+            color: #991B1B;
         }
         
         .timer-aviso {
@@ -517,6 +513,19 @@
             padding: 12px;
             border-radius: 8px;
             font-size: 13px;
+            margin-top: 16px;
+        }
+        
+        .btn-retomar {
+            width: 100%;
+            padding: 16px;
+            background: #F59E0B;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
             margin-top: 16px;
         }
         
@@ -941,6 +950,9 @@
                     <p style="color: #666; font-size: 13px;">
                         Não saia do app Melolo nem feche esta página
                     </p>
+                    <button class="btn-retomar" id="btnRetomar" onclick="retomarTimer()" style="display: none;">
+                        ▶️ RETOMAR CONTAGEM
+                    </button>
                 </div>
             </div>
             
@@ -972,7 +984,7 @@
                 <li>Crie sua conta no app</li>
                 <li>Fique 30 segundos no aplicativo</li>
                 <li>Volte aqui e clique em "Já fiz tudo"</li>
-                <li>Aguarde o timer de 30s finalizar</li>
+                <li>Aguarde o timer de 30s finalizar (não saia!)</li>
                 <li>Receba R$ 0,30 no seu saldo!</li>
             </ol>
         </div>
@@ -1035,22 +1047,23 @@
         let timerInterval = null;
         let segundosRestantes = 30;
         let paginaVisivel = true;
+        let timerPausado = false;
         let tarefaIniciada = false;
         
         // ==================== PERSISTÊNCIA ====================
         auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         
-        // Monitora visibilidade da página
+        // Monitora visibilidade da página - PAUSA O TIMER SE SAIR
         document.addEventListener('visibilitychange', () => {
-            paginaVisivel = !document.hidden;
+            const agoraVisivel = !document.hidden;
             
-            if (tarefaIniciada && timerInterval) {
-                if (document.hidden) {
-                    pausarTimer();
-                } else {
-                    retomarTimer();
-                }
+            // Se estava visível e agora está invisível = SAIU DA PÁGINA
+            if (paginaVisivel && !agoraVisivel && tarefaIniciada && timerInterval && !timerPausado) {
+                console.log('Usuário saiu da página - PAUSANDO TIMER');
+                pausarTimer();
             }
+            
+            paginaVisivel = agoraVisivel;
         });
         
         // ==================== LOGIN COM GOOGLE ====================
@@ -1127,7 +1140,6 @@
         }
         
         function carregarDadosUsuario(user) {
-            // Atualiza UI do perfil
             document.getElementById('userName').textContent = user.displayName || 'Usuário';
             document.getElementById('userEmail').textContent = user.email;
             
@@ -1141,7 +1153,6 @@
                 document.getElementById('avatarPlaceholder').textContent = initial;
             }
             
-            // Escuta mudanças no DB
             database.ref('usuarios/' + user.uid).on('value', (snapshot) => {
                 dadosUsuario = snapshot.val();
                 atualizarInterface();
@@ -1166,7 +1177,6 @@
                 badge.textContent = 'TAREFA CONCLUÍDA';
                 badge.classList.add('concluida');
                 
-                // Marca todos os checks
                 document.getElementById('check1').classList.add('feito');
                 document.getElementById('check2').classList.add('feito');
                 document.getElementById('check3').classList.add('feito');
@@ -1189,16 +1199,11 @@
         
         // ==================== FLUXO DA TAREFA ====================
         function iniciarTarefa() {
-            // Abre Play Store
             window.open('https://play.google.com/store/apps/details?id=com.melolo.app', '_blank');
             
             tarefaIniciada = true;
-            
-            // Marca primeiro check
             document.getElementById('check1').classList.add('feito');
             document.getElementById('check1').textContent = '✓';
-            
-            // Vai para verificação
             mostrarEstado('estadoVerificacao');
         }
         
@@ -1206,7 +1211,6 @@
             tarefaIniciada = false;
             mostrarEstado('estadoDisponivel');
             
-            // Desmarca checks
             document.getElementById('check1').classList.remove('feito');
             document.getElementById('check1').textContent = '1';
             document.getElementById('check2').classList.remove('feito');
@@ -1216,13 +1220,11 @@
         }
         
         function confirmarInstalacao() {
-            // Marca checks 2 e 3
             document.getElementById('check2').classList.add('feito');
             document.getElementById('check2').textContent = '✓';
             document.getElementById('check3').classList.add('feito');
             document.getElementById('check3').textContent = '✓';
             
-            // Inicia timer de 30 segundos
             iniciarTimer();
         }
         
@@ -1230,39 +1232,74 @@
             mostrarEstado('estadoTimer');
             
             segundosRestantes = 30;
+            timerPausado = false;
             atualizarTimerVisual();
             
+            // Mostra mensagem ativa
+            const status = document.getElementById('timerStatus');
+            status.className = 'timer-status ativo';
+            status.innerHTML = '<span>⏱️</span><span>Mantenha o app Melolo aberto</span>';
+            
+            // Esconde botão de retomar
+            document.getElementById('btnRetomar').style.display = 'none';
+            
+            // Limpa interval anterior se existir
+            if (timerInterval) clearInterval(timerInterval);
+            
             timerInterval = setInterval(() => {
-                if (!paginaVisivel) return;
+                // Se pausado, não decrementa
+                if (timerPausado) return;
+                
+                // Se não está visível, pausa automaticamente
+                if (!paginaVisivel) {
+                    pausarTimer();
+                    return;
+                }
                 
                 segundosRestantes--;
                 atualizarTimerVisual();
                 
                 if (segundosRestantes <= 0) {
                     clearInterval(timerInterval);
+                    timerInterval = null;
                     concluirTarefa();
                 }
             }, 1000);
         }
         
         function pausarTimer() {
+            timerPausado = true;
+            
             const status = document.getElementById('timerStatus');
             const progress = document.getElementById('progressFill');
+            const btnRetomar = document.getElementById('btnRetomar');
             
-            status.innerHTML = '<span>⏸️</span><span>Timer pausado - volte para continuar</span>';
-            status.classList.remove('ativo');
-            status.classList.add('pausado');
+            status.className = 'timer-status pausado';
+            status.innerHTML = '<span>⏸️</span><span>Timer pausado - você saiu da página</span>';
             progress.classList.add('pausado');
+            btnRetomar.style.display = 'block';
+            
+            showToast('⏸️ Timer pausado! Volte e clique em RETOMAR', 'error');
         }
         
         function retomarTimer() {
+            if (!paginaVisivel) {
+                showToast('⚠️ Volte para esta página primeiro!', 'error');
+                return;
+            }
+            
+            timerPausado = false;
+            
             const status = document.getElementById('timerStatus');
             const progress = document.getElementById('progressFill');
+            const btnRetomar = document.getElementById('btnRetomar');
             
+            status.className = 'timer-status ativo';
             status.innerHTML = '<span>⏱️</span><span>Mantenha o app Melolo aberto</span>';
-            status.classList.remove('pausado');
-            status.classList.add('ativo');
             progress.classList.remove('pausado');
+            btnRetomar.style.display = 'none';
+            
+            showToast('▶️ Timer retomado!', 'success');
         }
         
         function atualizarTimerVisual() {
@@ -1389,13 +1426,13 @@
                     usuarioAtual = null;
                     dadosUsuario = null;
                     tarefaIniciada = false;
+                    timerPausado = false;
                     
                     if (timerInterval) {
                         clearInterval(timerInterval);
                         timerInterval = null;
                     }
                     
-                    // Reseta checks
                     [1, 2, 3].forEach(i => {
                         const el = document.getElementById('check' + i);
                         el.classList.remove('feito');
