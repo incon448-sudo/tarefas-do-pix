@@ -12,6 +12,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
     
     <style>
+        /* ==================== PARTE 1: ESTILOS GLOBAIS E RESET ==================== */
         * {
             margin: 0;
             padding: 0;
@@ -45,7 +46,21 @@
             to { opacity: 1; }
         }
         
-        /* Login Screen */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+        
+        @keyframes pulse-processando {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* ==================== PARTE 2: TELA DE LOGIN ==================== */
         .auth-container {
             background: #1A5F2A;
             min-height: 100vh;
@@ -135,10 +150,6 @@
             animation: spin 1s linear infinite;
         }
         
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
         .terms {
             margin-top: 20px;
             font-size: 12px;
@@ -165,7 +176,7 @@
             display: block;
         }
         
-        /* Header */
+        /* ==================== PARTE 3: HEADER E SALDO ==================== */
         .header {
             background: #1A5F2A;
             color: white;
@@ -196,7 +207,6 @@
             font-size: 12px;
         }
         
-        /* Saldo Card */
         .saldo-card {
             background: linear-gradient(135deg, #00B894 0%, #00A383 100%);
             margin: 16px;
@@ -290,7 +300,28 @@
             transform: scale(0.98);
         }
         
-        /* Tarefa Card */
+        .btn-historico {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 12px;
+            transition: all 0.3s;
+        }
+        
+        .btn-historico:active {
+            transform: scale(0.98);
+            background: rgba(255,255,255,0.3);
+        }
+        
+        /* ==================== PARTE 4: TAREFAS E ESTADOS ==================== */
         .tarefa-card {
             background: white;
             margin: 16px;
@@ -434,7 +465,6 @@
             cursor: not-allowed;
         }
         
-        /* Estados */
         .estado {
             display: none;
         }
@@ -501,21 +531,6 @@
             color: #92400E;
         }
         
-        .timer-status.cancelado {
-            background: #FEE2E2;
-            color: #991B1B;
-        }
-        
-        .timer-aviso {
-            background: #FEF2F2;
-            border: 1px solid #FECACA;
-            color: #991B1B;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            margin-top: 16px;
-        }
-        
         .btn-retomar {
             width: 100%;
             padding: 16px;
@@ -548,11 +563,6 @@
             font-size: 40px;
             box-shadow: 0 10px 30px rgba(34,197,94,0.3);
             animation: scaleIn 0.5s;
-        }
-        
-        @keyframes scaleIn {
-            from { transform: scale(0); }
-            to { transform: scale(1); }
         }
         
         .status-concluido h3 {
@@ -652,177 +662,10 @@
             font-size: 14px;
             line-height: 1.8;
         }
-        
-        /* Modal Saque */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 200;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .modal-overlay.active {
-            display: flex;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            width: 100%;
-            max-width: 360px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        .modal-title {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .valor-options {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .valor-btn {
-            flex: 1;
-            padding: 16px;
-            border: 2px solid #E0E0E0;
-            background: white;
-            border-radius: 12px;
-            cursor: pointer;
-            text-align: center;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        
-        .valor-btn.selected {
-            border-color: #00B894;
-            background: #E8F5E9;
-            color: #00B894;
-        }
-        
-        .valor-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-        
-        .tipo-chave {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-        
-        .tipo-btn {
-            padding: 8px 16px;
-            border: 1px solid #DDD;
-            background: white;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-        
-        .tipo-btn.selected {
-            background: #00B894;
-            color: white;
-            border-color: #00B894;
-        }
-        
-        .input-group {
-            margin-bottom: 16px;
-        }
-        
-        .input-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 14px;
-            color: #555;
-            font-weight: 500;
-        }
-        
-        .input-group input {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid #E0E0E0;
-            border-radius: 12px;
-            font-size: 16px;
-        }
-        
-        .input-group input:focus {
-            outline: none;
-            border-color: #00B894;
-        }
-        
-        .modal-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 20px;
-        }
-        
-        .modal-actions button {
-            flex: 1;
-            padding: 14px;
-            border-radius: 12px;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        
-        .btn-cancelar {
-            background: #F5F5F5;
-            color: #666;
-        }
-        
-        .btn-confirmar {
-            background: #00B894;
-            color: white;
-        }
-        
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #333;
-            color: white;
-            padding: 16px 24px;
-            border-radius: 12px;
-            font-size: 14px;
-            z-index: 300;
-            opacity: 0;
-            transition: all 0.3s;
-        }
-        
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-        
-        .toast.success {
-            background: #00B894;
-        }
-        
-        .toast.error {
-            background: #E74C3C;
-        }
     </style>
 </head>
 <body>
-
-    <!-- TELA DE LOGIN -->
+    <!-- ==================== PARTE 5: TELA DE LOGIN ==================== -->
     <div id="authScreen" class="screen active">
         <div class="auth-container">
             <div class="auth-logo">
@@ -854,7 +697,7 @@
         </div>
     </div>
 
-    <!-- TELA PRINCIPAL -->
+    <!-- ==================== PARTE 6: TELA PRINCIPAL (HOME) ==================== -->
     <div id="homeScreen" class="screen">
         <div class="header">
             <h1>💰 Tarefas do Pix</h1>
@@ -876,6 +719,9 @@
             <button class="btn-saque" id="btnSaque" onclick="abrirModalSaque()" disabled>
                 💸 SACAR VIA PIX
             </button>
+            <button class="btn-historico" onclick="abrirTelaHistorico()">
+                📋 HISTÓRICO DE SAQUES
+            </button>
         </div>
         
         <!-- Tarefa -->
@@ -888,7 +734,6 @@
                     Baixe o aplicativo Melolo, crie sua conta e fique 30 segundos no app para ganhar sua recompensa!
                 </div>
                 
-                <!-- Requisitos -->
                 <div class="tarefa-requisitos">
                     <h4>📋 O que você precisa fazer:</h4>
                     <ul class="requisito-lista">
@@ -989,8 +834,507 @@
             </ol>
         </div>
     </div>
+    <style>
+        /* ==================== PARTE 7: CSS DO HISTÓRICO DE SAQUES ==================== */
+        
+        /* Header do Histórico */
+        .historico-header {
+            background: #1A5F2A;
+            color: white;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .btn-voltar-historico {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+        
+        .btn-voltar-historico:active {
+            background: rgba(255,255,255,0.3);
+            transform: scale(0.95);
+        }
+        
+        .historico-header h1 {
+            font-size: 18px;
+            font-weight: bold;
+            flex: 1;
+            text-align: center;
+            margin-right: 40px;
+        }
+        
+        /* Abas de Status */
+        .abas-status {
+            display: flex;
+            background: white;
+            margin: 16px;
+            border-radius: 12px;
+            padding: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow-x: auto;
+            gap: 4px;
+            scrollbar-width: none;
+        }
+        
+        .abas-status::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .aba-status {
+            flex: 1;
+            min-width: 80px;
+            padding: 10px 8px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            white-space: nowrap;
+            text-align: center;
+        }
+        
+        .aba-status.active {
+            background: #1A5F2A;
+            color: white;
+        }
+        
+        .aba-status .contador {
+            display: block;
+            font-size: 10px;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+        
+        /* Lista de Saques */
+        .lista-saques {
+            padding: 0 16px 20px;
+        }
+        
+        .saque-item {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 4px solid #E0E0E0;
+            transition: all 0.3s;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .saque-item.pendente {
+            border-left-color: #F59E0B;
+        }
+        
+        .saque-item.processando {
+            border-left-color: #3B82F6;
+        }
+        
+        .saque-item.concluido {
+            border-left-color: #22C55E;
+        }
+        
+        .saque-item.rejeitado {
+            border-left-color: #E74C3C;
+        }
+        
+        .saque-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        
+        .saque-valor {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .saque-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .saque-status.pendente {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+        
+        .saque-status.processando {
+            background: #DBEAFE;
+            color: #1E40AF;
+            animation: pulse-processando 2s infinite;
+        }
+        
+        .saque-status.concluido {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+        
+        .saque-status.rejeitado {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+        
+        .saque-detalhes {
+            display: grid;
+            gap: 8px;
+        }
+        
+        .saque-linha {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .saque-linha span:first-child {
+            color: #999;
+        }
+        
+        .saque-linha span:last-child {
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .saque-chave {
+            font-family: monospace;
+            background: #F5F5F5;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        /* Motivo de Rejeição */
+        .rejeicao-motivo {
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+        
+        .rejeicao-motivo strong {
+            color: #991B1B;
+            font-size: 12px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .rejeicao-motivo p {
+            color: #B91C1C;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        
+        /* Estado Vazio */
+        .historico-vazio {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .historico-vazio .icone {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+        
+        .historico-vazio h3 {
+            color: #666;
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+        
+        .historico-vazio p {
+            font-size: 14px;
+        }
+        
+        /* Loading do Histórico */
+        .historico-loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .historico-loading .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #E0E0E0;
+            border-top-color: #00B894;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+        
+        /* ==================== PARTE 8: MODAL DE SAQUE ==================== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            width: 100%;
+            max-width: 360px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #333;
+        }
+        
+        .valor-options {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .valor-btn {
+            flex: 1;
+            padding: 16px;
+            border: 2px solid #E0E0E0;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .valor-btn.selected {
+            border-color: #00B894;
+            background: #E8F5E9;
+            color: #00B894;
+        }
+        
+        .valor-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            border-color: #E0E0E0;
+            background: #F5F5F5;
+        }
+        
+        .tipo-chave {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .tipo-btn {
+            padding: 8px 16px;
+            border: 1px solid #DDD;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+        
+        .tipo-btn.selected {
+            background: #00B894;
+            color: white;
+            border-color: #00B894;
+        }
+        
+        .input-group {
+            margin-bottom: 16px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #E0E0E0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #00B894;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .modal-actions button {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .btn-cancelar {
+            background: #F5F5F5;
+            color: #666;
+        }
+        
+        .btn-cancelar:active {
+            background: #E0E0E0;
+        }
+        
+        .btn-confirmar {
+            background: #00B894;
+            color: white;
+        }
+        
+        .btn-confirmar:active {
+            background: #00A383;
+            transform: scale(0.98);
+        }
+        
+        /* ==================== PARTE 9: TOAST NOTIFICATIONS ==================== */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #333;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            z-index: 300;
+            opacity: 0;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            max-width: 90%;
+            text-align: center;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        .toast.success {
+            background: #00B894;
+        }
+        
+        .toast.error {
+            background: #E74C3C;
+        }
+        
+        .toast.info {
+            background: #3B82F6;
+        }
+    </style>
+</head>
+<body>
+    <!-- ==================== PARTE 10: TELA DE HISTÓRICO DE SAQUES ==================== -->
+    <div id="historicoScreen" class="screen">
+        <div class="historico-header">
+            <button class="btn-voltar-historico" onclick="voltarParaHome()">←</button>
+            <h1>📋 Histórico de Saques</h1>
+        </div>
+        
+        <!-- Abas de Status -->
+        <div class="abas-status">
+            <button class="aba-status active" onclick="filtrarSaques('todos')" id="abaTodos">
+                Todos
+                <span class="contador" id="contTodos">0</span>
+            </button>
+            <button class="aba-status" onclick="filtrarSaques('pendente')" id="abaPendente">
+                ⏳ Pendente
+                <span class="contador" id="contPendente">0</span>
+            </button>
+            <button class="aba-status" onclick="filtrarSaques('processando')" id="abaProcessando">
+                ⚙️ Processando
+                <span class="contador" id="contProcessando">0</span>
+            </button>
+            <button class="aba-status" onclick="filtrarSaques('concluido')" id="abaConcluido">
+                ✅ Concluído
+                <span class="contador" id="contConcluido">0</span>
+            </button>
+            <button class="aba-status" onclick="filtrarSaques('rejeitado')" id="abaRejeitado">
+                ❌ Rejeitado
+                <span class="contador" id="contRejeitado">0</span>
+            </button>
+        </div>
+        
+        <!-- Lista de Saques -->
+        <div class="lista-saques" id="listaSaques">
+            <div class="historico-loading">
+                <div class="spinner"></div>
+                <p>Carregando histórico...</p>
+            </div>
+        </div>
+    </div>
 
-    <!-- MODAL SAQUE -->
+    <!-- ==================== PARTE 11: MODAL DE SAQUE ==================== -->
     <div id="modalSaque" class="modal-overlay" onclick="fecharModalSaque(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="modal-title">💸 Sacar via Pix</div>
@@ -1003,9 +1347,9 @@
             
             <label style="display: block; margin-bottom: 12px; font-weight: 500;">Tipo de chave:</label>
             <div class="tipo-chave">
-                <button class="tipo-btn selected" onclick="selecionarTipo('CPF')">CPF</button>
-                <button class="tipo-btn" onclick="selecionarTipo('EMAIL')">E-mail</button>
-                <button class="tipo-btn" onclick="selecionarTipo('TELEFONE')">Celular</button>
+                <button class="tipo-btn selected" onclick="selecionarTipo('CPF', this)">CPF</button>
+                <button class="tipo-btn" onclick="selecionarTipo('EMAIL', this)">E-mail</button>
+                <button class="tipo-btn" onclick="selecionarTipo('TELEFONE', this)">Celular</button>
             </div>
             
             <div class="input-group">
@@ -1020,11 +1364,10 @@
         </div>
     </div>
 
-    <!-- TOAST -->
+    <!-- ==================== PARTE 12: TOAST ==================== -->
     <div id="toast" class="toast"></div>
-
     <script>
-        // ==================== CONFIGURAÇÃO FIREBASE ====================
+        // ==================== PARTE 13: CONFIGURAÇÃO FIREBASE ====================
         const firebaseConfig = {
             apiKey: "AIzaSyBUI_gg3WisOWvOfCPM3rrKogrZNLJ-WUE",
             authDomain: "tarefas-do-pix.firebaseapp.com",
@@ -1039,7 +1382,7 @@
         const auth = firebase.auth();
         const database = firebase.database();
         
-        // ==================== VARIÁVEIS GLOBAIS ====================
+        // ==================== PARTE 14: VARIÁVEIS GLOBAIS ====================
         let usuarioAtual = null;
         let dadosUsuario = null;
         let valorSaqueSelecionado = 0.30;
@@ -1049,24 +1392,35 @@
         let paginaVisivel = true;
         let timerPausado = false;
         let tarefaIniciada = false;
+        let listaSaquesCache = [];
+        let filtroAtual = 'todos';
+        let listenerHistorico = null;
         
-        // ==================== PERSISTÊNCIA ====================
+        // ==================== PARTE 15: INICIALIZAÇÃO ====================
         auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         
-        // Monitora visibilidade da página - PAUSA O TIMER SE SAIR
         document.addEventListener('visibilitychange', () => {
             const agoraVisivel = !document.hidden;
-            
-            // Se estava visível e agora está invisível = SAIU DA PÁGINA
             if (paginaVisivel && !agoraVisivel && tarefaIniciada && timerInterval && !timerPausado) {
-                console.log('Usuário saiu da página - PAUSANDO TIMER');
                 pausarTimer();
             }
-            
             paginaVisivel = agoraVisivel;
         });
         
-        // ==================== LOGIN COM GOOGLE ====================
+        // Previne zoom
+        document.addEventListener('gesturestart', (e) => e.preventDefault());
+        document.addEventListener('dblclick', (e) => e.preventDefault());
+        
+        // ==================== PARTE 16: AUTENTICAÇÃO ====================
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                usuarioAtual = user;
+                verificarOuCriarUsuario(user);
+            } else {
+                mostrarTela('authScreen');
+            }
+        });
+        
         function loginComGoogle() {
             const btn = document.getElementById('btnGoogle');
             const errorEl = document.getElementById('loginError');
@@ -1085,15 +1439,7 @@
                 .catch((error) => {
                     console.error('Erro:', error);
                     btn.disabled = false;
-                    btn.innerHTML = `
-                        <svg class="google-icon" viewBox="0 0 24 24">
-                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                        </svg>
-                        Entrar com Google
-                    `;
+                    btn.innerHTML = getGoogleButtonHTML();
                     
                     let msg = 'Erro ao conectar. Tente novamente.';
                     if (error.code === 'auth/popup-closed-by-user') msg = 'Você fechou a janela de login.';
@@ -1105,15 +1451,17 @@
                 });
         }
         
-        // ==================== GERENCIAMENTO DE USUÁRIO ====================
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                usuarioAtual = user;
-                verificarOuCriarUsuario(user);
-            } else {
-                mostrarTela('authScreen');
-            }
-        });
+        function getGoogleButtonHTML() {
+            return `
+                <svg class="google-icon" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Entrar com Google
+            `;
+        }
         
         function verificarOuCriarUsuario(user) {
             const userRef = database.ref('usuarios/' + user.uid);
@@ -1177,16 +1525,15 @@
                 badge.textContent = 'TAREFA CONCLUÍDA';
                 badge.classList.add('concluida');
                 
-                document.getElementById('check1').classList.add('feito');
-                document.getElementById('check2').classList.add('feito');
-                document.getElementById('check3').classList.add('feito');
-                document.getElementById('check1').textContent = '✓';
-                document.getElementById('check2').textContent = '✓';
-                document.getElementById('check3').textContent = '✓';
+                ['check1', 'check2', 'check3'].forEach((id, i) => {
+                    const el = document.getElementById(id);
+                    el.classList.add('feito');
+                    el.textContent = '✓';
+                });
             }
         }
         
-        // ==================== NAVEGAÇÃO ====================
+        // ==================== PARTE 17: NAVEGAÇÃO ====================
         function mostrarTela(telaId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(telaId).classList.add('active');
@@ -1197,10 +1544,9 @@
             document.getElementById(estadoId).classList.add('active');
         }
         
-        // ==================== FLUXO DA TAREFA ====================
+        // ==================== PARTE 18: FLUXO DA TAREFA ====================
         function iniciarTarefa() {
             window.open('https://play.google.com/store/apps/details?id=com.melolo.app', '_blank');
-            
             tarefaIniciada = true;
             document.getElementById('check1').classList.add('feito');
             document.getElementById('check1').textContent = '✓';
@@ -1210,13 +1556,11 @@
         function voltarParaDownload() {
             tarefaIniciada = false;
             mostrarEstado('estadoDisponivel');
-            
-            document.getElementById('check1').classList.remove('feito');
-            document.getElementById('check1').textContent = '1';
-            document.getElementById('check2').classList.remove('feito');
-            document.getElementById('check2').textContent = '2';
-            document.getElementById('check3').classList.remove('feito');
-            document.getElementById('check3').textContent = '3';
+            ['check1', 'check2', 'check3'].forEach((id, i) => {
+                const el = document.getElementById(id);
+                el.classList.remove('feito');
+                el.textContent = (i + 1).toString();
+            });
         }
         
         function confirmarInstalacao() {
@@ -1224,38 +1568,28 @@
             document.getElementById('check2').textContent = '✓';
             document.getElementById('check3').classList.add('feito');
             document.getElementById('check3').textContent = '✓';
-            
             iniciarTimer();
         }
         
         function iniciarTimer() {
             mostrarEstado('estadoTimer');
-            
             segundosRestantes = 30;
             timerPausado = false;
             atualizarTimerVisual();
             
-            // Mostra mensagem ativa
             const status = document.getElementById('timerStatus');
             status.className = 'timer-status ativo';
             status.innerHTML = '<span>⏱️</span><span>Mantenha o app Melolo aberto</span>';
-            
-            // Esconde botão de retomar
             document.getElementById('btnRetomar').style.display = 'none';
             
-            // Limpa interval anterior se existir
             if (timerInterval) clearInterval(timerInterval);
             
             timerInterval = setInterval(() => {
-                // Se pausado, não decrementa
                 if (timerPausado) return;
-                
-                // Se não está visível, pausa automaticamente
                 if (!paginaVisivel) {
                     pausarTimer();
                     return;
                 }
-                
                 segundosRestantes--;
                 atualizarTimerVisual();
                 
@@ -1269,7 +1603,6 @@
         
         function pausarTimer() {
             timerPausado = true;
-            
             const status = document.getElementById('timerStatus');
             const progress = document.getElementById('progressFill');
             const btnRetomar = document.getElementById('btnRetomar');
@@ -1287,9 +1620,7 @@
                 showToast('⚠️ Volte para esta página primeiro!', 'error');
                 return;
             }
-            
             timerPausado = false;
-            
             const status = document.getElementById('timerStatus');
             const progress = document.getElementById('progressFill');
             const btnRetomar = document.getElementById('btnRetomar');
@@ -1310,7 +1641,6 @@
         
         function concluirTarefa() {
             if (!usuarioAtual) return;
-            
             const updates = {
                 jaFeTarefa: true,
                 saldo: (dadosUsuario.saldo || 0) + 0.30
@@ -1320,7 +1650,6 @@
                 .then(() => {
                     mostrarEstado('estadoConcluido');
                     showToast('✓ R$ 0,30 adicionado ao saldo!', 'success');
-                    
                     database.ref('transacoes/' + usuarioAtual.uid).push({
                         tipo: 'RECOMPENSA',
                         valor: 0.30,
@@ -1329,11 +1658,207 @@
                     });
                 });
         }
+        // ==================== PARTE 19: SISTEMA DE HISTÓRICO DE SAQUES ====================
+        function abrirTelaHistorico() {
+            mostrarTela('historicoScreen');
+            carregarHistoricoSaques();
+        }
         
-        // ==================== SAQUE ====================
+        function voltarParaHome() {
+            mostrarTela('homeScreen');
+            if (listenerHistorico) {
+                listenerHistorico.off();
+                listenerHistorico = null;
+            }
+        }
+        
+        function carregarHistoricoSaques() {
+            if (!usuarioAtual) return;
+            
+            const listaEl = document.getElementById('listaSaques');
+            listaEl.innerHTML = `
+                <div class="historico-loading">
+                    <div class="spinner"></div>
+                    <p>Carregando histórico...</p>
+                </div>
+            `;
+            
+            listenerHistorico = database.ref('saques')
+                .orderByChild('userId')
+                .equalTo(usuarioAtual.uid);
+                
+            listenerHistorico.on('value', (snapshot) => {
+                const saques = [];
+                snapshot.forEach((child) => {
+                    saques.push({
+                        id: child.key,
+                        ...child.val()
+                    });
+                });
+                
+                saques.sort((a, b) => b.dataSolicitacao - a.dataSolicitacao);
+                listaSaquesCache = saques;
+                atualizarContadores(saques);
+                renderizarListaSaques(saques, filtroAtual);
+            });
+        }
+        
+        function atualizarContadores(saques) {
+            const contadores = {
+                todos: saques.length,
+                pendente: saques.filter(s => s.status === 'PENDENTE').length,
+                processando: saques.filter(s => s.status === 'PROCESSANDO').length,
+                concluido: saques.filter(s => s.status === 'CONCLUIDO' || s.status === 'COMPLETO').length,
+                rejeitado: saques.filter(s => s.status === 'REJEITADO' || s.status === 'CANCELADO').length
+            };
+            
+            document.getElementById('contTodos').textContent = contadores.todos;
+            document.getElementById('contPendente').textContent = contadores.pendente;
+            document.getElementById('contProcessando').textContent = contadores.processando;
+            document.getElementById('contConcluido').textContent = contadores.concluido;
+            document.getElementById('contRejeitado').textContent = contadores.rejeitado;
+        }
+        
+        function filtrarSaques(status) {
+            filtroAtual = status;
+            document.querySelectorAll('.aba-status').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('aba' + status.charAt(0).toUpperCase() + status.slice(1)).classList.add('active');
+            renderizarListaSaques(listaSaquesCache, status);
+        }
+        
+        function renderizarListaSaques(saques, filtro) {
+            const listaEl = document.getElementById('listaSaques');
+            
+            let saquesFiltrados = saques;
+            if (filtro !== 'todos') {
+                const statusMap = {
+                    'pendente': ['PENDENTE'],
+                    'processando': ['PROCESSANDO'],
+                    'concluido': ['CONCLUIDO', 'COMPLETO'],
+                    'rejeitado': ['REJEITADO', 'CANCELADO']
+                };
+                const statusValidos = statusMap[filtro] || [];
+                saquesFiltrados = saques.filter(s => statusValidos.includes(s.status));
+            }
+            
+            if (saquesFiltrados.length === 0) {
+                const mensagens = {
+                    'todos': { msg: 'Nenhum saque encontrado', icone: '📭' },
+                    'pendente': { msg: 'Nenhum saque pendente', icone: '⏳' },
+                    'processando': { msg: 'Nenhum saque em processamento', icone: '⚙️' },
+                    'concluido': { msg: 'Nenhum saque concluído ainda', icone: '✅' },
+                    'rejeitado': { msg: 'Nenhum saque rejeitado', icone: '❌' }
+                };
+                const config = mensagens[filtro];
+                
+                listaEl.innerHTML = `
+                    <div class="historico-vazio">
+                        <div class="icone">${config.icone}</div>
+                        <h3>${config.msg}</h3>
+                        <p>Seus saques aparecerão aqui</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            saquesFiltrados.forEach(saque => {
+                html += renderizarItemSaque(saque);
+            });
+            
+            listaEl.innerHTML = html;
+        }
+        
+        function renderizarItemSaque(saque) {
+            const data = new Date(saque.dataSolicitacao);
+            const dataFormatada = data.toLocaleDateString('pt-BR');
+            const horaFormatada = data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            
+            const statusConfig = getStatusConfig(saque.status);
+            const statusClass = statusConfig.class;
+            const statusTexto = statusConfig.texto;
+            const statusIcon = statusConfig.icone;
+            
+            let rejeicaoHtml = '';
+            if ((saque.status === 'REJEITADO' || saque.status === 'CANCELADO') && saque.motivoRejeicao) {
+                rejeicaoHtml = `
+                    <div class="rejeicao-motivo">
+                        <strong>Motivo da rejeição:</strong>
+                        <p>${saque.motivoRejeicao}</p>
+                    </div>
+                `;
+            }
+            
+            let dataInfo = `<span>${dataFormatada} às ${horaFormatada}</span>`;
+            if ((saque.status === 'CONCLUIDO' || saque.status === 'COMPLETO') && saque.dataConclusao) {
+                const dataConc = new Date(saque.dataConclusao);
+                dataInfo += ` <span style="color: #22C55E; font-size: 11px;">(Concluído em ${dataConc.toLocaleDateString('pt-BR')})</span>`;
+            }
+            
+            let extraInfo = '';
+            if (saque.dataProcessamento) {
+                extraInfo += `
+                    <div class="saque-linha">
+                        <span>Processado em:</span>
+                        <span>${new Date(saque.dataProcessamento).toLocaleDateString('pt-BR')}</span>
+                    </div>
+                `;
+            }
+            if (saque.codigoTransacao) {
+                extraInfo += `
+                    <div class="saque-linha">
+                        <span>Código:</span>
+                        <span style="font-family: monospace; font-size: 11px;">${saque.codigoTransacao.substring(0, 20)}...</span>
+                    </div>
+                `;
+            }
+            
+            return `
+                <div class="saque-item ${statusClass}">
+                    <div class="saque-header">
+                        <div class="saque-valor">R$ ${saque.valor.toFixed(2).replace('.', ',')}</div>
+                        <div class="saque-status ${statusClass}">
+                            <span>${statusIcon}</span>
+                            <span>${statusTexto}</span>
+                        </div>
+                    </div>
+                    <div class="saque-detalhes">
+                        <div class="saque-linha">
+                            <span>Chave Pix:</span>
+                            <span class="saque-chave">${saque.tipoChavePix}: ${mascararChave(saque.chavePix)}</span>
+                        </div>
+                        <div class="saque-linha">
+                            <span>Solicitado em:</span>
+                            <span>${dataInfo}</span>
+                        </div>
+                        ${extraInfo}
+                    </div>
+                    ${rejeicaoHtml}
+                </div>
+            `;
+        }
+        
+        function getStatusConfig(status) {
+            const configs = {
+                'PENDENTE': { class: 'pendente', texto: 'Pendente', icone: '⏳' },
+                'PROCESSANDO': { class: 'processando', texto: 'Processando', icone: '⚙️' },
+                'CONCLUIDO': { class: 'concluido', texto: 'Concluído', icone: '✅' },
+                'COMPLETO': { class: 'concluido', texto: 'Concluído', icone: '✅' },
+                'REJEITADO': { class: 'rejeitado', texto: 'Rejeitado', icone: '❌' },
+                'CANCELADO': { class: 'rejeitado', texto: 'Cancelado', icone: '❌' }
+            };
+            return configs[status] || { class: 'pendente', texto: status, icone: '⏳' };
+        }
+        
+        function mascararChave(chave) {
+            if (!chave) return '***';
+            if (chave.length <= 8) return chave;
+            return chave.substring(0, 4) + '***' + chave.substring(chave.length - 4);
+        }
+        
+        // ==================== PARTE 20: SISTEMA DE SAQUE ====================
         function abrirModalSaque() {
             const saldo = dadosUsuario?.saldo || 0;
-            
             document.getElementById('val30').disabled = saldo < 0.30;
             document.getElementById('val50').disabled = saldo < 0.50;
             
@@ -1362,10 +1887,10 @@
             btn.classList.add('selected');
         }
         
-        function selecionarTipo(tipo) {
+        function selecionarTipo(tipo, elemento) {
             tipoChaveSelecionado = tipo;
             document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('selected'));
-            event.target.classList.add('selected');
+            elemento.classList.add('selected');
             
             const placeholders = {
                 'CPF': '123.456.789-00',
@@ -1380,6 +1905,11 @@
             
             if (!chave) {
                 showToast('Digite sua chave Pix', 'error');
+                return;
+            }
+            
+            if (!validarChavePix(chave, tipoChaveSelecionado)) {
+                showToast('Chave Pix inválida para o tipo selecionado', 'error');
                 return;
             }
             
@@ -1406,7 +1936,7 @@
                 database.ref('transacoes/' + usuarioAtual.uid).push({
                     tipo: 'SAQUE',
                     valor: -valorSaqueSelecionado,
-                    descricao: 'Saque via Pix',
+                    descricao: 'Saque via Pix - R$ ' + valorSaqueSelecionado.toFixed(2),
                     data: Date.now()
                 })
             ])
@@ -1414,12 +1944,26 @@
                 fecharModalSaque();
                 showToast('✓ Saque solicitado com sucesso!', 'success');
             })
-            .catch(() => {
-                showToast('Erro ao solicitar saque', 'error');
+            .catch((error) => {
+                console.error('Erro no saque:', error);
+                showToast('Erro ao solicitar saque. Tente novamente.', 'error');
             });
         }
         
-        // ==================== LOGOUT ====================
+        function validarChavePix(chave, tipo) {
+            switch(tipo) {
+                case 'CPF':
+                    return /^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/.test(chave) || /^\d{11}$/.test(chave);
+                case 'EMAIL':
+                    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(chave);
+                case 'TELEFONE':
+                    return /^(\(?\d{2}\)?\s?)?\d{4,5}-?\d{4}$/.test(chave);
+                default:
+                    return chave.length >= 5;
+            }
+        }
+        
+        // ==================== PARTE 21: LOGOUT E UTILITÁRIOS ====================
         function fazerLogout() {
             auth.signOut()
                 .then(() => {
@@ -1433,30 +1977,26 @@
                         timerInterval = null;
                     }
                     
-                    [1, 2, 3].forEach(i => {
-                        const el = document.getElementById('check' + i);
+                    if (listenerHistorico) {
+                        listenerHistorico.off();
+                        listenerHistorico = null;
+                    }
+                    
+                    ['check1', 'check2', 'check3'].forEach((id, i) => {
+                        const el = document.getElementById(id);
                         el.classList.remove('feito');
-                        el.textContent = i;
+                        el.textContent = (i + 1).toString();
                     });
                     
                     mostrarTela('authScreen');
                     
                     const btn = document.getElementById('btnGoogle');
                     btn.disabled = false;
-                    btn.innerHTML = `
-                        <svg class="google-icon" viewBox="0 0 24 24">
-                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                        </svg>
-                        Entrar com Google
-                    `;
+                    btn.innerHTML = getGoogleButtonHTML();
                     document.getElementById('loginError').classList.remove('show');
                 });
         }
         
-        // ==================== UTILITÁRIOS ====================
         function showToast(mensagem, tipo = 'success') {
             const toast = document.getElementById('toast');
             toast.textContent = mensagem;
@@ -1465,10 +2005,7 @@
             setTimeout(() => toast.classList.add('show'), 10);
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
-        
-        // Previne zoom
-        document.addEventListener('gesturestart', (e) => e.preventDefault());
-        document.addEventListener('dblclick', (e) => e.preventDefault());
     </script>
 </body>
 </html>
+
