@@ -616,164 +616,7 @@
             font-size: 14px;
             line-height: 1.8;
         }
-    </style>
-</head>
-<body>
-    <!-- ==================== PARTE 5: TELA DE LOGIN ==================== -->
-    <div id="authScreen" class="screen active">
-        <div class="auth-container">
-            <div class="auth-logo">
-                <h1>💰 Tarefas do Pix</h1>
-                <p>Ganhe dinheiro realizando tarefas</p>
-            </div>
-            
-            <div class="auth-card">
-                <h2>Bem-vindo!</h2>
-                <p>Entre com sua conta Google para começar</p>
-                
-                <div class="error-message" id="loginError"></div>
-                
-                <button class="btn-google" onclick="loginComGoogle()" id="btnGoogle">
-                    <svg class="google-icon" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                    </svg>
-                    Entrar com Google
-                </button>
-                
-                <p class="terms">
-                    Ao entrar, você concorda com nossos<br>
-                    <a href="#">Termos de Uso</a> e <a href="#">Política de Privacidade</a>
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- ==================== PARTE 6: TELA PRINCIPAL (HOME) ==================== -->
-    <div id="homeScreen" class="screen">
-        <div class="header">
-            <h1>💰 Tarefas do Pix</h1>
-            <button class="logout-btn" onclick="fazerLogout()">Sair</button>
-        </div>
         
-        <!-- Saldo -->
-        <div class="saldo-card">
-            <div class="user-info">
-                <img src="" alt="Foto" class="user-avatar" id="userAvatar">
-                <div class="user-avatar-placeholder" id="avatarPlaceholder">U</div>
-                <div class="user-details">
-                    <div class="user-name" id="userName">Usuário</div>
-                    <div class="user-email" id="userEmail">email@exemplo.com</div>
-                </div>
-            </div>
-            <div class="saldo-label">Seu Saldo</div>
-            <div class="saldo-valor" id="saldoValor">R$ 0,00</div>
-            <button class="btn-saque" id="btnSaque" onclick="abrirModalSaque()" disabled>
-                💸 SACAR VIA PIX
-            </button>
-            <button class="btn-historico" onclick="abrirTelaHistorico()">
-                📋 HISTÓRICO DE SAQUES
-            </button>
-        </div>
-        
-        <!-- Tarefa -->
-        <div class="tarefa-card" id="tarefaCard">
-            <div class="tarefa-header">
-                <span class="tarefa-badge" id="taskBadge">TAREFA DISPONÍVEL</span>
-                <div class="app-icon">🎬</div>
-                <div class="tarefa-nome">Registre-se no Worldance Drama</div>
-                <div class="tarefa-desc">
-                    Baixe o aplicativo Worldance Drama, crie sua conta usando o código de convite e ganhe sua recompensa!
-                </div>
-                
-                <!-- Código de Convite -->
-                <div class="codigo-convite">
-                    <h4>🎁 Código de Convite</h4>
-                    <div class="codigo">BE764096</div>
-                </div>
-                
-                <div class="tarefa-requisitos">
-                    <h4>📋 O que você precisa fazer:</h4>
-                    <ul class="requisito-lista">
-                        <li>
-                            <span class="requisito-check" id="check1">1</span>
-                            <span>Baixar o app Worldance Drama na Play Store</span>
-                        </li>
-                        <li>
-                            <span class="requisito-check" id="check2">2</span>
-                            <span>Criar uma conta no aplicativo</span>
-                        </li>
-                        <li>
-                            <span class="requisito-check" id="check3">3</span>
-                            <span>Usar o código de convite <strong>BE764096</strong></span>
-                        </li>
-                    </ul>
-                </div>
-                
-                <div class="tarefa-valor">+ R$ 0,50</div>
-            </div>
-            
-            <!-- Estado: Disponível -->
-            <div id="estadoDisponivel" class="estado active">
-                <button class="btn-tarefa" onclick="iniciarTarefa()">
-                    📲 BAIXAR APP E COMEÇAR
-                </button>
-            </div>
-            
-            <!-- Estado: Verificação -->
-            <div id="estadoVerificacao" class="estado">
-                <div class="verificacao-box">
-                    <h4>✋ Quase lá!</h4>
-                    <p>
-                        Agora você precisa:<br>
-                        1. Instalar o app Worldance Drama<br>
-                        2. Criar sua conta<br>
-                        3. Usar o código de convite <strong>BE764096</strong>
-                    </p>
-                    <button class="btn-verificar" onclick="confirmarInstalacao()">
-                        ✅ JÁ FIZ TUDO - CONCLUIR TAREFA
-                    </button>
-                    <button class="btn-voltar" onclick="voltarParaDownload()">
-                        ← Voltar
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Estado: Concluído -->
-            <div id="estadoConcluido" class="estado">
-                <div class="status-concluido">
-                    <div class="status-icon">✓</div>
-                    <h3>Tarefa Concluída!</h3>
-                    <p>R$ 0,50 foi adicionado ao seu saldo</p>
-                </div>
-            </div>
-            
-            <!-- Estado: Bloqueado -->
-            <div id="estadoBloqueado" class="estado">
-                <div class="status-bloqueado">
-                    <div class="icone">✓</div>
-                    <h3>Você já completou esta tarefa</h3>
-                    <p>Aguarde novas tarefas em breve!</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Instruções -->
-        <div class="info-card">
-            <h3>📋 Como funciona:</h3>
-            <ol>
-                <li>Clique em "Baixar App" para ir à Play Store</li>
-                <li>Instale e abra o Worldance Drama</li>
-                <li>Crie sua conta no app</li>
-                <li>Use o código de convite <strong>BE764096</strong></li>
-                <li>Volte aqui e clique em "Já fiz tudo"</li>
-                <li>Receba R$ 0,50 no seu saldo!</li>
-            </ol>
-        </div>
-    </div>
-    <style>
         /* ==================== PARTE 7: CSS DO HISTÓRICO DE SAQUES ==================== */
         
         /* Header do Histórico */
@@ -1233,6 +1076,161 @@
     </style>
 </head>
 <body>
+    <!-- ==================== PARTE 5: TELA DE LOGIN ==================== -->
+    <div id="authScreen" class="screen active">
+        <div class="auth-container">
+            <div class="auth-logo">
+                <h1>💰 Tarefas do Pix</h1>
+                <p>Ganhe dinheiro realizando tarefas</p>
+            </div>
+            
+            <div class="auth-card">
+                <h2>Bem-vindo!</h2>
+                <p>Entre com sua conta Google para começar</p>
+                
+                <div class="error-message" id="loginError"></div>
+                
+                <button class="btn-google" onclick="loginComGoogle()" id="btnGoogle">
+                    <svg class="google-icon" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Entrar com Google
+                </button>
+                
+                <p class="terms">
+                    Ao entrar, você concorda com nossos<br>
+                    <a href="#">Termos de Uso</a> e <a href="#">Política de Privacidade</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== PARTE 6: TELA PRINCIPAL (HOME) ==================== -->
+    <div id="homeScreen" class="screen">
+        <div class="header">
+            <h1>💰 Tarefas do Pix</h1>
+            <button class="logout-btn" onclick="fazerLogout()">Sair</button>
+        </div>
+        
+        <!-- Saldo -->
+        <div class="saldo-card">
+            <div class="user-info">
+                <img src="" alt="Foto" class="user-avatar" id="userAvatar">
+                <div class="user-avatar-placeholder" id="avatarPlaceholder">U</div>
+                <div class="user-details">
+                    <div class="user-name" id="userName">Usuário</div>
+                    <div class="user-email" id="userEmail">email@exemplo.com</div>
+                </div>
+            </div>
+            <div class="saldo-label">Seu Saldo</div>
+            <div class="saldo-valor" id="saldoValor">R$ 0,00</div>
+            <button class="btn-saque" id="btnSaque" onclick="abrirModalSaque()" disabled>
+                💸 SACAR VIA PIX
+            </button>
+            <button class="btn-historico" onclick="abrirTelaHistorico()">
+                📋 HISTÓRICO DE SAQUES
+            </button>
+        </div>
+        
+        <!-- Tarefa -->
+        <div class="tarefa-card" id="tarefaCard">
+            <div class="tarefa-header">
+                <span class="tarefa-badge" id="taskBadge">TAREFA DISPONÍVEL</span>
+                <div class="app-icon">🎬</div>
+                <div class="tarefa-nome">Registre-se no Worldance Drama</div>
+                <div class="tarefa-desc">
+                    Baixe o aplicativo Worldance Drama, crie sua conta usando o código de convite e ganhe sua recompensa!
+                </div>
+                
+                <!-- Código de Convite -->
+                <div class="codigo-convite">
+                    <h4>🎁 Código de Convite</h4>
+                    <div class="codigo">BE764096</div>
+                </div>
+                
+                <div class="tarefa-requisitos">
+                    <h4>📋 O que você precisa fazer:</h4>
+                    <ul class="requisito-lista">
+                        <li>
+                            <span class="requisito-check" id="check1">1</span>
+                            <span>Baixar o app Worldance Drama na Play Store</span>
+                        </li>
+                        <li>
+                            <span class="requisito-check" id="check2">2</span>
+                            <span>Criar uma conta no aplicativo</span>
+                        </li>
+                        <li>
+                            <span class="requisito-check" id="check3">3</span>
+                            <span>Usar o código de convite <strong>BE764096</strong></span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="tarefa-valor">+ R$ 0,30</div>
+            </div>
+            
+            <!-- Estado: Disponível -->
+            <div id="estadoDisponivel" class="estado active">
+                <button class="btn-tarefa" onclick="iniciarTarefa()">
+                    📲 BAIXAR APP E COMEÇAR
+                </button>
+            </div>
+            
+            <!-- Estado: Verificação -->
+            <div id="estadoVerificacao" class="estado">
+                <div class="verificacao-box">
+                    <h4>✋ Quase lá!</h4>
+                    <p>
+                        Agora você precisa:<br>
+                        1. Instalar o app Worldance Drama<br>
+                        2. Criar sua conta<br>
+                        3. Usar o código de convite <strong>BE764096</strong>
+                    </p>
+                    <button class="btn-verificar" onclick="confirmarInstalacao()">
+                        ✅ JÁ FIZ TUDO - CONCLUIR TAREFA
+                    </button>
+                    <button class="btn-voltar" onclick="voltarParaDownload()">
+                        ← Voltar
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Estado: Concluído -->
+            <div id="estadoConcluido" class="estado">
+                <div class="status-concluido">
+                    <div class="status-icon">✓</div>
+                    <h3>Tarefa Concluída!</h3>
+                    <p>R$ 0,30 foi adicionado ao seu saldo</p>
+                </div>
+            </div>
+            
+            <!-- Estado: Bloqueado -->
+            <div id="estadoBloqueado" class="estado">
+                <div class="status-bloqueado">
+                    <div class="icone">✓</div>
+                    <h3>Você já completou esta tarefa</h3>
+                    <p>Aguarde novas tarefas em breve!</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Instruções -->
+        <div class="info-card">
+            <h3>📋 Como funciona:</h3>
+            <ol>
+                <li>Clique em "Baixar App" para ir à Play Store</li>
+                <li>Instale e abra o Worldance Drama</li>
+                <li>Crie sua conta no app</li>
+                <li>Use o código de convite <strong>BE764096</strong></li>
+                <li>Volte aqui e clique em "Já fiz tudo"</li>
+                <li>Receba <strong>R$ 0,30</strong> no seu saldo!</li>
+            </ol>
+        </div>
+    </div>
+
     <!-- ==================== PARTE 10: TELA DE HISTÓRICO DE SAQUES ==================== -->
     <div id="historicoScreen" class="screen">
         <div class="historico-header">
@@ -1280,7 +1278,7 @@
             
             <label style="display: block; margin-bottom: 12px; font-weight: 500;">Escolha o valor:</label>
             <div class="valor-options">
-                <button class="valor-btn selected" id="val50" onclick="selecionarValor(0.50)">R$ 0,50</button>
+                <button class="valor-btn selected" id="val30" onclick="selecionarValor(0.30)">R$ 0,30</button>
             </div>
             
             <label style="display: block; margin-bottom: 12px; font-weight: 500;">Tipo de chave:</label>
@@ -1304,6 +1302,7 @@
 
     <!-- ==================== PARTE 12: TOAST ==================== -->
     <div id="toast" class="toast"></div>
+    
     <script>
         // ==================== PARTE 13: CONFIGURAÇÃO FIREBASE ====================
         const firebaseConfig = {
@@ -1323,7 +1322,7 @@
         // ==================== PARTE 14: VARIÁVEIS GLOBAIS ====================
         let usuarioAtual = null;
         let dadosUsuario = null;
-        let valorSaqueSelecionado = 0.50;
+        let valorSaqueSelecionado = 0.30;
         let tipoChaveSelecionado = 'CPF';
         let tarefaIniciada = false;
         let listaSaquesCache = [];
@@ -1441,7 +1440,7 @@
             document.getElementById('saldoValor').textContent = 'R$ ' + saldo.toFixed(2).replace('.', ',');
             
             const btnSaque = document.getElementById('btnSaque');
-            btnSaque.disabled = saldo < 0.50;
+            btnSaque.disabled = saldo < 0.30;
             
             const jaFeTarefa = dadosUsuario.jaFeTarefa || false;
             const badge = document.getElementById('taskBadge');
@@ -1501,21 +1500,22 @@
             if (!usuarioAtual) return;
             const updates = {
                 jaFeTarefa: true,
-                saldo: (dadosUsuario.saldo || 0) + 0.50
+                saldo: (dadosUsuario.saldo || 0) + 0.30
             };
             
             database.ref('usuarios/' + usuarioAtual.uid).update(updates)
                 .then(() => {
                     mostrarEstado('estadoConcluido');
-                    showToast('✓ R$ 0,50 adicionado ao saldo!', 'success');
+                    showToast('✓ R$ 0,30 adicionado ao saldo!', 'success');
                     database.ref('transacoes/' + usuarioAtual.uid).push({
                         tipo: 'RECOMPENSA',
-                        valor: 0.50,
+                        valor: 0.30,
                         descricao: 'Tarefa: Registro Worldance Drama',
                         data: Date.now()
                     });
                 });
         }
+        
         // ==================== PARTE 19: SISTEMA DE HISTÓRICO DE SAQUES ====================
         function abrirTelaHistorico() {
             mostrarTela('historicoScreen');
@@ -1717,9 +1717,9 @@
         // ==================== PARTE 20: SISTEMA DE SAQUE ====================
         function abrirModalSaque() {
             const saldo = dadosUsuario?.saldo || 0;
-            document.getElementById('val50').disabled = saldo < 0.50;
+            document.getElementById('val30').disabled = saldo < 0.30;
             
-            selecionarValor(0.50);
+            selecionarValor(0.30);
             
             document.getElementById('modalSaque').classList.add('active');
         }
@@ -1732,12 +1732,20 @@
         }
         
         function selecionarValor(valor) {
-            const btn = document.getElementById('val50');
-            if (btn.disabled) return;
+            const btn30 = document.getElementById('val30');
+            
+            // Verifica se o botão está desabilitado
+            if (valor === 0.30 && btn30.disabled) return;
             
             valorSaqueSelecionado = valor;
+            
+            // Remove selected de todos
             document.querySelectorAll('.valor-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
+            
+            // Adiciona selected no botão correto
+            if (valor === 0.30) {
+                btn30.classList.add('selected');
+            }
         }
         
         function selecionarTipo(tipo, elemento) {
