@@ -354,7 +354,7 @@
         .app-icon {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #FF6B6B 0%, #EE5A6F 100%);
             border-radius: 20px;
             margin: 0 auto 16px;
             display: flex;
@@ -375,6 +375,30 @@
             font-size: 14px;
             margin-bottom: 12px;
             line-height: 1.5;
+        }
+        
+        .codigo-convite {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 12px;
+            margin: 16px 0;
+            text-align: center;
+        }
+        
+        .codigo-convite h4 {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .codigo-convite .codigo {
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            font-family: monospace;
         }
         
         .tarefa-requisitos {
@@ -472,76 +496,6 @@
         .estado.active {
             display: block;
             animation: fadeIn 0.3s;
-        }
-        
-        /* Timer */
-        .timer-container {
-            text-align: center;
-            padding: 20px;
-        }
-        
-        .progress-bar {
-            width: 100%;
-            height: 10px;
-            background: #E0E0E0;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-bottom: 20px;
-            position: relative;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00B894 0%, #00D4AA 100%);
-            border-radius: 5px;
-            transition: width 1s linear;
-        }
-        
-        .progress-fill.pausado {
-            background: #F59E0B;
-        }
-        
-        .timer-text {
-            font-size: 48px;
-            font-weight: bold;
-            color: #00B894;
-            margin-bottom: 12px;
-            font-variant-numeric: tabular-nums;
-        }
-        
-        .timer-status {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-        
-        .timer-status.ativo {
-            background: #D1FAE5;
-            color: #065F46;
-        }
-        
-        .timer-status.pausado {
-            background: #FEF3C7;
-            color: #92400E;
-        }
-        
-        .btn-retomar {
-            width: 100%;
-            padding: 16px;
-            background: #F59E0B;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 16px;
         }
         
         /* Status Concluído */
@@ -728,10 +682,16 @@
         <div class="tarefa-card" id="tarefaCard">
             <div class="tarefa-header">
                 <span class="tarefa-badge" id="taskBadge">TAREFA DISPONÍVEL</span>
-                <div class="app-icon">🎵</div>
-                <div class="tarefa-nome">Registre-se no Melolo</div>
+                <div class="app-icon">🎬</div>
+                <div class="tarefa-nome">Registre-se no Worldance Drama</div>
                 <div class="tarefa-desc">
-                    Baixe o aplicativo Melolo, crie sua conta e fique 30 segundos no app para ganhar sua recompensa!
+                    Baixe o aplicativo Worldance Drama, crie sua conta usando o código de convite e ganhe sua recompensa!
+                </div>
+                
+                <!-- Código de Convite -->
+                <div class="codigo-convite">
+                    <h4>🎁 Código de Convite</h4>
+                    <div class="codigo">BE764096</div>
                 </div>
                 
                 <div class="tarefa-requisitos">
@@ -739,7 +699,7 @@
                     <ul class="requisito-lista">
                         <li>
                             <span class="requisito-check" id="check1">1</span>
-                            <span>Baixar o app Melolo na Play Store</span>
+                            <span>Baixar o app Worldance Drama na Play Store</span>
                         </li>
                         <li>
                             <span class="requisito-check" id="check2">2</span>
@@ -747,12 +707,12 @@
                         </li>
                         <li>
                             <span class="requisito-check" id="check3">3</span>
-                            <span>Ficar 30 segundos no app</span>
+                            <span>Usar o código de convite <strong>BE764096</strong></span>
                         </li>
                     </ul>
                 </div>
                 
-                <div class="tarefa-valor">+ R$ 0,30</div>
+                <div class="tarefa-valor">+ R$ 0,50</div>
             </div>
             
             <!-- Estado: Disponível -->
@@ -768,35 +728,15 @@
                     <h4>✋ Quase lá!</h4>
                     <p>
                         Agora você precisa:<br>
-                        1. Instalar o app Melolo<br>
+                        1. Instalar o app Worldance Drama<br>
                         2. Criar sua conta<br>
-                        3. Ficar 30 segundos no app
+                        3. Usar o código de convite <strong>BE764096</strong>
                     </p>
                     <button class="btn-verificar" onclick="confirmarInstalacao()">
-                        ✅ JÁ FIZ TUDO - INICIAR TIMER
+                        ✅ JÁ FIZ TUDO - CONCLUIR TAREFA
                     </button>
                     <button class="btn-voltar" onclick="voltarParaDownload()">
                         ← Voltar
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Estado: Timer -->
-            <div id="estadoTimer" class="estado">
-                <div class="timer-container">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill" style="width: 100%"></div>
-                    </div>
-                    <div class="timer-text" id="timerText">30s</div>
-                    <div class="timer-status ativo" id="timerStatus">
-                        <span>⏱️</span>
-                        <span>Mantenha o app Melolo aberto</span>
-                    </div>
-                    <p style="color: #666; font-size: 13px;">
-                        Não saia do app Melolo nem feche esta página
-                    </p>
-                    <button class="btn-retomar" id="btnRetomar" onclick="retomarTimer()" style="display: none;">
-                        ▶️ RETOMAR CONTAGEM
                     </button>
                 </div>
             </div>
@@ -806,7 +746,7 @@
                 <div class="status-concluido">
                     <div class="status-icon">✓</div>
                     <h3>Tarefa Concluída!</h3>
-                    <p>R$ 0,30 foi adicionado ao seu saldo</p>
+                    <p>R$ 0,50 foi adicionado ao seu saldo</p>
                 </div>
             </div>
             
@@ -825,12 +765,11 @@
             <h3>📋 Como funciona:</h3>
             <ol>
                 <li>Clique em "Baixar App" para ir à Play Store</li>
-                <li>Instale e abra o Melolo</li>
+                <li>Instale e abra o Worldance Drama</li>
                 <li>Crie sua conta no app</li>
-                <li>Fique 30 segundos no aplicativo</li>
+                <li>Use o código de convite <strong>BE764096</strong></li>
                 <li>Volte aqui e clique em "Já fiz tudo"</li>
-                <li>Aguarde o timer de 30s finalizar (não saia!)</li>
-                <li>Receba R$ 0,30 no seu saldo!</li>
+                <li>Receba R$ 0,50 no seu saldo!</li>
             </ol>
         </div>
     </div>
@@ -1341,8 +1280,7 @@
             
             <label style="display: block; margin-bottom: 12px; font-weight: 500;">Escolha o valor:</label>
             <div class="valor-options">
-                <button class="valor-btn selected" id="val30" onclick="selecionarValor(0.30)">R$ 0,30</button>
-                <button class="valor-btn" id="val50" onclick="selecionarValor(0.50)">R$ 0,50</button>
+                <button class="valor-btn selected" id="val50" onclick="selecionarValor(0.50)">R$ 0,50</button>
             </div>
             
             <label style="display: block; margin-bottom: 12px; font-weight: 500;">Tipo de chave:</label>
@@ -1385,12 +1323,8 @@
         // ==================== PARTE 14: VARIÁVEIS GLOBAIS ====================
         let usuarioAtual = null;
         let dadosUsuario = null;
-        let valorSaqueSelecionado = 0.30;
+        let valorSaqueSelecionado = 0.50;
         let tipoChaveSelecionado = 'CPF';
-        let timerInterval = null;
-        let segundosRestantes = 30;
-        let paginaVisivel = true;
-        let timerPausado = false;
         let tarefaIniciada = false;
         let listaSaquesCache = [];
         let filtroAtual = 'todos';
@@ -1398,14 +1332,6 @@
         
         // ==================== PARTE 15: INICIALIZAÇÃO ====================
         auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-        
-        document.addEventListener('visibilitychange', () => {
-            const agoraVisivel = !document.hidden;
-            if (paginaVisivel && !agoraVisivel && tarefaIniciada && timerInterval && !timerPausado) {
-                pausarTimer();
-            }
-            paginaVisivel = agoraVisivel;
-        });
         
         // Previne zoom
         document.addEventListener('gesturestart', (e) => e.preventDefault());
@@ -1515,7 +1441,7 @@
             document.getElementById('saldoValor').textContent = 'R$ ' + saldo.toFixed(2).replace('.', ',');
             
             const btnSaque = document.getElementById('btnSaque');
-            btnSaque.disabled = saldo < 0.30;
+            btnSaque.disabled = saldo < 0.50;
             
             const jaFeTarefa = dadosUsuario.jaFeTarefa || false;
             const badge = document.getElementById('taskBadge');
@@ -1546,7 +1472,7 @@
         
         // ==================== PARTE 18: FLUXO DA TAREFA ====================
         function iniciarTarefa() {
-            window.open('https://play.google.com/store/apps/details?id=com.melolo.app', '_blank');
+            window.open('https://play.google.com/store/apps/details?id=com.worldance.drama', '_blank');
             tarefaIniciada = true;
             document.getElementById('check1').classList.add('feito');
             document.getElementById('check1').textContent = '✓';
@@ -1568,92 +1494,24 @@
             document.getElementById('check2').textContent = '✓';
             document.getElementById('check3').classList.add('feito');
             document.getElementById('check3').textContent = '✓';
-            iniciarTimer();
-        }
-        
-        function iniciarTimer() {
-            mostrarEstado('estadoTimer');
-            segundosRestantes = 30;
-            timerPausado = false;
-            atualizarTimerVisual();
-            
-            const status = document.getElementById('timerStatus');
-            status.className = 'timer-status ativo';
-            status.innerHTML = '<span>⏱️</span><span>Mantenha o app Melolo aberto</span>';
-            document.getElementById('btnRetomar').style.display = 'none';
-            
-            if (timerInterval) clearInterval(timerInterval);
-            
-            timerInterval = setInterval(() => {
-                if (timerPausado) return;
-                if (!paginaVisivel) {
-                    pausarTimer();
-                    return;
-                }
-                segundosRestantes--;
-                atualizarTimerVisual();
-                
-                if (segundosRestantes <= 0) {
-                    clearInterval(timerInterval);
-                    timerInterval = null;
-                    concluirTarefa();
-                }
-            }, 1000);
-        }
-        
-        function pausarTimer() {
-            timerPausado = true;
-            const status = document.getElementById('timerStatus');
-            const progress = document.getElementById('progressFill');
-            const btnRetomar = document.getElementById('btnRetomar');
-            
-            status.className = 'timer-status pausado';
-            status.innerHTML = '<span>⏸️</span><span>Timer pausado - você saiu da página</span>';
-            progress.classList.add('pausado');
-            btnRetomar.style.display = 'block';
-            
-            showToast('⏸️ Timer pausado! Volte e clique em RETOMAR', 'error');
-        }
-        
-        function retomarTimer() {
-            if (!paginaVisivel) {
-                showToast('⚠️ Volte para esta página primeiro!', 'error');
-                return;
-            }
-            timerPausado = false;
-            const status = document.getElementById('timerStatus');
-            const progress = document.getElementById('progressFill');
-            const btnRetomar = document.getElementById('btnRetomar');
-            
-            status.className = 'timer-status ativo';
-            status.innerHTML = '<span>⏱️</span><span>Mantenha o app Melolo aberto</span>';
-            progress.classList.remove('pausado');
-            btnRetomar.style.display = 'none';
-            
-            showToast('▶️ Timer retomado!', 'success');
-        }
-        
-        function atualizarTimerVisual() {
-            const progresso = (segundosRestantes / 30) * 100;
-            document.getElementById('progressFill').style.width = progresso + '%';
-            document.getElementById('timerText').textContent = segundosRestantes + 's';
+            concluirTarefa();
         }
         
         function concluirTarefa() {
             if (!usuarioAtual) return;
             const updates = {
                 jaFeTarefa: true,
-                saldo: (dadosUsuario.saldo || 0) + 0.30
+                saldo: (dadosUsuario.saldo || 0) + 0.50
             };
             
             database.ref('usuarios/' + usuarioAtual.uid).update(updates)
                 .then(() => {
                     mostrarEstado('estadoConcluido');
-                    showToast('✓ R$ 0,30 adicionado ao saldo!', 'success');
+                    showToast('✓ R$ 0,50 adicionado ao saldo!', 'success');
                     database.ref('transacoes/' + usuarioAtual.uid).push({
                         tipo: 'RECOMPENSA',
-                        valor: 0.30,
-                        descricao: 'Tarefa: Registro Melolo',
+                        valor: 0.50,
+                        descricao: 'Tarefa: Registro Worldance Drama',
                         data: Date.now()
                     });
                 });
@@ -1859,14 +1717,9 @@
         // ==================== PARTE 20: SISTEMA DE SAQUE ====================
         function abrirModalSaque() {
             const saldo = dadosUsuario?.saldo || 0;
-            document.getElementById('val30').disabled = saldo < 0.30;
             document.getElementById('val50').disabled = saldo < 0.50;
             
-            if (saldo >= 0.50) {
-                selecionarValor(0.50);
-            } else {
-                selecionarValor(0.30);
-            }
+            selecionarValor(0.50);
             
             document.getElementById('modalSaque').classList.add('active');
         }
@@ -1879,7 +1732,7 @@
         }
         
         function selecionarValor(valor) {
-            const btn = document.getElementById(valor === 0.30 ? 'val30' : 'val50');
+            const btn = document.getElementById('val50');
             if (btn.disabled) return;
             
             valorSaqueSelecionado = valor;
@@ -1970,12 +1823,6 @@
                     usuarioAtual = null;
                     dadosUsuario = null;
                     tarefaIniciada = false;
-                    timerPausado = false;
-                    
-                    if (timerInterval) {
-                        clearInterval(timerInterval);
-                        timerInterval = null;
-                    }
                     
                     if (listenerHistorico) {
                         listenerHistorico.off();
@@ -2008,4 +1855,3 @@
     </script>
 </body>
 </html>
-
