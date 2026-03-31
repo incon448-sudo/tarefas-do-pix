@@ -1696,16 +1696,13 @@
         document.addEventListener('gesturestart', (e) => e.preventDefault());
         document.addEventListener('dblclick', (e) => e.preventDefault());
         
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                usuarioAtual = user;
-                verificarOuCriarUsuario(user);
-                inicializarChatListener();
-            } else {
-                mostrarTela('authScreen');
-            }
-        });
+        // ==================== DETECTAR MOBILE ====================
+        function isMobile() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                   window.innerWidth <= 768;
+        }
         
+        // ==================== LOGIN COM REDIRECT (MOBILE) ====================
         function loginComGoogle() {
             const btn = document.getElementById('btnGoogle');
             const errorEl = document.getElementById('loginError');
@@ -1716,25 +1713,70 @@
             
             const provider = new firebase.auth.GoogleAuthProvider();
             provider.setCustomParameters({ 'prompt': 'select_account' });
+            provider.addScope('profile');
+            provider.addScope('email');
             
-            auth.signInWithPopup(provider)
-                .then((result) => {
-                    console.log('Login OK:', result.user.email);
-                })
-                .catch((error) => {
-                    console.error('Erro:', error);
-                    btn.disabled = false;
-                    btn.innerHTML = getGoogleButtonHTML();
-                    
-                    let msg = 'Erro ao conectar. Tente novamente.';
-                    if (error.code === 'auth/popup-closed-by-user') msg = 'Você fechou a janela de login.';
-                    if (error.code === 'auth/popup-blocked') msg = 'Popup bloqueado. Permita popups.';
-                    if (error.code === 'auth/network-request-failed') msg = 'Sem conexão com internet.';
-                    
-                    errorEl.textContent = msg;
-                    errorEl.classList.add('show');
-                });
+            // Em mobile, usar redirect. Em desktop, usar popup
+            if (isMobile()) {
+                console.log('Usando signInWithRedirect (mobile)');
+                auth.signInWithRedirect(provider)
+                    .catch((error) => {
+                        console.error('Erro redirect:', error);
+                        btn.disabled = false;
+                        btn.innerHTML = getGoogleButtonHTML();
+                        
+                        let msg = 'Erro ao conectar. Tente novamente.';
+                        if (error.code === 'auth/network-request-failed') msg = 'Sem conexão com internet.';
+                        
+                        errorEl.textContent = msg;
+                        errorEl.classList.add('show');
+                    });
+            } else {
+                console.log('Usando signInWithPopup (desktop)');
+                auth.signInWithPopup(provider)
+                    .then((result) => {
+                        console.log('Login OK (popup):', result.user.email);
+                    })
+                    .catch((error) => {
+                        console.error('Erro popup:', error);
+                        btn.disabled = false;
+                        btn.innerHTML = getGoogleButtonHTML();
+                        
+                        let msg = 'Erro ao conectar. Tente novamente.';
+                        if (error.code === 'auth/popup-closed-by-user') msg = 'Você fechou a janela de login.';
+                        if (error.code === 'auth/popup-blocked') msg = 'Popup bloqueado. Tente em modo desktop.';
+                        if (error.code === 'auth/network-request-failed') msg = 'Sem conexão com internet.';
+                        
+                        errorEl.textContent = msg;
+                        errorEl.classList.add('show');
+                    });
+            }
         }
+        
+        // ==================== VERIFICAR RESULTADO DO REDIRECT ====================
+        auth.getRedirectResult()
+            .then((result) => {
+                if (result.user) {
+                    console.log('Login via redirect OK:', result.user.email);
+                    // O onAuthStateChanged vai cuidar do resto
+                }
+            })
+            .catch((error) => {
+                console.error('Erro no redirect result:', error);
+                const btn = document.getElementById('btnGoogle');
+                const errorEl = document.getElementById('loginError');
+                
+                btn.disabled = false;
+                btn.innerHTML = getGoogleButtonHTML();
+                
+                let msg = 'Erro ao conectar. Tente novamente.';
+                if (error.code === 'auth/account-exists-with-different-credential') {
+                    msg = 'Esta conta já existe com outro método de login.';
+                }
+                
+                errorEl.textContent = msg;
+                errorEl.classList.add('show');
+            });
         
         function getGoogleButtonHTML() {
             return `
@@ -1747,6 +1789,22 @@
                 Entrar com Google
             `;
         }
+        
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                usuarioAtual = user;
+                verificarOuCriarUsuario(user);
+                inicializarChatListener();
+            } else {
+                mostrarTela('authScreen');
+                // Resetar botão se estiver carregando
+                const btn = document.getElementById('btnGoogle');
+                if (btn && btn.disabled) {
+                    btn.disabled = false;
+                    btn.innerHTML = getGoogleButtonHTML();
+                }
+            }
+        });
         
         function verificarOuCriarUsuario(user) {
             const userRef = database.ref('usuarios/' + user.uid);
