@@ -59,6 +59,21 @@
             50% { opacity: 0.5; }
         }
         
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
         .auth-container {
             background: #1A5F2A;
             min-height: 100vh;
@@ -316,6 +331,39 @@
         .btn-historico:active {
             transform: scale(0.98);
             background: rgba(255,255,255,0.3);
+        }
+        
+        .btn-suporte {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            margin-left: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        .btn-suporte:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-suporte .badge {
+            background: #E74C3C;
+            color: white;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
         }
         
         .tarefa-card {
@@ -1055,6 +1103,303 @@
         .toast.info {
             background: #3B82F6;
         }
+        
+        /* CHAT STYLES */
+        .chat-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            top: 0;
+            background: white;
+            z-index: 250;
+            display: none;
+            flex-direction: column;
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        .chat-container.active {
+            display: flex;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .btn-voltar-chat {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+        
+        .btn-voltar-chat:active {
+            background: rgba(255,255,255,0.3);
+            transform: scale(0.95);
+        }
+        
+        .chat-header-info {
+            flex: 1;
+        }
+        
+        .chat-header-info h2 {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .chat-header-info p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .chat-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #22C55E;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            background: #F8F9FA;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 3px;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .message.received {
+            align-self: flex-start;
+            background: white;
+            color: #333;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .message.sent {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+        
+        .message.sent .message-time {
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .chat-input-container {
+            background: white;
+            padding: 12px 16px;
+            border-top: 1px solid #E5E7EB;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #E5E7EB;
+            border-radius: 24px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+        
+        .btn-enviar {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+        
+        .btn-enviar:active {
+            transform: scale(0.95);
+        }
+        
+        .btn-enviar:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .chat-welcome {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        
+        .chat-welcome .icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+        
+        .chat-welcome h3 {
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .chat-welcome p {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background: white;
+            padding: 12px 16px;
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .typing-indicator.active {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #CBD5E1;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        
+        .typing-dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+        
+        .typing-dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+        
+        .chat-fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            z-index: 150;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            animation: pulse 2s infinite;
+        }
+        
+        .chat-fab.active {
+            display: flex;
+        }
+        
+        .chat-fab:active {
+            transform: scale(0.95);
+        }
+        
+        .chat-fab .badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #E74C3C;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            min-width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 6px;
+        }
+        
+        .admin-badge {
+            background: #F59E0B;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+            font-weight: bold;
+        }
+        
+        .system-message {
+            align-self: center;
+            background: #E5E7EB;
+            color: #666;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 12px;
+            text-align: center;
+            max-width: 90%;
+        }
     </style>
 </head>
 <body>
@@ -1109,9 +1454,15 @@
             <button class="btn-saque" id="btnSaque" onclick="abrirModalSaque()" disabled>
                 💸 SACAR VIA PIX
             </button>
-            <button class="btn-historico" onclick="abrirTelaHistorico()">
-                📋 HISTÓRICO DE SAQUES
-            </button>
+            <div style="margin-top: 12px;">
+                <button class="btn-historico" onclick="abrirTelaHistorico()">
+                    📋 HISTÓRICO
+                </button>
+                <button class="btn-suporte" onclick="abrirChatSuporte()" id="btnSuporte">
+                    💬 SUPORTE
+                    <span class="badge" id="badgeNovasMensagens" style="display: none;">0</span>
+                </button>
+            </div>
         </div>
         
         <div class="tarefa-card" id="tarefaCard">
@@ -1240,6 +1591,44 @@
         </div>
     </div>
 
+    <!-- CHAT SCREEN -->
+    <div id="chatScreen" class="chat-container">
+        <div class="chat-header">
+            <button class="btn-voltar-chat" onclick="fecharChatSuporte()">←</button>
+            <div class="chat-header-info">
+                <h2>Suporte Tarefas do Pix</h2>
+                <div class="chat-status">
+                    <span class="status-dot"></span>
+                    <span>Online</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-welcome" id="chatWelcome">
+                <div class="icon">💬</div>
+                <h3>Chat de Suporte</h3>
+                <p>Envie sua mensagem e nossa equipe responderá em breve.<br>Horário de atendimento: 9h às 18h</p>
+            </div>
+            
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+        
+        <div class="chat-input-container">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Digite sua mensagem..." maxlength="500">
+            <button class="btn-enviar" id="btnEnviar" onclick="enviarMensagemChat()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+
     <div id="modalSaque" class="modal-overlay" onclick="fecharModalSaque(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="modal-title">💸 Sacar via Pix</div>
@@ -1275,7 +1664,7 @@
         const firebaseConfig = {
             apiKey: "AIzaSyBUI_gg3WisOWvOfCPM3rrKogrZNLJ-WUE",
             authDomain: "tarefas-do-pix.firebaseapp.com",
-            databaseURL: "https://tarefas-do-pix-default-rtdb.firebaseio.com",
+            databaseURL: "https://tarefas-do-pix-default-rtdb.firebase.io",
             projectId: "tarefas-do-pix",
             storageBucket: "tarefas-do-pix.firebasestorage.app",
             messagingSenderId: "236400248524",
@@ -1295,6 +1684,13 @@
         let filtroAtual = 'todos';
         let listenerHistorico = null;
         
+        // CHAT VARIABLES
+        let chatListener = null;
+        let chatRoomId = null;
+        let ultimaMensagemId = null;
+        let mensagensNaoLidas = 0;
+        let estaDigitando = false;
+        
         auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         
         document.addEventListener('gesturestart', (e) => e.preventDefault());
@@ -1304,6 +1700,7 @@
             if (user) {
                 usuarioAtual = user;
                 verificarOuCriarUsuario(user);
+                inicializarChatListener();
             } else {
                 mostrarTela('authScreen');
             }
@@ -1377,10 +1774,8 @@
                 });
         }
         
-        // ==================== FUNÇÃO CORRIGIDA: VERIFICAR ESTORNOS ====================
         function verificarEstornosPendentes(userId) {
             return new Promise((resolve) => {
-                // Verifica saques REJEITADOS que ainda não tiveram estorno aplicado
                 const saquesRef = database.ref('saques').orderByChild('userId').equalTo(userId);
                 
                 saquesRef.once('value', (snapshot) => {
@@ -1388,7 +1783,6 @@
                     
                     snapshot.forEach((child) => {
                         const saque = child.val();
-                        // Procura saques rejeitados ou cancelados que ainda não foram estornados
                         if ((saque.status === 'REJEITADO' || saque.status === 'CANCELADO') && 
                             !saque.estornoAplicado) {
                             saquesRejeitados.push({
@@ -1403,7 +1797,6 @@
                         return;
                     }
                     
-                    // Busca saldo atual
                     database.ref('usuarios/' + userId + '/saldo').once('value', (saldoSnapshot) => {
                         let saldoAtual = saldoSnapshot.val() || 0;
                         let totalEstornado = 0;
@@ -1411,19 +1804,15 @@
                         const updates = {};
                         
                         saquesRejeitados.forEach((saque) => {
-                            // Adiciona o valor de volta ao saldo
                             saldoAtual += saque.valor;
                             totalEstornado += saque.valor;
                             
-                            // Marca o saque como estornado
                             updates['saques/' + saque.id + '/estornoAplicado'] = true;
                             updates['saques/' + saque.id + '/dataEstorno'] = Date.now();
                         });
                         
-                        // Atualiza o saldo do usuário
                         updates['usuarios/' + userId + '/saldo'] = saldoAtual;
                         
-                        // Aplica todas as atualizações
                         database.ref().update(updates)
                             .then(() => {
                                 console.log(`Estorno aplicado: R$ ${totalEstornado.toFixed(2)} para ${saquesRejeitados.length} saque(s)`);
@@ -1697,7 +2086,6 @@
                 `;
             }
             
-            // Mostra se o estorno foi aplicado
             let estornoInfo = '';
             if ((saque.status === 'REJEITADO' || saque.status === 'CANCELADO') && saque.estornoAplicado) {
                 estornoInfo = `
@@ -1868,11 +2256,16 @@
         }
         
         function fazerLogout() {
+            if (chatListener) {
+                chatListener.off();
+            }
+            
             auth.signOut()
                 .then(() => {
                     usuarioAtual = null;
                     dadosUsuario = null;
                     tarefaIniciada = false;
+                    mensagensNaoLidas = 0;
                     
                     if (listenerHistorico) {
                         listenerHistorico.off();
@@ -1902,6 +2295,221 @@
             setTimeout(() => toast.classList.add('show'), 10);
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
+        
+        // ==================== CHAT FUNCTIONS ====================
+        
+        function inicializarChatListener() {
+            if (!usuarioAtual) return;
+            
+            // Cria ID único da sala: userId + "_suporte"
+            chatRoomId = usuarioAtual.uid + '_suporte';
+            
+            // Listener para novas mensagens
+            chatListener = database.ref('chats/' + chatRoomId + '/mensagens')
+                .orderByChild('timestamp')
+                .limitToLast(50);
+            
+            chatListener.on('child_added', (snapshot) => {
+                const mensagem = snapshot.val();
+                const msgId = snapshot.key;
+                
+                // Se o chat não está aberto e a mensagem é do suporte, incrementa badge
+                if (!document.getElementById('chatScreen').classList.contains('active') && 
+                    mensagem.remetente === 'suporte' && 
+                    !mensagem.lida) {
+                    mensagensNaoLidas++;
+                    atualizarBadgeMensagens();
+                }
+                
+                // Se o chat está aberto, marca como lida
+                if (document.getElementById('chatScreen').classList.contains('active') && 
+                    mensagem.remetente === 'suporte' && 
+                    !mensagem.lida) {
+                    database.ref('chats/' + chatRoomId + '/mensagens/' + msgId + '/lida').set(true);
+                }
+                
+                // Renderiza mensagem se o chat estiver aberto
+                if (document.getElementById('chatScreen').classList.contains('active')) {
+                    renderizarMensagem(mensagem, msgId);
+                }
+            });
+            
+            // Listener para status "digitando" do suporte
+            database.ref('chats/' + chatRoomId + '/suporteDigitando').on('value', (snapshot) => {
+                const digitando = snapshot.val();
+                const indicator = document.getElementById('typingIndicator');
+                if (digitando && document.getElementById('chatScreen').classList.contains('active')) {
+                    indicator.classList.add('active');
+                    scrollToBottom();
+                } else {
+                    indicator.classList.remove('active');
+                }
+            });
+        }
+        
+        function abrirChatSuporte() {
+            document.getElementById('chatScreen').classList.add('active');
+            document.getElementById('chatWelcome').style.display = 'none';
+            
+            // Limpa mensagens anteriores
+            const container = document.getElementById('chatMessages');
+            // Mantém o welcome e typing indicator
+            const welcome = document.getElementById('chatWelcome');
+            const typing = document.getElementById('typingIndicator');
+            container.innerHTML = '';
+            container.appendChild(welcome);
+            container.appendChild(typing);
+            
+            // Carrega histórico de mensagens
+            carregarHistoricoChat();
+            
+            // Zera badge
+            mensagensNaoLidas = 0;
+            atualizarBadgeMensagens();
+            
+            // Foca no input
+            setTimeout(() => document.getElementById('chatInput').focus(), 300);
+        }
+        
+        function fecharChatSuporte() {
+            document.getElementById('chatScreen').classList.remove('active');
+        }
+        
+        function carregarHistoricoChat() {
+            if (!chatRoomId) return;
+            
+            database.ref('chats/' + chatRoomId + '/mensagens')
+                .orderByChild('timestamp')
+                .limitToLast(50)
+                .once('value', (snapshot) => {
+                    const mensagens = [];
+                    snapshot.forEach((child) => {
+                        mensagens.push({
+                            id: child.key,
+                            ...child.val()
+                        });
+                    });
+                    
+                    if (mensagens.length > 0) {
+                        document.getElementById('chatWelcome').style.display = 'none';
+                        mensagens.forEach((msg) => {
+                            renderizarMensagem(msg, msg.id, false);
+                        });
+                        scrollToBottom();
+                    }
+                });
+        }
+        
+        function renderizarMensagem(mensagem, msgId, animar = true) {
+            // Evita duplicatas
+            if (document.querySelector(`[data-msg-id="${msgId}"]`)) return;
+            
+            const container = document.getElementById('chatMessages');
+            const typingIndicator = document.getElementById('typingIndicator');
+            
+            const div = document.createElement('div');
+            div.className = 'message ' + (mensagem.remetente === 'usuario' ? 'sent' : 'received');
+            div.setAttribute('data-msg-id', msgId);
+            
+            const hora = new Date(mensagem.timestamp).toLocaleTimeString('pt-BR', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            
+            let conteudo = mensagem.texto;
+            if (mensagem.remetente === 'suporte') {
+                conteudo += ' <span class="admin-badge">SUPORTE</span>';
+            }
+            
+            div.innerHTML = `
+                <div>${conteudo}</div>
+                <div class="message-time">${hora}</div>
+            `;
+            
+            // Insere antes do typing indicator
+            container.insertBefore(div, typingIndicator);
+            
+            if (animar) {
+                scrollToBottom();
+            }
+        }
+        
+        function enviarMensagemChat() {
+            const input = document.getElementById('chatInput');
+            const texto = input.value.trim();
+            
+            if (!texto || !usuarioAtual || !chatRoomId) return;
+            
+            // Limpa input
+            input.value = '';
+            
+            // Cria mensagem
+            const mensagem = {
+                texto: texto,
+                remetente: 'usuario',
+                timestamp: Date.now(),
+                lida: false,
+                userId: usuarioAtual.uid,
+                userName: dadosUsuario?.nome || 'Usuário',
+                userEmail: usuarioAtual.email
+            };
+            
+            // Salva no Firebase
+            database.ref('chats/' + chatRoomId + '/mensagens').push(mensagem)
+                .then(() => {
+                    // Atualiza info da sala
+                    database.ref('chats/' + chatRoomId).update({
+                        ultimaMensagem: texto,
+                        ultimaAtualizacao: Date.now(),
+                        userId: usuarioAtual.uid,
+                        userName: dadosUsuario?.nome || 'Usuário',
+                        userEmail: usuarioAtual.email,
+                        status: 'aguardando_resposta'
+                    });
+                    
+                    // Esconde welcome
+                    document.getElementById('chatWelcome').style.display = 'none';
+                })
+                .catch((error) => {
+                    console.error('Erro ao enviar mensagem:', error);
+                    showToast('Erro ao enviar mensagem', 'error');
+                });
+        }
+        
+        function scrollToBottom() {
+            const container = document.getElementById('chatMessages');
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function atualizarBadgeMensagens() {
+            const badge = document.getElementById('badgeNovasMensagens');
+            if (mensagensNaoLidas > 0) {
+                badge.textContent = mensagensNaoLidas > 99 ? '99+' : mensagensNaoLidas;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+        
+        // Event listeners do chat
+        document.getElementById('chatInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                enviarMensagemChat();
+            }
+        });
+        
+        // Detecta quando usuário está digitando
+        let typingTimeout;
+        document.getElementById('chatInput').addEventListener('input', () => {
+            if (!chatRoomId) return;
+            
+            database.ref('chats/' + chatRoomId + '/usuarioDigitando').set(true);
+            
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                database.ref('chats/' + chatRoomId + '/usuarioDigitando').set(false);
+            }, 2000);
+        });
     </script>
 </body>
 </html>
