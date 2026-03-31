@@ -1696,6 +1696,16 @@
         document.addEventListener('gesturestart', (e) => e.preventDefault());
         document.addEventListener('dblclick', (e) => e.preventDefault());
         
+        // ==================== FUNÇÃO PARA RESETAR BOTÃO ====================
+        function resetarBotaoLogin() {
+            const btn = document.getElementById('btnGoogle');
+            const errorEl = document.getElementById('loginError');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = getGoogleButtonHTML();
+            }
+        }
+        
         // ==================== DETECTAR MOBILE ====================
         function isMobile() {
             return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
@@ -1718,12 +1728,11 @@
             
             // Em mobile, usar redirect. Em desktop, usar popup
             if (isMobile()) {
-                console.log('Usando signInWithRedirect (mobile)');
+                console.log('📱 Usando signInWithRedirect (mobile)');
                 auth.signInWithRedirect(provider)
                     .catch((error) => {
-                        console.error('Erro redirect:', error);
-                        btn.disabled = false;
-                        btn.innerHTML = getGoogleButtonHTML();
+                        console.error('❌ Erro redirect:', error);
+                        resetarBotaoLogin();
                         
                         let msg = 'Erro ao conectar. Tente novamente.';
                         if (error.code === 'auth/network-request-failed') msg = 'Sem conexão com internet.';
@@ -1732,15 +1741,14 @@
                         errorEl.classList.add('show');
                     });
             } else {
-                console.log('Usando signInWithPopup (desktop)');
+                console.log('💻 Usando signInWithPopup (desktop)');
                 auth.signInWithPopup(provider)
                     .then((result) => {
-                        console.log('Login OK (popup):', result.user.email);
+                        console.log('✅ Login OK (popup):', result.user.email);
                     })
                     .catch((error) => {
-                        console.error('Erro popup:', error);
-                        btn.disabled = false;
-                        btn.innerHTML = getGoogleButtonHTML();
+                        console.error('❌ Erro popup:', error);
+                        resetarBotaoLogin();
                         
                         let msg = 'Erro ao conectar. Tente novamente.';
                         if (error.code === 'auth/popup-closed-by-user') msg = 'Você fechou a janela de login.';
@@ -1757,21 +1765,25 @@
         auth.getRedirectResult()
             .then((result) => {
                 if (result.user) {
-                    console.log('Login via redirect OK:', result.user.email);
+                    console.log('✅ Login via redirect OK:', result.user.email);
                     // O onAuthStateChanged vai cuidar do resto
+                } else {
+                    // Nenhum redirect pendente, resetar botão
+                    console.log('ℹ️ Nenhum redirect pendente');
+                    resetarBotaoLogin();
                 }
             })
             .catch((error) => {
-                console.error('Erro no redirect result:', error);
-                const btn = document.getElementById('btnGoogle');
+                console.error('❌ Erro no redirect result:', error);
+                resetarBotaoLogin();
+                
                 const errorEl = document.getElementById('loginError');
-                
-                btn.disabled = false;
-                btn.innerHTML = getGoogleButtonHTML();
-                
                 let msg = 'Erro ao conectar. Tente novamente.';
+                
                 if (error.code === 'auth/account-exists-with-different-credential') {
                     msg = 'Esta conta já existe com outro método de login.';
+                } else if (error.code === 'auth/network-request-failed') {
+                    msg = 'Sem conexão com internet.';
                 }
                 
                 errorEl.textContent = msg;
@@ -1792,30 +1804,30 @@
         
         auth.onAuthStateChanged((user) => {
             if (user) {
+                console.log('✅ Usuário autenticado:', user.email);
                 usuarioAtual = user;
                 verificarOuCriarUsuario(user);
                 inicializarChatListener();
             } else {
+                console.log('🏠 Usuário deslogado');
                 mostrarTela('authScreen');
-                // Resetar botão se estiver carregando
-                const btn = document.getElementById('btnGoogle');
-                if (btn && btn.disabled) {
-                    btn.disabled = false;
-                    btn.innerHTML = getGoogleButtonHTML();
-                }
+                resetarBotaoLogin();
             }
         });
         
         function verificarOuCriarUsuario(user) {
+            console.log('🔍 Verificando usuário no banco:', user.uid);
             const userRef = database.ref('usuarios/' + user.uid);
             
             userRef.once('value')
                 .then((snapshot) => {
                     if (snapshot.exists()) {
-                        verificarEstornosPendentes(user.uid).then(() => {
+                        console.log('✅ Usuário existe no banco');
+                        return verificarEstornosPendentes(user.uid).then(() => {
                             carregarDadosUsuario(user);
                         });
                     } else {
+                        console.log('🆕 Criando novo usuário no banco...');
                         const userData = {
                             nome: user.displayName || 'Usuário',
                             email: user.email,
@@ -1825,10 +1837,19 @@
                             dataCadastro: Date.now(),
                             provedor: 'google'
                         };
-                        return userRef.set(userData).then(() => {
-                            carregarDadosUsuario(user);
-                        });
+                        return userRef.set(userData)
+                            .then(() => {
+                                console.log('✅ Novo usuário criado com sucesso');
+                                carregarDadosUsuario(user);
+                            });
                     }
+                })
+                .catch((error) => {
+                    console.error('❌ ERRO CRÍTICO ao acessar banco:', error);
+                    showToast('Erro ao acessar dados. Tente novamente.', 'error');
+                    resetarBotaoLogin();
+                    // Desloga para tentar de novo
+                    auth.signOut();
                 });
         }
         
@@ -1873,7 +1894,7 @@
                         
                         database.ref().update(updates)
                             .then(() => {
-                                console.log(`Estorno aplicado: R$ ${totalEstornado.toFixed(2)} para ${saquesRejeitados.length} saque(s)`);
+                                console.log(`💰 Estorno aplicado: R$ ${totalEstornado.toFixed(2)}`);
                                 if (totalEstornado > 0) {
                                     showToast(`💰 R$ ${totalEstornado.toFixed(2)} devolvido ao seu saldo!`, 'success');
                                 }
@@ -2337,10 +2358,7 @@
                     });
                     
                     mostrarTela('authScreen');
-                    
-                    const btn = document.getElementById('btnGoogle');
-                    btn.disabled = false;
-                    btn.innerHTML = getGoogleButtonHTML();
+                    resetarBotaoLogin();
                     document.getElementById('loginError').classList.remove('show');
                 });
         }
@@ -2359,10 +2377,8 @@
         function inicializarChatListener() {
             if (!usuarioAtual) return;
             
-            // Cria ID único da sala: userId + "_suporte"
             chatRoomId = usuarioAtual.uid + '_suporte';
             
-            // Listener para novas mensagens
             chatListener = database.ref('chats/' + chatRoomId + '/mensagens')
                 .orderByChild('timestamp')
                 .limitToLast(50);
@@ -2371,7 +2387,6 @@
                 const mensagem = snapshot.val();
                 const msgId = snapshot.key;
                 
-                // Se o chat não está aberto e a mensagem é do suporte, incrementa badge
                 if (!document.getElementById('chatScreen').classList.contains('active') && 
                     mensagem.remetente === 'suporte' && 
                     !mensagem.lida) {
@@ -2379,20 +2394,17 @@
                     atualizarBadgeMensagens();
                 }
                 
-                // Se o chat está aberto, marca como lida
                 if (document.getElementById('chatScreen').classList.contains('active') && 
                     mensagem.remetente === 'suporte' && 
                     !mensagem.lida) {
                     database.ref('chats/' + chatRoomId + '/mensagens/' + msgId + '/lida').set(true);
                 }
                 
-                // Renderiza mensagem se o chat estiver aberto
                 if (document.getElementById('chatScreen').classList.contains('active')) {
                     renderizarMensagem(mensagem, msgId);
                 }
             });
             
-            // Listener para status "digitando" do suporte
             database.ref('chats/' + chatRoomId + '/suporteDigitando').on('value', (snapshot) => {
                 const digitando = snapshot.val();
                 const indicator = document.getElementById('typingIndicator');
@@ -2409,23 +2421,18 @@
             document.getElementById('chatScreen').classList.add('active');
             document.getElementById('chatWelcome').style.display = 'none';
             
-            // Limpa mensagens anteriores
             const container = document.getElementById('chatMessages');
-            // Mantém o welcome e typing indicator
             const welcome = document.getElementById('chatWelcome');
             const typing = document.getElementById('typingIndicator');
             container.innerHTML = '';
             container.appendChild(welcome);
             container.appendChild(typing);
             
-            // Carrega histórico de mensagens
             carregarHistoricoChat();
             
-            // Zera badge
             mensagensNaoLidas = 0;
             atualizarBadgeMensagens();
             
-            // Foca no input
             setTimeout(() => document.getElementById('chatInput').focus(), 300);
         }
         
@@ -2459,7 +2466,6 @@
         }
         
         function renderizarMensagem(mensagem, msgId, animar = true) {
-            // Evita duplicatas
             if (document.querySelector(`[data-msg-id="${msgId}"]`)) return;
             
             const container = document.getElementById('chatMessages');
@@ -2484,7 +2490,6 @@
                 <div class="message-time">${hora}</div>
             `;
             
-            // Insere antes do typing indicator
             container.insertBefore(div, typingIndicator);
             
             if (animar) {
@@ -2498,10 +2503,8 @@
             
             if (!texto || !usuarioAtual || !chatRoomId) return;
             
-            // Limpa input
             input.value = '';
             
-            // Cria mensagem
             const mensagem = {
                 texto: texto,
                 remetente: 'usuario',
@@ -2512,10 +2515,8 @@
                 userEmail: usuarioAtual.email
             };
             
-            // Salva no Firebase
             database.ref('chats/' + chatRoomId + '/mensagens').push(mensagem)
                 .then(() => {
-                    // Atualiza info da sala
                     database.ref('chats/' + chatRoomId).update({
                         ultimaMensagem: texto,
                         ultimaAtualizacao: Date.now(),
@@ -2525,7 +2526,6 @@
                         status: 'aguardando_resposta'
                     });
                     
-                    // Esconde welcome
                     document.getElementById('chatWelcome').style.display = 'none';
                 })
                 .catch((error) => {
@@ -2556,7 +2556,6 @@
             }
         });
         
-        // Detecta quando usuário está digitando
         let typingTimeout;
         document.getElementById('chatInput').addEventListener('input', () => {
             if (!chatRoomId) return;
