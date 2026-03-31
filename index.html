@@ -1377,47 +1377,58 @@
                 });
         }
         
+        // ==================== FUNÇÃO CORRIGIDA: VERIFICAR ESTORNOS ====================
         function verificarEstornosPendentes(userId) {
             return new Promise((resolve) => {
-                const estornosRef = database.ref('estornos').orderByChild('userId').equalTo(userId);
+                // Verifica saques REJEITADOS que ainda não tiveram estorno aplicado
+                const saquesRef = database.ref('saques').orderByChild('userId').equalTo(userId);
                 
-                estornosRef.once('value', (snapshot) => {
-                    const estornos = [];
-                    let totalEstorno = 0;
+                saquesRef.once('value', (snapshot) => {
+                    const saquesRejeitados = [];
                     
                     snapshot.forEach((child) => {
-                        const estorno = child.val();
-                        if (estorno.status === 'PENDENTE') {
-                            estornos.push({
+                        const saque = child.val();
+                        // Procura saques rejeitados ou cancelados que ainda não foram estornados
+                        if ((saque.status === 'REJEITADO' || saque.status === 'CANCELADO') && 
+                            !saque.estornoAplicado) {
+                            saquesRejeitados.push({
                                 id: child.key,
-                                ...estorno
+                                ...saque
                             });
-                            totalEstorno += estorno.valor || 0;
                         }
                     });
                     
-                    if (estornos.length === 0) {
+                    if (saquesRejeitados.length === 0) {
                         resolve();
                         return;
                     }
                     
+                    // Busca saldo atual
                     database.ref('usuarios/' + userId + '/saldo').once('value', (saldoSnapshot) => {
-                        const saldoAtual = saldoSnapshot.val() || 0;
-                        const novoSaldo = saldoAtual + totalEstorno;
+                        let saldoAtual = saldoSnapshot.val() || 0;
+                        let totalEstornado = 0;
                         
                         const updates = {};
-                        updates['usuarios/' + userId + '/saldo'] = novoSaldo;
                         
-                        estornos.forEach((estorno) => {
-                            updates['estornos/' + estorno.id + '/status'] = 'APLICADO';
-                            updates['estornos/' + estorno.id + '/dataAplicacao'] = Date.now();
+                        saquesRejeitados.forEach((saque) => {
+                            // Adiciona o valor de volta ao saldo
+                            saldoAtual += saque.valor;
+                            totalEstornado += saque.valor;
+                            
+                            // Marca o saque como estornado
+                            updates['saques/' + saque.id + '/estornoAplicado'] = true;
+                            updates['saques/' + saque.id + '/dataEstorno'] = Date.now();
                         });
                         
+                        // Atualiza o saldo do usuário
+                        updates['usuarios/' + userId + '/saldo'] = saldoAtual;
+                        
+                        // Aplica todas as atualizações
                         database.ref().update(updates)
                             .then(() => {
-                                console.log(`Estorno aplicado: R$ ${totalEstorno.toFixed(2)}`);
-                                if (totalEstorno > 0) {
-                                    showToast(`💰 Estorno de R$ ${totalEstorno.toFixed(2)} aplicado!`, 'success');
+                                console.log(`Estorno aplicado: R$ ${totalEstornado.toFixed(2)} para ${saquesRejeitados.length} saque(s)`);
+                                if (totalEstornado > 0) {
+                                    showToast(`💰 R$ ${totalEstornado.toFixed(2)} devolvido ao seu saldo!`, 'success');
                                 }
                                 resolve();
                             })
@@ -1686,6 +1697,17 @@
                 `;
             }
             
+            // Mostra se o estorno foi aplicado
+            let estornoInfo = '';
+            if ((saque.status === 'REJEITADO' || saque.status === 'CANCELADO') && saque.estornoAplicado) {
+                estornoInfo = `
+                    <div class="saque-linha">
+                        <span>💰 Estorno:</span>
+                        <span style="color: #22C55E;">Aplicado em ${new Date(saque.dataEstorno).toLocaleDateString('pt-BR')}</span>
+                    </div>
+                `;
+            }
+            
             return `
                 <div class="saque-item ${statusClass}">
                     <div class="saque-header">
@@ -1705,6 +1727,7 @@
                             <span>${dataInfo}</span>
                         </div>
                         ${extraInfo}
+                        ${estornoInfo}
                     </div>
                     ${rejeicaoHtml}
                 </div>
