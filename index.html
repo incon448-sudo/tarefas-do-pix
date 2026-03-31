@@ -8,7 +8,6 @@
     
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
     
     <style>
@@ -121,36 +120,85 @@
             margin-bottom: 20px;
         }
         
-        .btn-google {
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: #F5F5F5;
+            padding: 4px;
+            border-radius: 12px;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn.active {
+            background: #1A5F2A;
+            color: white;
+        }
+        
+        .input-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #555;
+            font-weight: 500;
+        }
+        
+        .input-group input {
             width: 100%;
             padding: 16px;
-            background: white;
-            border: 2px solid #dadce0;
+            border: 2px solid #E0E0E0;
             border-radius: 12px;
             font-size: 16px;
-            font-weight: 600;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group input:focus {
+            outline: none;
+            border-color: #1A5F2A;
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: #1A5F2A;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 8px;
             transition: all 0.3s;
-            color: #757575;
         }
         
-        .btn-google:active {
+        .btn-primary:active:not(:disabled) {
             transform: scale(0.98);
-            background: #f8f9fa;
+            background: #134a20;
         }
         
-        .btn-google:disabled {
+        .btn-primary:disabled {
             opacity: 0.6;
             cursor: not-allowed;
-        }
-        
-        .google-icon {
-            width: 24px;
-            height: 24px;
         }
         
         .loading {
@@ -159,7 +207,7 @@
             height: 20px;
             border: 3px solid rgba(255,255,255,0.3);
             border-radius: 50%;
-            border-top-color: #00B894;
+            border-top-color: white;
             animation: spin 1s linear infinite;
         }
         
@@ -186,6 +234,21 @@
         }
         
         .error-message.show {
+            display: block;
+        }
+        
+        .success-message {
+            background: #F0FDF4;
+            border: 1px solid #22C55E;
+            color: #166534;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+        
+        .success-message.show {
             display: block;
         }
         
@@ -235,19 +298,6 @@
             justify-content: center;
             gap: 12px;
             margin-bottom: 16px;
-        }
-        
-        .user-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: 3px solid rgba(255,255,255,0.3);
-            object-fit: cover;
-            display: none;
-        }
-        
-        .user-avatar.show {
-            display: block;
         }
         
         .user-avatar-placeholder {
@@ -1007,32 +1057,6 @@
             border-color: #00B894;
         }
         
-        .input-group {
-            margin-bottom: 16px;
-        }
-        
-        .input-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 14px;
-            color: #555;
-            font-weight: 500;
-        }
-        
-        .input-group input {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid #E0E0E0;
-            border-radius: 12px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        
-        .input-group input:focus {
-            outline: none;
-            border-color: #00B894;
-        }
-        
         .modal-actions {
             display: flex;
             gap: 12px;
@@ -1411,20 +1435,59 @@
             </div>
             
             <div class="auth-card">
-                <h2>Bem-vindo!</h2>
-                <p>Entre com sua conta Google para começar</p>
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="mostrarTab('login')" id="tabLogin">Entrar</button>
+                    <button class="tab-btn" onclick="mostrarTab('cadastro')" id="tabCadastro">Criar Conta</button>
+                </div>
                 
-                <div class="error-message" id="loginError"></div>
+                <div id="formLogin">
+                    <h2>Bem-vindo de volta!</h2>
+                    <p>Entre com seu email e senha</p>
+                    
+                    <div class="error-message" id="loginError"></div>
+                    <div class="success-message" id="loginSuccess"></div>
+                    
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" placeholder="seu@email.com">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Senha (4-12 caracteres)</label>
+                        <input type="password" id="loginSenha" placeholder="****" maxlength="12">
+                    </div>
+                    
+                    <button class="btn-primary" onclick="fazerLogin()" id="btnLogin">
+                        Entrar
+                    </button>
+                </div>
                 
-                <button class="btn-google" onclick="loginComGoogle()" id="btnGoogle">
-                    <svg class="google-icon" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                    </svg>
-                    Entrar com Google
-                </button>
+                <div id="formCadastro" style="display: none;">
+                    <h2>Criar conta</h2>
+                    <p>Cadastre-se para começar</p>
+                    
+                    <div class="error-message" id="cadastroError"></div>
+                    <div class="success-message" id="cadastroSuccess"></div>
+                    
+                    <div class="input-group">
+                        <label>Nome</label>
+                        <input type="text" id="cadastroNome" placeholder="Seu nome">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" id="cadastroEmail" placeholder="seu@email.com">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Senha (4-12 caracteres)</label>
+                        <input type="password" id="cadastroSenha" placeholder="Crie uma senha" maxlength="12">
+                    </div>
+                    
+                    <button class="btn-primary" onclick="fazerCadastro()" id="btnCadastro">
+                        Criar Conta
+                    </button>
+                </div>
                 
                 <p class="terms">
                     Ao entrar, você concorda com nossos<br>
@@ -1442,7 +1505,6 @@
         
         <div class="saldo-card">
             <div class="user-info">
-                <img src="" alt="Foto" class="user-avatar" id="userAvatar">
                 <div class="user-avatar-placeholder" id="avatarPlaceholder">U</div>
                 <div class="user-details">
                     <div class="user-name" id="userName">Usuário</div>
@@ -1661,6 +1723,7 @@
     <div id="toast" class="toast"></div>
     
     <script>
+        // ============== CONFIGURAÇÃO FIREBASE ==============
         const firebaseConfig = {
             apiKey: "AIzaSyBUI_gg3WisOWvOfCPM3rrKogrZNLJ-WUE",
             authDomain: "tarefas-do-pix.firebaseapp.com",
@@ -1672,9 +1735,9 @@
         };
         
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
         const database = firebase.database();
         
+        // ============== VARIÁVEIS GLOBAIS ==============
         let usuarioAtual = null;
         let dadosUsuario = null;
         let valorSaqueSelecionado = 0.30;
@@ -1683,250 +1746,275 @@
         let listaSaquesCache = [];
         let filtroAtual = 'todos';
         let listenerHistorico = null;
-        
-        // CHAT VARIABLES
         let chatListener = null;
         let chatRoomId = null;
-        let ultimaMensagemId = null;
         let mensagensNaoLidas = 0;
-        let estaDigitando = false;
         
-        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        // ============== SISTEMA DE LOGIN SIMPLES ==============
         
-        document.addEventListener('gesturestart', (e) => e.preventDefault());
-        document.addEventListener('dblclick', (e) => e.preventDefault());
-        
-        // ==================== FUNÇÃO PARA RESETAR BOTÃO ====================
-        function resetarBotaoLogin() {
-            const btn = document.getElementById('btnGoogle');
-            const errorEl = document.getElementById('loginError');
-            if (btn) {
-                btn.disabled = false;
-                btn.innerHTML = getGoogleButtonHTML();
+        // Mostrar tab (login ou cadastro)
+        function mostrarTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+            
+            if (tab === 'login') {
+                document.getElementById('formLogin').style.display = 'block';
+                document.getElementById('formCadastro').style.display = 'none';
+            } else {
+                document.getElementById('formLogin').style.display = 'none';
+                document.getElementById('formCadastro').style.display = 'block';
             }
+            
+            // Limpar mensagens
+            document.querySelectorAll('.error-message, .success-message').forEach(el => el.classList.remove('show'));
         }
         
-        // ==================== DETECTAR MOBILE ====================
-        function isMobile() {
-            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-                   window.innerWidth <= 768;
+        // Validar email
+        function validarEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         }
         
-        // ==================== LOGIN COM REDIRECT (MOBILE) ====================
-        function loginComGoogle() {
-            const btn = document.getElementById('btnGoogle');
-            const errorEl = document.getElementById('loginError');
+        // Validar senha (4-12 caracteres)
+        function validarSenha(senha) {
+            return senha.length >= 4 && senha.length <= 12;
+        }
+        
+        // Criar hash simples da senha (para não salvar em texto puro)
+        function hashSenha(senha) {
+            let hash = 0;
+            for (let i = 0; i < senha.length; i++) {
+                const char = senha.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return hash.toString(16);
+        }
+        
+        // Fazer cadastro
+        function fazerCadastro() {
+            const btn = document.getElementById('btnCadastro');
+            const errorEl = document.getElementById('cadastroError');
+            const successEl = document.getElementById('cadastroSuccess');
+            
+            const nome = document.getElementById('cadastroNome').value.trim();
+            const email = document.getElementById('cadastroEmail').value.trim().toLowerCase();
+            const senha = document.getElementById('cadastroSenha').value;
+            
+            // Validações
+            if (!nome) {
+                errorEl.textContent = 'Digite seu nome';
+                errorEl.classList.add('show');
+                return;
+            }
+            
+            if (!validarEmail(email)) {
+                errorEl.textContent = 'Email inválido';
+                errorEl.classList.add('show');
+                return;
+            }
+            
+            if (!validarSenha(senha)) {
+                errorEl.textContent = 'A senha deve ter entre 4 e 12 caracteres';
+                errorEl.classList.add('show');
+                return;
+            }
             
             btn.disabled = true;
-            btn.innerHTML = '<span class="loading"></span> Conectando...';
+            btn.innerHTML = '<span class="loading"></span> Criando...';
             errorEl.classList.remove('show');
+            successEl.classList.remove('show');
             
-            const provider = new firebase.auth.GoogleAuthProvider();
-            provider.setCustomParameters({ 'prompt': 'select_account' });
-            provider.addScope('profile');
-            provider.addScope('email');
-            
-            // Em mobile, usar redirect. Em desktop, usar popup
-            if (isMobile()) {
-                console.log('📱 Usando signInWithRedirect (mobile)');
-                auth.signInWithRedirect(provider)
-                    .catch((error) => {
-                        console.error('❌ Erro redirect:', error);
-                        resetarBotaoLogin();
-                        
-                        let msg = 'Erro ao conectar. Tente novamente.';
-                        if (error.code === 'auth/network-request-failed') msg = 'Sem conexão com internet.';
-                        
-                        errorEl.textContent = msg;
-                        errorEl.classList.add('show');
-                    });
-            } else {
-                console.log('💻 Usando signInWithPopup (desktop)');
-                auth.signInWithPopup(provider)
-                    .then((result) => {
-                        console.log('✅ Login OK (popup):', result.user.email);
-                    })
-                    .catch((error) => {
-                        console.error('❌ Erro popup:', error);
-                        resetarBotaoLogin();
-                        
-                        let msg = 'Erro ao conectar. Tente novamente.';
-                        if (error.code === 'auth/popup-closed-by-user') msg = 'Você fechou a janela de login.';
-                        if (error.code === 'auth/popup-blocked') msg = 'Popup bloqueado. Tente em modo desktop.';
-                        if (error.code === 'auth/network-request-failed') msg = 'Sem conexão com internet.';
-                        
-                        errorEl.textContent = msg;
-                        errorEl.classList.add('show');
-                    });
-            }
-        }
-        
-        // ==================== VERIFICAR RESULTADO DO REDIRECT ====================
-        auth.getRedirectResult()
-            .then((result) => {
-                if (result.user) {
-                    console.log('✅ Login via redirect OK:', result.user.email);
-                    // O onAuthStateChanged vai cuidar do resto
-                } else {
-                    // Nenhum redirect pendente, resetar botão
-                    console.log('ℹ️ Nenhum redirect pendente');
-                    resetarBotaoLogin();
-                }
-            })
-            .catch((error) => {
-                console.error('❌ Erro no redirect result:', error);
-                resetarBotaoLogin();
-                
-                const errorEl = document.getElementById('loginError');
-                let msg = 'Erro ao conectar. Tente novamente.';
-                
-                if (error.code === 'auth/account-exists-with-different-credential') {
-                    msg = 'Esta conta já existe com outro método de login.';
-                } else if (error.code === 'auth/network-request-failed') {
-                    msg = 'Sem conexão com internet.';
-                }
-                
-                errorEl.textContent = msg;
-                errorEl.classList.add('show');
-            });
-        
-        function getGoogleButtonHTML() {
-            return `
-                <svg class="google-icon" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-                Entrar com Google
-            `;
-        }
-        
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                console.log('✅ Usuário autenticado:', user.email);
-                usuarioAtual = user;
-                verificarOuCriarUsuario(user);
-                inicializarChatListener();
-            } else {
-                console.log('🏠 Usuário deslogado');
-                mostrarTela('authScreen');
-                resetarBotaoLogin();
-            }
-        });
-        
-        function verificarOuCriarUsuario(user) {
-            console.log('🔍 Verificando usuário no banco:', user.uid);
-            const userRef = database.ref('usuarios/' + user.uid);
-            
-            userRef.once('value')
+            // Verificar se email já existe
+            database.ref('usuarios').orderByChild('email').equalTo(email).once('value')
                 .then((snapshot) => {
                     if (snapshot.exists()) {
-                        console.log('✅ Usuário existe no banco');
-                        return verificarEstornosPendentes(user.uid).then(() => {
-                            carregarDadosUsuario(user);
-                        });
-                    } else {
-                        console.log('🆕 Criando novo usuário no banco...');
-                        const userData = {
-                            nome: user.displayName || 'Usuário',
-                            email: user.email,
-                            foto: user.photoURL || '',
-                            saldo: 0,
-                            jaFeTarefa: false,
-                            dataCadastro: Date.now(),
-                            provedor: 'google'
-                        };
-                        return userRef.set(userData)
-                            .then(() => {
-                                console.log('✅ Novo usuário criado com sucesso');
-                                carregarDadosUsuario(user);
-                            });
-                    }
-                })
-                .catch((error) => {
-                    console.error('❌ ERRO CRÍTICO ao acessar banco:', error);
-                    showToast('Erro ao acessar dados. Tente novamente.', 'error');
-                    resetarBotaoLogin();
-                    // Desloga para tentar de novo
-                    auth.signOut();
-                });
-        }
-        
-        function verificarEstornosPendentes(userId) {
-            return new Promise((resolve) => {
-                const saquesRef = database.ref('saques').orderByChild('userId').equalTo(userId);
-                
-                saquesRef.once('value', (snapshot) => {
-                    const saquesRejeitados = [];
-                    
-                    snapshot.forEach((child) => {
-                        const saque = child.val();
-                        if ((saque.status === 'REJEITADO' || saque.status === 'CANCELADO') && 
-                            !saque.estornoAplicado) {
-                            saquesRejeitados.push({
-                                id: child.key,
-                                ...saque
-                            });
-                        }
-                    });
-                    
-                    if (saquesRejeitados.length === 0) {
-                        resolve();
+                        errorEl.textContent = 'Este email já está cadastrado';
+                        errorEl.classList.add('show');
+                        btn.disabled = false;
+                        btn.textContent = 'Criar Conta';
                         return;
                     }
                     
-                    database.ref('usuarios/' + userId + '/saldo').once('value', (saldoSnapshot) => {
-                        let saldoAtual = saldoSnapshot.val() || 0;
-                        let totalEstornado = 0;
-                        
-                        const updates = {};
-                        
-                        saquesRejeitados.forEach((saque) => {
-                            saldoAtual += saque.valor;
-                            totalEstornado += saque.valor;
+                    // Criar novo usuário
+                    const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    const userData = {
+                        nome: nome,
+                        email: email,
+                        senhaHash: hashSenha(senha),
+                        saldo: 0,
+                        jaFeTarefa: false,
+                        dataCadastro: Date.now()
+                    };
+                    
+                    return database.ref('usuarios/' + userId).set(userData)
+                        .then(() => {
+                            successEl.textContent = 'Conta criada com sucesso! Faça login.';
+                            successEl.classList.add('show');
                             
-                            updates['saques/' + saque.id + '/estornoAplicado'] = true;
-                            updates['saques/' + saque.id + '/dataEstorno'] = Date.now();
+                            // Limpar campos
+                            document.getElementById('cadastroNome').value = '';
+                            document.getElementById('cadastroEmail').value = '';
+                            document.getElementById('cadastroSenha').value = '';
+                            
+                            // Voltar para login após 1.5s
+                            setTimeout(() => {
+                                mostrarTab('login');
+                                document.getElementById('loginEmail').value = email;
+                                successEl.classList.remove('show');
+                            }, 1500);
+                            
+                            btn.disabled = false;
+                            btn.textContent = 'Criar Conta';
                         });
-                        
-                        updates['usuarios/' + userId + '/saldo'] = saldoAtual;
-                        
-                        database.ref().update(updates)
-                            .then(() => {
-                                console.log(`💰 Estorno aplicado: R$ ${totalEstornado.toFixed(2)}`);
-                                if (totalEstornado > 0) {
-                                    showToast(`💰 R$ ${totalEstornado.toFixed(2)} devolvido ao seu saldo!`, 'success');
-                                }
-                                resolve();
-                            })
-                            .catch((error) => {
-                                console.error('Erro ao aplicar estorno:', error);
-                                resolve();
-                            });
-                    });
+                })
+                .catch((error) => {
+                    console.error('Erro no cadastro:', error);
+                    errorEl.textContent = 'Erro ao criar conta. Tente novamente.';
+                    errorEl.classList.add('show');
+                    btn.disabled = false;
+                    btn.textContent = 'Criar Conta';
                 });
-            });
         }
         
-        function carregarDadosUsuario(user) {
-            document.getElementById('userName').textContent = user.displayName || 'Usuário';
-            document.getElementById('userEmail').textContent = user.email;
+        // Fazer login
+        function fazerLogin() {
+            const btn = document.getElementById('btnLogin');
+            const errorEl = document.getElementById('loginError');
+            const successEl = document.getElementById('loginSuccess');
             
-            if (user.photoURL) {
-                const avatar = document.getElementById('userAvatar');
-                avatar.src = user.photoURL;
-                avatar.classList.add('show');
-                document.getElementById('avatarPlaceholder').style.display = 'none';
-            } else {
-                const initial = (user.displayName || 'U').charAt(0).toUpperCase();
-                document.getElementById('avatarPlaceholder').textContent = initial;
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const senha = document.getElementById('loginSenha').value;
+            
+            if (!validarEmail(email)) {
+                errorEl.textContent = 'Email inválido';
+                errorEl.classList.add('show');
+                return;
             }
             
-            database.ref('usuarios/' + user.uid).on('value', (snapshot) => {
+            if (!senha) {
+                errorEl.textContent = 'Digite sua senha';
+                errorEl.classList.add('show');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Entrando...';
+            errorEl.classList.remove('show');
+            successEl.classList.remove('show');
+            
+            // Buscar usuário pelo email
+            database.ref('usuarios').orderByChild('email').equalTo(email).once('value')
+                .then((snapshot) => {
+                    if (!snapshot.exists()) {
+                        errorEl.textContent = 'Email ou senha incorretos';
+                        errorEl.classList.add('show');
+                        btn.disabled = false;
+                        btn.textContent = 'Entrar';
+                        return;
+                    }
+                    
+                    let userFound = null;
+                    let userId = null;
+                    
+                    snapshot.forEach((child) => {
+                        userFound = child.val();
+                        userId = child.key;
+                    });
+                    
+                    // Verificar senha
+                    if (userFound.senhaHash !== hashSenha(senha)) {
+                        errorEl.textContent = 'Email ou senha incorretos';
+                        errorEl.classList.add('show');
+                        btn.disabled = false;
+                        btn.textContent = 'Entrar';
+                        return;
+                    }
+                    
+                    // Login bem-sucedido
+                    usuarioAtual = {
+                        uid: userId,
+                        email: userFound.email,
+                        displayName: userFound.nome
+                    };
+                    dadosUsuario = userFound;
+                    
+                    // Salvar sessão no localStorage
+                    localStorage.setItem('tarefasPixUser', JSON.stringify({
+                        uid: userId,
+                        email: userFound.email,
+                        nome: userFound.nome
+                    }));
+                    
+                    successEl.textContent = 'Login realizado!';
+                    successEl.classList.add('show');
+                    
+                    setTimeout(() => {
+                        carregarDadosUsuario();
+                        inicializarChatListener();
+                        mostrarTela('homeScreen');
+                        
+                        // Resetar botão
+                        btn.disabled = false;
+                        btn.textContent = 'Entrar';
+                        document.getElementById('loginSenha').value = '';
+                    }, 500);
+                })
+                .catch((error) => {
+                    console.error('Erro no login:', error);
+                    errorEl.textContent = 'Erro ao fazer login. Tente novamente.';
+                    errorEl.classList.add('show');
+                    btn.disabled = false;
+                    btn.textContent = 'Entrar';
+                });
+        }
+        
+        // Verificar sessão salva ao carregar
+        function verificarSessao() {
+            const sessao = localStorage.getItem('tarefasPixUser');
+            if (sessao) {
+                try {
+                    const userData = JSON.parse(sessao);
+                    
+                    // Verificar se usuário ainda existe no banco
+                    database.ref('usuarios/' + userData.uid).once('value')
+                        .then((snapshot) => {
+                            if (snapshot.exists()) {
+                                usuarioAtual = {
+                                    uid: userData.uid,
+                                    email: userData.email,
+                                    displayName: snapshot.val().nome
+                                };
+                                dadosUsuario = snapshot.val();
+                                carregarDadosUsuario();
+                                inicializarChatListener();
+                                mostrarTela('homeScreen');
+                            } else {
+                                localStorage.removeItem('tarefasPixUser');
+                            }
+                        });
+                } catch (e) {
+                    localStorage.removeItem('tarefasPixUser');
+                }
+            }
+        }
+        
+        // ============== FUNÇÕES DO APP ==============
+        
+        function carregarDadosUsuario() {
+            if (!usuarioAtual || !dadosUsuario) return;
+            
+            document.getElementById('userName').textContent = dadosUsuario.nome || 'Usuário';
+            document.getElementById('userEmail').textContent = dadosUsuario.email;
+            
+            const initial = (dadosUsuario.nome || 'U').charAt(0).toUpperCase();
+            document.getElementById('avatarPlaceholder').textContent = initial;
+            
+            atualizarInterface();
+            
+            // Ouvir mudanças no usuário
+            database.ref('usuarios/' + usuarioAtual.uid).on('value', (snapshot) => {
                 dadosUsuario = snapshot.val();
                 atualizarInterface();
-                mostrarTela('homeScreen');
             });
         }
         
@@ -1993,6 +2081,7 @@
         
         function concluirTarefa() {
             if (!usuarioAtual) return;
+            
             const updates = {
                 jaFeTarefa: true,
                 saldo: (dadosUsuario.saldo || 0) + 0.30
@@ -2002,6 +2091,7 @@
                 .then(() => {
                     mostrarEstado('estadoConcluido');
                     showToast('✓ R$ 0,30 adicionado ao saldo!', 'success');
+                    
                     database.ref('transacoes/' + usuarioAtual.uid).push({
                         tipo: 'RECOMPENSA',
                         valor: 0.30,
@@ -2339,28 +2429,31 @@
                 chatListener.off();
             }
             
-            auth.signOut()
-                .then(() => {
-                    usuarioAtual = null;
-                    dadosUsuario = null;
-                    tarefaIniciada = false;
-                    mensagensNaoLidas = 0;
-                    
-                    if (listenerHistorico) {
-                        listenerHistorico.off();
-                        listenerHistorico = null;
-                    }
-                    
-                    ['check1', 'check2', 'check3'].forEach((id, i) => {
-                        const el = document.getElementById(id);
-                        el.classList.remove('feito');
-                        el.textContent = (i + 1).toString();
-                    });
-                    
-                    mostrarTela('authScreen');
-                    resetarBotaoLogin();
-                    document.getElementById('loginError').classList.remove('show');
-                });
+            // Limpar sessão
+            localStorage.removeItem('tarefasPixUser');
+            usuarioAtual = null;
+            dadosUsuario = null;
+            tarefaIniciada = false;
+            mensagensNaoLidas = 0;
+            
+            if (listenerHistorico) {
+                listenerHistorico.off();
+                listenerHistorico = null;
+            }
+            
+            ['check1', 'check2', 'check3'].forEach((id, i) => {
+                const el = document.getElementById(id);
+                el.classList.remove('feito');
+                el.textContent = (i + 1).toString();
+            });
+            
+            // Limpar campos de login
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginSenha').value = '';
+            document.getElementById('loginError').classList.remove('show');
+            document.getElementById('loginSuccess').classList.remove('show');
+            
+            mostrarTela('authScreen');
         }
         
         function showToast(mensagem, tipo = 'success') {
@@ -2372,7 +2465,7 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
         
-        // ==================== CHAT FUNCTIONS ====================
+        // ============== CHAT FUNCTIONS ==============
         
         function inicializarChatListener() {
             if (!usuarioAtual) return;
@@ -2512,7 +2605,7 @@
                 lida: false,
                 userId: usuarioAtual.uid,
                 userName: dadosUsuario?.nome || 'Usuário',
-                userEmail: usuarioAtual.email
+                userEmail: dadosUsuario?.email
             };
             
             database.ref('chats/' + chatRoomId + '/mensagens').push(mensagem)
@@ -2522,7 +2615,7 @@
                         ultimaAtualizacao: Date.now(),
                         userId: usuarioAtual.uid,
                         userName: dadosUsuario?.nome || 'Usuário',
-                        userEmail: usuarioAtual.email,
+                        userEmail: dadosUsuario?.email,
                         status: 'aguardando_resposta'
                     });
                     
@@ -2567,6 +2660,13 @@
                 database.ref('chats/' + chatRoomId + '/usuarioDigitando').set(false);
             }, 2000);
         });
+        
+        // ============== INICIALIZAÇÃO ==============
+        document.addEventListener('gesturestart', (e) => e.preventDefault());
+        document.addEventListener('dblclick', (e) => e.preventDefault());
+        
+        // Verificar sessão ao carregar
+        verificarSessao();
     </script>
 </body>
 </html>
