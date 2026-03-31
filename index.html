@@ -12,7 +12,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
     
     <style>
-        /* ==================== PARTE 1: ESTILOS GLOBAIS E RESET ==================== */
         * {
             margin: 0;
             padding: 0;
@@ -60,7 +59,6 @@
             50% { opacity: 0.5; }
         }
         
-        /* ==================== PARTE 2: TELA DE LOGIN ==================== */
         .auth-container {
             background: #1A5F2A;
             min-height: 100vh;
@@ -176,7 +174,6 @@
             display: block;
         }
         
-        /* ==================== PARTE 3: HEADER E SALDO ==================== */
         .header {
             background: #1A5F2A;
             color: white;
@@ -321,7 +318,6 @@
             background: rgba(255,255,255,0.3);
         }
         
-        /* ==================== PARTE 4: TAREFAS E ESTADOS ==================== */
         .tarefa-card {
             background: white;
             margin: 16px;
@@ -498,7 +494,6 @@
             animation: fadeIn 0.3s;
         }
         
-        /* Status Concluído */
         .status-concluido {
             text-align: center;
             padding: 20px;
@@ -530,7 +525,6 @@
             font-size: 14px;
         }
         
-        /* Status Bloqueado */
         .status-bloqueado {
             text-align: center;
             padding: 30px 20px;
@@ -548,7 +542,6 @@
             margin-bottom: 8px;
         }
         
-        /* Verificação */
         .verificacao-box {
             background: #F0FDF4;
             border: 2px dashed #86EFAC;
@@ -595,7 +588,6 @@
             cursor: pointer;
         }
         
-        /* Info */
         .info-card {
             background: #FFF3E0;
             margin: 16px;
@@ -617,9 +609,6 @@
             line-height: 1.8;
         }
         
-        /* ==================== PARTE 7: CSS DO HISTÓRICO DE SAQUES ==================== */
-        
-        /* Header do Histórico */
         .historico-header {
             background: #1A5F2A;
             color: white;
@@ -660,7 +649,6 @@
             margin-right: 40px;
         }
         
-        /* Abas de Status */
         .abas-status {
             display: flex;
             background: white;
@@ -705,7 +693,6 @@
             margin-top: 2px;
         }
         
-        /* Lista de Saques */
         .lista-saques {
             padding: 0 16px 20px;
         }
@@ -814,7 +801,6 @@
             white-space: nowrap;
         }
         
-        /* Motivo de Rejeição */
         .rejeicao-motivo {
             background: #FEF2F2;
             border: 1px solid #FECACA;
@@ -836,7 +822,6 @@
             line-height: 1.4;
         }
         
-        /* Estado Vazio */
         .historico-vazio {
             text-align: center;
             padding: 60px 20px;
@@ -859,7 +844,6 @@
             font-size: 14px;
         }
         
-        /* Loading do Histórico */
         .historico-loading {
             text-align: center;
             padding: 40px;
@@ -875,7 +859,6 @@
             margin: 0 auto 16px;
         }
         
-        /* ==================== PARTE 8: MODAL DE SAQUE ==================== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -1038,7 +1021,6 @@
             transform: scale(0.98);
         }
         
-        /* ==================== PARTE 9: TOAST NOTIFICATIONS ==================== */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -1076,7 +1058,6 @@
     </style>
 </head>
 <body>
-    <!-- ==================== PARTE 5: TELA DE LOGIN ==================== -->
     <div id="authScreen" class="screen active">
         <div class="auth-container">
             <div class="auth-logo">
@@ -1108,14 +1089,12 @@
         </div>
     </div>
 
-    <!-- ==================== PARTE 6: TELA PRINCIPAL (HOME) ==================== -->
     <div id="homeScreen" class="screen">
         <div class="header">
             <h1>💰 Tarefas do Pix</h1>
             <button class="logout-btn" onclick="fazerLogout()">Sair</button>
         </div>
         
-        <!-- Saldo -->
         <div class="saldo-card">
             <div class="user-info">
                 <img src="" alt="Foto" class="user-avatar" id="userAvatar">
@@ -1135,7 +1114,6 @@
             </button>
         </div>
         
-        <!-- Tarefa -->
         <div class="tarefa-card" id="tarefaCard">
             <div class="tarefa-header">
                 <span class="tarefa-badge" id="taskBadge">TAREFA DISPONÍVEL</span>
@@ -1145,7 +1123,6 @@
                     Baixe o aplicativo Worldance Drama, crie sua conta usando o código de convite e ganhe sua recompensa!
                 </div>
                 
-                <!-- Código de Convite -->
                 <div class="codigo-convite">
                     <h4>🎁 Código de Convite</h4>
                     <div class="codigo">BE764096</div>
@@ -1172,14 +1149,12 @@
                 <div class="tarefa-valor">+ R$ 0,30</div>
             </div>
             
-            <!-- Estado: Disponível -->
             <div id="estadoDisponivel" class="estado active">
                 <button class="btn-tarefa" onclick="iniciarTarefa()">
                     📲 BAIXAR APP E COMEÇAR
                 </button>
             </div>
             
-            <!-- Estado: Verificação -->
             <div id="estadoVerificacao" class="estado">
                 <div class="verificacao-box">
                     <h4>✋ Quase lá!</h4>
@@ -1198,7 +1173,6 @@
                 </div>
             </div>
             
-            <!-- Estado: Concluído -->
             <div id="estadoConcluido" class="estado">
                 <div class="status-concluido">
                     <div class="status-icon">✓</div>
@@ -1207,7 +1181,6 @@
                 </div>
             </div>
             
-            <!-- Estado: Bloqueado -->
             <div id="estadoBloqueado" class="estado">
                 <div class="status-bloqueado">
                     <div class="icone">✓</div>
@@ -1217,7 +1190,6 @@
             </div>
         </div>
         
-        <!-- Instruções -->
         <div class="info-card">
             <h3>📋 Como funciona:</h3>
             <ol>
@@ -1231,14 +1203,12 @@
         </div>
     </div>
 
-    <!-- ==================== PARTE 10: TELA DE HISTÓRICO DE SAQUES ==================== -->
     <div id="historicoScreen" class="screen">
         <div class="historico-header">
             <button class="btn-voltar-historico" onclick="voltarParaHome()">←</button>
             <h1>📋 Histórico de Saques</h1>
         </div>
         
-        <!-- Abas de Status -->
         <div class="abas-status">
             <button class="aba-status active" onclick="filtrarSaques('todos')" id="abaTodos">
                 Todos
@@ -1262,7 +1232,6 @@
             </button>
         </div>
         
-        <!-- Lista de Saques -->
         <div class="lista-saques" id="listaSaques">
             <div class="historico-loading">
                 <div class="spinner"></div>
@@ -1271,7 +1240,6 @@
         </div>
     </div>
 
-    <!-- ==================== PARTE 11: MODAL DE SAQUE ==================== -->
     <div id="modalSaque" class="modal-overlay" onclick="fecharModalSaque(event)">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="modal-title">💸 Sacar via Pix</div>
@@ -1279,6 +1247,7 @@
             <label style="display: block; margin-bottom: 12px; font-weight: 500;">Escolha o valor:</label>
             <div class="valor-options">
                 <button class="valor-btn selected" id="val30" onclick="selecionarValor(0.30)">R$ 0,30</button>
+                <button class="valor-btn" id="val50" onclick="selecionarValor(0.50)">R$ 0,50</button>
             </div>
             
             <label style="display: block; margin-bottom: 12px; font-weight: 500;">Tipo de chave:</label>
@@ -1300,11 +1269,9 @@
         </div>
     </div>
 
-    <!-- ==================== PARTE 12: TOAST ==================== -->
     <div id="toast" class="toast"></div>
     
     <script>
-        // ==================== PARTE 13: CONFIGURAÇÃO FIREBASE ====================
         const firebaseConfig = {
             apiKey: "AIzaSyBUI_gg3WisOWvOfCPM3rrKogrZNLJ-WUE",
             authDomain: "tarefas-do-pix.firebaseapp.com",
@@ -1319,7 +1286,6 @@
         const auth = firebase.auth();
         const database = firebase.database();
         
-        // ==================== PARTE 14: VARIÁVEIS GLOBAIS ====================
         let usuarioAtual = null;
         let dadosUsuario = null;
         let valorSaqueSelecionado = 0.30;
@@ -1329,14 +1295,11 @@
         let filtroAtual = 'todos';
         let listenerHistorico = null;
         
-        // ==================== PARTE 15: INICIALIZAÇÃO ====================
         auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         
-        // Previne zoom
         document.addEventListener('gesturestart', (e) => e.preventDefault());
         document.addEventListener('dblclick', (e) => e.preventDefault());
         
-        // ==================== PARTE 16: AUTENTICAÇÃO ====================
         auth.onAuthStateChanged((user) => {
             if (user) {
                 usuarioAtual = user;
@@ -1394,7 +1357,9 @@
             userRef.once('value')
                 .then((snapshot) => {
                     if (snapshot.exists()) {
-                        carregarDadosUsuario(user);
+                        verificarEstornosPendentes(user.uid).then(() => {
+                            carregarDadosUsuario(user);
+                        });
                     } else {
                         const userData = {
                             nome: user.displayName || 'Usuário',
@@ -1410,6 +1375,59 @@
                         });
                     }
                 });
+        }
+        
+        function verificarEstornosPendentes(userId) {
+            return new Promise((resolve) => {
+                const estornosRef = database.ref('estornos').orderByChild('userId').equalTo(userId);
+                
+                estornosRef.once('value', (snapshot) => {
+                    const estornos = [];
+                    let totalEstorno = 0;
+                    
+                    snapshot.forEach((child) => {
+                        const estorno = child.val();
+                        if (estorno.status === 'PENDENTE') {
+                            estornos.push({
+                                id: child.key,
+                                ...estorno
+                            });
+                            totalEstorno += estorno.valor || 0;
+                        }
+                    });
+                    
+                    if (estornos.length === 0) {
+                        resolve();
+                        return;
+                    }
+                    
+                    database.ref('usuarios/' + userId + '/saldo').once('value', (saldoSnapshot) => {
+                        const saldoAtual = saldoSnapshot.val() || 0;
+                        const novoSaldo = saldoAtual + totalEstorno;
+                        
+                        const updates = {};
+                        updates['usuarios/' + userId + '/saldo'] = novoSaldo;
+                        
+                        estornos.forEach((estorno) => {
+                            updates['estornos/' + estorno.id + '/status'] = 'APLICADO';
+                            updates['estornos/' + estorno.id + '/dataAplicacao'] = Date.now();
+                        });
+                        
+                        database.ref().update(updates)
+                            .then(() => {
+                                console.log(`Estorno aplicado: R$ ${totalEstorno.toFixed(2)}`);
+                                if (totalEstorno > 0) {
+                                    showToast(`💰 Estorno de R$ ${totalEstorno.toFixed(2)} aplicado!`, 'success');
+                                }
+                                resolve();
+                            })
+                            .catch((error) => {
+                                console.error('Erro ao aplicar estorno:', error);
+                                resolve();
+                            });
+                    });
+                });
+            });
         }
         
         function carregarDadosUsuario(user) {
@@ -1458,7 +1476,6 @@
             }
         }
         
-        // ==================== PARTE 17: NAVEGAÇÃO ====================
         function mostrarTela(telaId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(telaId).classList.add('active');
@@ -1469,7 +1486,6 @@
             document.getElementById(estadoId).classList.add('active');
         }
         
-        // ==================== PARTE 18: FLUXO DA TAREFA ====================
         function iniciarTarefa() {
             window.open('https://play.google.com/store/apps/details?id=com.worldance.drama', '_blank');
             tarefaIniciada = true;
@@ -1516,7 +1532,6 @@
                 });
         }
         
-        // ==================== PARTE 19: SISTEMA DE HISTÓRICO DE SAQUES ====================
         function abrirTelaHistorico() {
             mostrarTela('historicoScreen');
             carregarHistoricoSaques();
@@ -1714,12 +1729,16 @@
             return chave.substring(0, 4) + '***' + chave.substring(chave.length - 4);
         }
         
-        // ==================== PARTE 20: SISTEMA DE SAQUE ====================
         function abrirModalSaque() {
             const saldo = dadosUsuario?.saldo || 0;
             document.getElementById('val30').disabled = saldo < 0.30;
+            document.getElementById('val50').disabled = saldo < 0.50;
             
-            selecionarValor(0.30);
+            if (saldo >= 0.30) {
+                selecionarValor(0.30);
+            } else if (saldo >= 0.50) {
+                selecionarValor(0.50);
+            }
             
             document.getElementById('modalSaque').classList.add('active');
         }
@@ -1733,18 +1752,19 @@
         
         function selecionarValor(valor) {
             const btn30 = document.getElementById('val30');
+            const btn50 = document.getElementById('val50');
             
-            // Verifica se o botão está desabilitado
             if (valor === 0.30 && btn30.disabled) return;
+            if (valor === 0.50 && btn50.disabled) return;
             
             valorSaqueSelecionado = valor;
             
-            // Remove selected de todos
             document.querySelectorAll('.valor-btn').forEach(b => b.classList.remove('selected'));
             
-            // Adiciona selected no botão correto
             if (valor === 0.30) {
                 btn30.classList.add('selected');
+            } else {
+                btn50.classList.add('selected');
             }
         }
         
@@ -1824,7 +1844,6 @@
             }
         }
         
-        // ==================== PARTE 21: LOGOUT E UTILITÁRIOS ====================
         function fazerLogout() {
             auth.signOut()
                 .then(() => {
