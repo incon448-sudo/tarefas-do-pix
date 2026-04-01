@@ -3,1694 +3,1505 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Renda Extra - Ganhe Dinheiro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <title>TarefaPix</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
-        
+
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            background: #f5f5f5;
+            color: #333;
             overflow-x: hidden;
         }
-        
-        /* Loading Screen */
-        #loading-screen {
+
+        .login-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            z-index: 99999;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: opacity 0.5s ease;
+            z-index: 1000;
+            padding: 20px;
         }
-        
-        .loading-icon {
-            font-size: 80px;
+
+        .login-box {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #667eea;
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .logo p {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .input-group {
             margin-bottom: 20px;
-            animation: pulse 1.5s infinite;
         }
-        
-        .loading-text {
-            color: white;
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 10px;
-        }
-        
-        .loading-subtext {
-            color: rgba(255,255,255,0.8);
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
             font-size: 14px;
         }
-        
-        .loading-bar {
-            width: 200px;
-            height: 4px;
-            background: rgba(255,255,255,0.3);
-            border-radius: 2px;
-            margin-top: 20px;
-            overflow: hidden;
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.3s;
         }
-        
-        .loading-progress {
-            height: 100%;
-            background: white;
-            border-radius: 2px;
-            animation: loading 1.5s infinite;
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
         }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        
-        @keyframes loading {
-            0% { width: 0%; margin-left: 0%; }
-            50% { width: 100%; margin-left: 0%; }
-            100% { width: 0%; margin-left: 100%; }
-        }
-        
-        /* App Container */
-        #app-container {
-            display: none;
-            max-width: 480px;
-            margin: 0 auto;
-            background: #f8f9fa;
-            min-height: 100vh;
-            position: relative;
-        }
-        
-        /* Header */
-        .header {
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
             color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .register-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .app-container {
+            display: none;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            background: #2d3748;
+            color: white;
+            padding: 15px 20px;
             position: sticky;
             top: 0;
-            z-index: 1000;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            z-index: 100;
         }
-        
+
         .header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
-        
-        .logo {
-            font-size: 24px;
-            font-weight: 800;
+
+        .balance {
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
-        .header-actions {
+
+        .coin-icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border-radius: 50%;
             display: flex;
-            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #b8860b;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
-        
-        .btn-header {
+
+        .balance-text {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .balance-conversion {
+            color: #ffd700;
+            font-size: 14px;
+        }
+
+        .user-avatar {
             width: 40px;
             height: 40px;
+            background: #48bb78;
             border-radius: 50%;
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s;
+            font-weight: bold;
             position: relative;
         }
-        
-        .btn-header:hover {
-            background: rgba(255,255,255,0.3);
-            transform: scale(1.1);
-        }
-        
-        .btn-header .badge {
+
+        .admin-badge {
             position: absolute;
-            top: -5px;
+            bottom: -5px;
             right: -5px;
-            background: #ff6b6b;
+            background: #e53e3e;
             color: white;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 10px;
-            min-width: 18px;
-            text-align: center;
+            font-size: 8px;
+            padding: 2px 4px;
+            border-radius: 4px;
         }
-        
-        .user-id {
-            font-size: 10px;
-            opacity: 0.7;
-            background: rgba(255,255,255,0.2);
-            padding: 4px 8px;
-            border-radius: 20px;
-            max-width: 150px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+
+        .task-list {
+            padding: 15px;
         }
-        
-        /* Balance Card */
-        .balance-card {
-            background: rgba(255,255,255,0.15);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 25px;
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        
-        .balance-label {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 5px;
-        }
-        
-        .balance-amount {
-            font-size: 42px;
-            font-weight: 800;
-            margin-bottom: 5px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .balance-pending {
-            font-size: 12px;
-            opacity: 0.8;
-            background: rgba(255,255,255,0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-            display: inline-block;
-        }
-        
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            padding: 20px;
-            background: white;
-            margin: 20px;
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-        }
-        
-        .stat-item {
-            text-align: center;
-            padding: 15px 10px;
-        }
-        
-        .stat-icon {
-            font-size: 24px;
-            margin-bottom: 8px;
-        }
-        
-        .stat-value {
-            font-size: 20px;
-            font-weight: 700;
-            color: #2d3436;
-        }
-        
-        .stat-label {
-            font-size: 11px;
-            color: #636e72;
-            margin-top: 3px;
-        }
-        
-        /* Withdraw Button */
-        .withdraw-section {
-            padding: 0 20px 20px;
-        }
-        
-        .btn-withdraw {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
-            color: white;
-            border: none;
-            border-radius: 15px;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            box-shadow: 0 4px 15px rgba(0,184,148,0.4);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .btn-withdraw:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,184,148,0.5);
-        }
-        
-        .btn-withdraw:disabled {
-            background: #b2bec3;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-        
-        /* Tasks Section */
-        .section-title {
-            padding: 20px 20px 10px;
-            font-size: 20px;
-            font-weight: 700;
-            color: #2d3436;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .tasks-container {
-            padding: 0 20px 20px;
-        }
-        
+
         .task-card {
             background: white;
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             display: flex;
             align-items: center;
             gap: 15px;
             transition: transform 0.2s;
         }
-        
-        .task-card:hover {
-            transform: translateX(5px);
+
+        .task-card:active {
+            transform: scale(0.99);
         }
-        
-        .task-card.completada {
-            opacity: 0.6;
-            background: #f1f2f6;
-        }
-        
-        .task-card.completada .btn-do-task {
-            background: #b2bec3;
-            cursor: not-allowed;
-        }
-        
+
         .task-icon {
             width: 60px;
             height: 60px;
-            border-radius: 15px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
+            font-size: 24px;
             flex-shrink: 0;
         }
-        
-        .task-info {
+
+        .task-icon.green { background: #e6fffa; color: #38b2ac; }
+        .task-icon.blue { background: #ebf8ff; color: #4299e1; }
+
+        .task-content {
             flex: 1;
         }
-        
+
         .task-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #2d3436;
-            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 6px;
+            color: #2d3748;
         }
-        
+
         .task-desc {
             font-size: 12px;
-            color: #636e72;
+            color: #718096;
+            margin-bottom: 6px;
         }
-        
+
         .task-reward {
-            text-align: right;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: bold;
+            color: #d69e2e;
         }
-        
-        .reward-amount {
-            font-size: 20px;
-            font-weight: 700;
-            color: #00b894;
+
+        .task-reward .coin-small {
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
         }
-        
-        .btn-do-task {
-            margin-top: 8px;
-            padding: 8px 20px;
-            background: #6c5ce7;
+
+        .task-reward .money {
+            color: #e53e3e;
+            font-size: 14px;
+        }
+
+        .task-action {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .btn-ganhar {
+            background: #84cc16;
             color: white;
             border: none;
+            padding: 10px 24px;
             border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
+            font-weight: bold;
+            font-size: 14px;
             cursor: pointer;
+            box-shadow: 0 4px 6px rgba(132, 204, 22, 0.3);
             transition: all 0.2s;
         }
-        
-        .btn-do-task:hover {
-            background: #5b4cdb;
-            transform: scale(1.05);
+
+        .btn-ganhar:active {
+            transform: scale(0.95);
         }
-        
-        .btn-do-task:disabled {
-            background: #b2bec3;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .task-completed-badge {
-            display: inline-block;
-            background: #00b894;
+
+        .btn-admin {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-top: 5px;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 15px;
+            width: calc(100% - 30px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        
-        /* Chat Overlay */
-        .chat-overlay {
+
+        .btn-admin.hidden {
+            display: none;
+        }
+
+        .btn-pendencias {
+            background: #ed8936;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 0 15px 15px 15px;
+            width: calc(100% - 30px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-pendencias.hidden {
+            display: none;
+        }
+
+        .badge-count {
+            background: #e53e3e;
+            color: white;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 5px;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #a0aec0;
+            text-decoration: none;
+            font-size: 12px;
+            position: relative;
+        }
+
+        .nav-item.active {
+            color: #84cc16;
+        }
+
+        .modal {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.5);
-            z-index: 10000;
-            display: none;
-            justify-content: flex-end;
-        }
-        
-        .chat-overlay.active {
-            display: flex;
-        }
-        
-        .chat-container {
-            width: 100%;
-            max-width: 480px;
-            height: 100%;
-            background: #f8f9fa;
-            display: flex;
-            flex-direction: column;
-            animation: slideInRight 0.3s ease;
-        }
-        
-        @keyframes slideInRight {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
-        }
-        
-        .chat-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        
-        .btn-close-chat {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-        
-        .btn-close-chat:hover {
-            background: rgba(255,255,255,0.3);
-        }
-        
-        .chat-header-info {
-            flex: 1;
-        }
-        
-        .chat-header-title {
-            font-size: 18px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .chat-status {
-            font-size: 12px;
-            opacity: 0.9;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background: #00b894;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-        
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .message {
-            max-width: 80%;
-            padding: 12px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            line-height: 1.4;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .message-received {
-            align-self: flex-start;
-            background: white;
-            color: #2d3436;
-            border-bottom-left-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        }
-        
-        .message-sent {
-            align-self: flex-end;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-bottom-right-radius: 5px;
-        }
-        
-        .message-time {
-            font-size: 11px;
-            opacity: 0.7;
-            margin-top: 5px;
-        }
-        
-        .message-sender {
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 4px;
-            color: #6c5ce7;
-        }
-        
-        .chat-input-area {
-            background: white;
-            padding: 15px 20px;
-            border-top: 1px solid #e9ecef;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .chat-input {
-            flex: 1;
-            padding: 12px 20px;
-            border: 2px solid #e9ecef;
-            border-radius: 25px;
-            font-size: 14px;
-            font-family: 'Poppins', sans-serif;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        
-        .chat-input:focus {
-            border-color: #6c5ce7;
-        }
-        
-        .btn-send {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-        
-        .btn-send:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 15px rgba(108,92,231,0.4);
-        }
-        
-        .btn-send:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .chat-welcome {
-            text-align: center;
-            padding: 40px 20px;
-            color: #636e72;
-        }
-        
-        .chat-welcome-icon {
-            font-size: 60px;
-            margin-bottom: 15px;
-        }
-        
-        .chat-welcome h3 {
-            color: #2d3436;
-            margin-bottom: 10px;
-        }
-        
-        .typing-indicator {
-            display: none;
-            align-self: flex-start;
-            background: white;
-            padding: 15px 20px;
-            border-radius: 20px;
-            border-bottom-left-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        }
-        
-        .typing-indicator.active {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .typing-dot {
-            width: 8px;
-            height: 8px;
-            background: #6c5ce7;
-            border-radius: 50%;
-            animation: typingBounce 1.4s infinite;
-        }
-        
-        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-        
-        @keyframes typingBounce {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-10px); }
-        }
-        
-        /* Modals */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.85);
-            z-index: 10001;
-            display: flex;
+            z-index: 200;
             justify-content: center;
             align-items: center;
             padding: 20px;
-            backdrop-filter: blur(5px);
         }
-        
+
         .modal-content {
             background: white;
-            border-radius: 25px;
+            border-radius: 20px;
             padding: 30px;
-            max-width: 400px;
             width: 100%;
+            max-width: 400px;
+            animation: slideUp 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
             text-align: center;
-            animation: modalSlide 0.3s ease;
+            margin-bottom: 25px;
         }
-        
-        @keyframes modalSlide {
-            from { opacity: 0; transform: translateY(50px) scale(0.9); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        
-        .modal-icon {
-            font-size: 60px;
-            margin-bottom: 15px;
-        }
-        
-        .modal-title {
-            font-size: 22px;
-            font-weight: 700;
-            color: #2d3436;
+
+        .modal-header h2 {
+            color: #2d3748;
             margin-bottom: 10px;
         }
-        
-        .modal-text {
-            color: #636e72;
-            font-size: 14px;
-            margin-bottom: 25px;
-            line-height: 1.5;
+
+        .upload-section {
+            margin: 20px 0;
         }
-        
+
         .upload-area {
-            border: 3px dashed #6c5ce7;
-            border-radius: 20px;
-            padding: 40px 20px;
-            margin-bottom: 20px;
+            border: 2px dashed #cbd5e0;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
             cursor: pointer;
             transition: all 0.3s;
-            background: #f8f9fa;
+            background: #f7fafc;
         }
-        
+
         .upload-area:hover {
-            border-color: #5b4cdb;
-            background: #f0e6ff;
+            border-color: #84cc16;
+            background: #f0fff4;
         }
-        
+
+        .upload-area.has-image {
+            border-color: #84cc16;
+            background: #f0fff4;
+            padding: 15px;
+        }
+
         .upload-icon {
-            font-size: 50px;
-            color: #6c5ce7;
+            font-size: 48px;
             margin-bottom: 10px;
         }
-        
+
         .upload-text {
-            color: #6c5ce7;
-            font-weight: 600;
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .upload-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .upload-preview.show {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .withdraw-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .withdraw-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .withdraw-card:hover {
+            border-color: #84cc16;
+            background: #f0fff4;
+        }
+
+        .withdraw-card.selected {
+            border-color: #84cc16;
+            background: #f0fff4;
+        }
+
+        .withdraw-info h3 {
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .withdraw-info p {
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .withdraw-amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #84cc16;
+        }
+
+        .pix-key-input {
+            margin-top: 20px;
+        }
+
+        .pix-key-input label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .pix-key-input input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
             font-size: 16px;
         }
-        
-        .upload-hint {
-            color: #b2bec3;
-            font-size: 12px;
-            margin-top: 5px;
-        }
-        
-        .preview-image {
-            max-width: 100%;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            display: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        
-        .btn-submit {
+
+        .btn-withdraw {
             width: 100%;
+            margin-top: 20px;
             padding: 16px;
-            background: linear-gradient(135deg, #6c5ce7 0%, #5b4cdb 100%);
+            background: #84cc16;
             color: white;
             border: none;
             border-radius: 12px;
             font-size: 16px;
-            font-weight: 700;
+            font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 10px;
         }
-        
-        .btn-submit:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(108,92,231,0.4);
-        }
-        
-        .btn-submit:disabled {
-            opacity: 0.5;
+
+        .btn-withdraw:disabled {
+            background: #cbd5e0;
             cursor: not-allowed;
         }
-        
-        .btn-cancel {
+
+        .task-detail-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .task-detail-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .task-steps {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .task-steps h4 {
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+
+        .task-steps ol {
+            padding-left: 20px;
+            color: #4a5568;
+            line-height: 1.8;
+        }
+
+        .task-steps li {
+            margin-bottom: 8px;
+        }
+
+        .btn-confirm-task {
             width: 100%;
             padding: 16px;
-            background: transparent;
-            color: #636e72;
-            border: 2px solid #dfe6e9;
+            background: #84cc16;
+            color: white;
+            border: none;
             border-radius: 12px;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
+            margin-top: 10px;
         }
-        
-        .btn-cancel:hover {
-            background: #f8f9fa;
-            border-color: #b2bec3;
+
+        .btn-confirm-task:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
         }
-        
-        .notification {
+
+        .btn-go-task {
+            width: 100%;
+            padding: 16px;
+            background: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .toast {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #2d3748;
+            color: white;
             padding: 16px 24px;
             border-radius: 12px;
-            color: white;
-            font-weight: 600;
-            z-index: 99999;
-            animation: slideIn 0.3s ease;
-            max-width: 300px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 300;
         }
-        
-        .notification.success {
-            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
         }
-        
-        .notification.error {
-            background: linear-gradient(135deg, #e17055 0%, #d63031 100%);
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(400px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        .withdraw-options {
-            display: grid;
-            gap: 12px;
-            margin: 20px 0;
-        }
-        
-        .withdraw-option {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 2px solid transparent;
-        }
-        
-        .withdraw-option:hover {
-            background: #f0e6ff;
-            border-color: #6c5ce7;
-        }
-        
-        .withdraw-option.selected {
-            background: #f0e6ff;
-            border-color: #6c5ce7;
-        }
-        
-        .withdraw-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .withdraw-icon {
-            font-size: 30px;
-        }
-        
-        .withdraw-details h4 {
-            font-size: 16px;
-            color: #2d3436;
-            margin-bottom: 3px;
-        }
-        
-        .withdraw-details p {
-            font-size: 12px;
-            color: #636e72;
-        }
-        
-        .withdraw-amount {
-            font-size: 20px;
-            font-weight: 700;
-            color: #6c5ce7;
-        }
-        
-        .pix-key-input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #dfe6e9;
+
+        .admin-login {
+            background: #fffaf0;
+            border: 2px solid #ed8936;
             border-radius: 12px;
-            font-size: 16px;
-            margin: 20px 0;
-            font-family: 'Poppins', sans-serif;
-            transition: border-color 0.2s;
+            padding: 15px;
+            margin-bottom: 20px;
         }
-        
-        .pix-key-input:focus {
-            outline: none;
-            border-color: #6c5ce7;
+
+        .admin-login h4 {
+            color: #c05621;
+            margin-bottom: 10px;
         }
-        
-        .footer {
-            text-align: center;
-            padding: 30px 20px;
-            color: #636e72;
+
+        /* Pending List Styles */
+        .pending-list {
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .pending-item {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #ed8936;
+        }
+
+        .pending-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .pending-item-title {
+            font-weight: bold;
+            color: #2d3748;
+        }
+
+        .pending-item-user {
             font-size: 12px;
+            color: #718096;
         }
-        
-        .footer i {
-            color: #e17055;
+
+        .pending-item-image {
+            width: 100%;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
         }
+
+        .pending-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-approve {
+            flex: 1;
+            padding: 10px;
+            background: #48bb78;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-reject {
+            flex: 1;
+            padding: 10px;
+            background: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .status-pending {
+            background: #fffaf0;
+            color: #c05621;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 15px;
+            border: 2px solid #ed8936;
+        }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loading-screen">
-        <div class="loading-icon">💰</div>
-        <div class="loading-text">Renda Extra</div>
-        <div class="loading-subtext">Iniciando...</div>
-        <div class="loading-bar">
-            <div class="loading-progress"></div>
+
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <div class="logo">
+                <h1>💰 TarefaPix</h1>
+                <p>Realize tarefas e ganhe dinheiro</p>
+            </div>
+            <form id="loginForm">
+                <div class="input-group">
+                    <label>Usuário</label>
+                    <input type="text" id="username" placeholder="Digite seu usuário" required>
+                </div>
+                <div class="input-group">
+                    <label>Senha</label>
+                    <input type="password" id="password" placeholder="Digite sua senha" required>
+                </div>
+                <button type="submit" class="btn-primary">Entrar</button>
+            </form>
         </div>
     </div>
 
-    <!-- App Container -->
-    <div id="app-container">
-        <!-- Header -->
+    <!-- Main App -->
+    <div class="app-container" id="appContainer">
         <div class="header">
             <div class="header-top">
-                <div class="logo">
-                    <i class="fas fa-coins"></i>
-                    Renda Extra
+                <div class="balance">
+                    <div class="coin-icon">$</div>
+                    <div>
+                        <div class="balance-text" id="coinBalance">0</div>
+                        <div class="balance-conversion">≈ R$ <span id="realBalance">0.00</span></div>
+                    </div>
                 </div>
-                <div class="header-actions">
-                    <button class="btn-header" onclick="abrirChat()" title="Suporte">
-                        <i class="fas fa-comments"></i>
-                        <span class="badge" id="chat-badge" style="display: none;">0</span>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="balance-card">
-                <div class="balance-label">Seu Saldo Disponível</div>
-                <div class="balance-amount" id="saldo">R$ 0,00</div>
-                <div class="balance-pending">
-                    <i class="fas fa-clock"></i> Pendente: R$ <span id="saldo-pendente">0,00</span>
+                <div class="user-avatar" id="userAvatar">
+                    U
+                    <span class="admin-badge hidden" id="adminBadge">ADM</span>
                 </div>
             </div>
         </div>
 
-        <!-- Stats -->
-        <div class="stats-grid">
-            <div class="stat-item">
-                <div class="stat-icon">💵</div>
-                <div class="stat-value" id="total-ganho">0</div>
-                <div class="stat-label">Total Ganho</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-icon">✅</div>
-                <div class="stat-value" id="tarefas-completadas">0</div>
-                <div class="stat-label">Tarefas</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-icon">🏦</div>
-                <div class="stat-value" id="saques-realizados">0</div>
-                <div class="stat-label">Saques</div>
-            </div>
-        </div>
+        <button class="btn-admin hidden" id="btnAdmin" onclick="openCreateTaskModal()">
+            <span>➕</span> Criar Nova Tarefa
+        </button>
 
-        <!-- Withdraw Button -->
-        <div class="withdraw-section">
-            <button class="btn-withdraw" onclick="abrirModalSaque()">
-                <i class="fas fa-wallet"></i>
-                Sacar Dinheiro
-            </button>
-        </div>
+        <button class="btn-pendencias hidden" id="btnPendencias" onclick="openPendingModal()">
+            <span>📋</span> Comprovantes Pendentes
+            <span class="badge-count" id="pendingCount">0</span>
+        </button>
 
-        <!-- Tasks Section -->
-        <div class="section-title">
-            <i class="fas fa-tasks"></i>
-            Tarefas Disponíveis
-        </div>
-        
-        <div class="tasks-container" id="tasks-container">
-            <div style="text-align: center; padding: 40px; color: #b2bec3;">
-                <i class="fas fa-spinner fa-spin" style="font-size: 30px;"></i>
-                <p style="margin-top: 15px;">Carregando tarefas...</p>
+        <div class="task-list" id="taskList"></div>
+
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active" onclick="showSection('tasks')">
+                <span>📦</span>
+                <span>Tarefas</span>
+            </a>
+            <a href="#" class="nav-item" onclick="openMySubmissions()">
+                <span>📤</span>
+                <span>Meus Envios</span>
+            </a>
+            <a href="#" class="nav-item" onclick="openWithdrawModal()">
+                <span>🏧</span>
+                <span>Saque</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div class="modal" id="adminLoginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔐 Área Restrita</h2>
+                <p>Apenas administradores</p>
             </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="footer">
-            <p>ID: <span id="footer-user-id">...</span></p>
-            <p style="margin-top: 5px;">Feito com <i class="fas fa-heart"></i> para você ganhar dinheiro</p>
+            <div class="admin-login">
+                <h4>Digite a senha de admin:</h4>
+                <input type="password" id="adminPassword" placeholder="Senha admin" style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px;">
+            </div>
+            <button class="btn-primary" onclick="verifyAdmin()">Entrar como Admin</button>
+            <button onclick="closeAdminLoginModal()" style="margin-top: 10px; width: 100%; padding: 12px; background: #e2e8f0; border: none; border-radius: 8px; cursor: pointer;">✕ Cancelar</button>
         </div>
     </div>
 
-    <!-- Chat Overlay -->
-    <div id="chat-overlay" class="chat-overlay">
-        <div class="chat-container">
-            <div class="chat-header">
-                <button class="btn-close-chat" onclick="fecharChat()">
-                    <i class="fas fa-arrow-right"></i>
-                </button>
-                <div class="chat-header-info">
-                    <div class="chat-header-title">
-                        <i class="fas fa-headset"></i>
-                        Suporte
-                    </div>
-                    <div class="chat-status">
-                        <span class="status-dot"></span>
-                        Online - Responde em breve
-                    </div>
-                </div>
+    <!-- Create Task Modal (Só Admin) -->
+    <div class="modal" id="createTaskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>➕ Criar Nova Tarefa</h2>
+                <p>Modo Administrador</p>
             </div>
-            
-            <div id="chat-messages" class="chat-messages">
-                <div class="chat-welcome">
-                    <div class="chat-welcome-icon">👋</div>
-                    <h3>Olá! Como podemos ajudar?</h3>
-                    <p>Envie sua dúvida ou problema. Nossa equipe responde em até 24h.</p>
-                </div>
-                
-                <div id="typing-indicator" class="typing-indicator">
-                    <span class="typing-dot"></span>
-                    <span class="typing-dot"></span>
-                    <span class="typing-dot"></span>
-                </div>
+            <div class="form-group">
+                <label>Título da Tarefa</label>
+                <input type="text" id="taskTitle" placeholder="Ex: Recarregue R$ 5 e Ganhe R$ 6">
             </div>
-            
-            <div class="chat-input-area">
-                <input type="text" id="chat-input" class="chat-input" 
-                    placeholder="Digite sua mensagem..." 
-                    onkeypress="if(event.key==='Enter')enviarMensagem()">
-                <button class="btn-send" onclick="enviarMensagem()" id="btn-send">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
+            <div class="form-group">
+                <label>Descrição Detalhada</label>
+                <textarea id="taskDesc" placeholder="Explique passo a passo o que o usuário deve fazer..."></textarea>
             </div>
+            <div class="form-group">
+                <label>Link da Plataforma</label>
+                <input type="url" id="taskLink" placeholder="https://...">
+            </div>
+            <div class="form-group">
+                <label>Recompensa em Dinheiro (R$)</label>
+                <input type="number" id="taskReward" placeholder="6.00" step="0.01">
+            </div>
+            <div class="form-group">
+                <label>Moedas para Recompensa</label>
+                <input type="number" id="taskCoins" placeholder="6000" value="6000">
+            </div>
+            <button class="btn-confirm-task" onclick="createTask()">✓ Criar Tarefa</button>
+            <button onclick="closeCreateTaskModal()" style="margin-top: 10px; width: 100%; padding: 12px; background: #e2e8f0; border: none; border-radius: 8px; cursor: pointer;">✕ Cancelar</button>
         </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <!-- Pending Approvals Modal (Só Admin) -->
+    <div class="modal" id="pendingModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>📋 Comprovantes Pendentes</h2>
+                <p>Aprove ou rejeite os envios</p>
+            </div>
+            <div class="pending-list" id="pendingList">
+                <!-- Pending items will be inserted here -->
+            </div>
+            <button onclick="closePendingModal()" style="margin-top: 15px; width: 100%; padding: 12px; background: #e2e8f0; border: none; border-radius: 8px; cursor: pointer;">✕ Fechar</button>
+        </div>
+    </div>
+
+    <!-- My Submissions Modal -->
+    <div class="modal" id="mySubmissionsModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>📤 Meus Envios</h2>
+                <p>Status dos seus comprovantes</p>
+            </div>
+            <div class="pending-list" id="mySubmissionsList">
+                <!-- User submissions will be inserted here -->
+            </div>
+            <button onclick="closeMySubmissions()" style="margin-top: 15px; width: 100%; padding: 12px; background: #e2e8f0; border: none; border-radius: 8px; cursor: pointer;">✕ Fechar</button>
+        </div>
+    </div>
+
+    <!-- Withdraw Modal -->
+    <div class="modal" id="withdrawModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>💸 Saque via Pix</h2>
+                <p>Escolha o valor para sacar</p>
+            </div>
+            <div class="withdraw-options">
+                <div class="withdraw-card" onclick="selectWithdraw(0.30, 3000)" id="withdraw030">
+                    <div class="withdraw-info">
+                        <h3>Saque R$ 0,30</h3>
+                        <p>3.000 moedas</p>
+                    </div>
+                    <div class="withdraw-amount">R$ 0,30</div>
+                </div>
+                <div class="withdraw-card" onclick="selectWithdraw(0.50, 5000)" id="withdraw050">
+                    <div class="withdraw-info">
+                        <h3>Saque R$ 0,50</h3>
+                        <p>5.000 moedas</p>
+                    </div>
+                    <div class="withdraw-amount">R$ 0,50</div>
+                </div>
+            </div>
+            <div class="pix-key-input">
+                <label>Chave Pix</label>
+                <input type="text" id="pixKey" placeholder="CPF, Email, Celular ou Chave Aleatória">
+            </div>
+            <button class="btn-withdraw" id="btnWithdraw" onclick="processWithdraw()" disabled>Sacar Agora</button>
+            <button onclick="closeWithdrawModal()" style="margin-top: 15px; width: 100%; padding: 12px; background: #e2e8f0; border: none; border-radius: 8px; cursor: pointer;">✕ Fechar</button>
+        </div>
+    </div>
+
+    <!-- Do Task Modal -->
+    <div class="modal" id="doTaskModal">
+        <div class="modal-content">
+            <div class="task-detail-header">
+                <div class="task-detail-icon" id="doTaskIcon">💳</div>
+                <h2 id="doTaskTitle">Tarefa</h2>
+                <div class="task-reward" style="justify-content: center; margin-top: 10px;">
+                    <span class="money" style="font-size: 20px;">💰 R$ <span id="doTaskReward">0.00</span></span>
+                </div>
+            </div>
+            
+            <div class="task-steps">
+                <h4>📋 Passo a Passo:</h4>
+                <ol id="taskSteps">
+                    <li>Clique em "Ir para Tarefa" abaixo</li>
+                    <li>Cadastre-se na plataforma</li>
+                    <li>Faça a recarga de R$ 5,00</li>
+                    <li>Volte aqui e envie o comprovante</li>
+                    <li>Aguarde aprovação do admin</li>
+                    <li>Receba as moedas!</li>
+                </ol>
+            </div>
+
+            <button class="btn-go-task" id="btnGoTask" onclick="goToTask()">🚀 Ir para Tarefa</button>
+
+            <div class="upload-section" id="uploadSection" style="display: none;">
+                <h4 style="margin-bottom: 10px; color: #2d3748;">📸 Enviar Comprovante:</h4>
+                <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon" id="uploadIcon">📷</div>
+                    <div class="upload-text" id="uploadText">
+                        Clique para enviar print/comprovante<br>
+                        <small>JPG, PNG ou PDF</small>
+                    </div>
+                    <img class="upload-preview" id="uploadPreview" alt="Preview">
+                </div>
+                <input type="file" class="file-input" id="fileInput" accept="image/*,.pdf" onchange="handleFileSelect(event)">
+            </div>
+
+            <button class="btn-confirm-task" id="btnSubmitProof" onclick="submitProof()" disabled style="display: none;">📤 Enviar para Análise</button>
+            
+            <div class="status-pending hidden" id="statusPending">
+                ⏳ <strong>Aguardando Aprovação</strong><br>
+                <small>O admin vai verificar seu comprovante em breve.</small>
+            </div>
+
+            <div class="task-steps" style="background: #fffaf0; margin-top: 15px;">
+                <h4>⚠️ Atenção:</h4>
+                <p style="color: #744210; line-height: 1.6; font-size: 12px;">
+                    • Complete a tarefa antes de enviar o comprovante<br>
+                    • O admin vai verificar e aprovar em até 24h<br>
+                    • Você receberá as moedas apenas após aprovação<br>
+                    • Prints falsos = banimento permanente
+                </p>
+            </div>
+
+            <button onclick="closeDoTaskModal()" style="margin-top: 10px; width: 100%; padding: 12px; background: #e2e8f0; border: none; border-radius: 8px; cursor: pointer;">✕ Fechar</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
 
     <script>
-        // ============================================
-        // CONFIGURAÇÃO FIREBASE
-        // ============================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyChdKpWC0g4W2kFM8m2E7f6v9X8w2w3w4w",
-            authDomain: "renda-extra-app.firebaseapp.com",
-            projectId: "renda-extra-app",
-            storageBucket: "renda-extra-app.appspot.com",
-            messagingSenderId: "1234567890",
-            appId: "1:1234567890:web:abc123def456"
+        // CONFIGURAÇÃO - ALTERE AQUI
+        const ADMIN_PASSWORD = "admin123";
+        const ADMIN_USER = "admin";
+        
+        // App State
+        let currentUser = localStorage.getItem('tarefapix_user') || null;
+        let isAdmin = localStorage.getItem('tarefapix_isadmin') === 'true';
+        let coins = parseInt(localStorage.getItem('tarefapix_coins')) || 0;
+        let tasks = JSON.parse(localStorage.getItem('tarefapix_tasks')) || [];
+        let submissions = JSON.parse(localStorage.getItem('tarefapix_submissions')) || [];
+        let selectedWithdrawAmount = 0;
+        let selectedWithdrawCoins = 0;
+        let currentTask = null;
+        let selectedFile = null;
+
+        // Tarefa padrão inicial
+        const defaultTask = {
+            id: 1,
+            title: "Recarregue R$ 5,00 e Ganhe R$ 6,00",
+            desc: "Cadastre-se na plataforma, faça uma recarga de R$ 5,00 e receba R$ 6,00 de volta (lucro de R$ 1,00). Envie o comprovante da recarga.",
+            icon: "💳",
+            iconColor: "green",
+            reward: 6.00,
+            coins: 6000,
+            link: "https://exemplo.com/recarga"
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const storage = firebase.storage();
-
-        // ============================================
-        // VARIÁVEIS GLOBAIS
-        // ============================================
-        let currentUser = null;
-        let chatListener = null;
-        let unreadMessages = 0;
-        let tarefasListener = null;
-        let tarefasCompletadas = [];
-
-        // ============================================
-        // SISTEMA DE ID ANÔNIMO
-        // ============================================
-        function getAnonymousId() {
-            let anonId = localStorage.getItem('anonymous_user_id');
-            
-            if (!anonId) {
-                const timestamp = Date.now().toString(36);
-                const random = Math.random().toString(36).substr(2, 9);
-                const device = navigator.userAgent.replace(/\\s/g, '').substr(0, 20);
-                anonId = `anon_${timestamp}_${random}_${device}`;
-                
-                localStorage.setItem('anonymous_user_id', anonId);
-                localStorage.setItem('first_visit', new Date().toISOString());
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            if (tasks.length === 0) {
+                tasks.push(defaultTask);
+                saveTasks();
             }
-            
-            return anonId;
+            if (currentUser) {
+                showApp();
+            }
+            updateBalance();
+            updatePendingCount();
+        });
+
+        function saveTasks() {
+            localStorage.setItem('tarefapix_tasks', JSON.stringify(tasks));
         }
 
-        async function initAnonymousUser() {
-            const anonId = getAnonymousId();
-            const userRef = db.collection('anonymous_users').doc(anonId);
+        function saveSubmissions() {
+            localStorage.setItem('tarefapix_submissions', JSON.stringify(submissions));
+        }
+
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
             
-            try {
-                const doc = await userRef.get();
-                
-                if (!doc.exists) {
-                    await userRef.set({
-                        anonymous_id: anonId,
-                        saldo: 0,
-                        saldo_pendente: 0,
-                        total_ganho: 0,
-                        tarefas_completadas: 0,
-                        saques_realizados: 0,
-                        data_criacao: firebase.firestore.FieldValue.serverTimestamp(),
-                        ultimo_acesso: firebase.firestore.FieldValue.serverTimestamp(),
-                        device_info: {
-                            user_agent: navigator.userAgent,
-                            language: navigator.language,
-                            platform: navigator.platform,
-                            screen: `${screen.width}x${screen.height}`,
-                            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-                        },
-                        status: 'ativo'
-                    });
+            if (username && password) {
+                currentUser = username;
+                if (username.toLowerCase() === ADMIN_USER && password === ADMIN_PASSWORD) {
+                    isAdmin = true;
+                    localStorage.setItem('tarefapix_isadmin', 'true');
+                    showToast('✓ Logado como Administrador!');
                 } else {
-                    await userRef.update({
-                        ultimo_acesso: firebase.firestore.FieldValue.serverTimestamp()
-                    });
+                    isAdmin = false;
+                    localStorage.setItem('tarefapix_isadmin', 'false');
                 }
                 
-                return anonId;
-            } catch (error) {
-                console.error('❌ Erro:', error);
-                throw error;
-            }
-        }
-
-        // ============================================
-        // INICIALIZAÇÃO DO APP
-        // ============================================
-        async function initApp() {
-            try {
-                const userId = await initAnonymousUser();
-                await loadUserData(userId);
+                localStorage.setItem('tarefapix_user', username);
+                localStorage.setItem('tarefapix_coins', coins);
+                showApp();
                 
-                // Inicia listeners em tempo real
-                initChatListener();
-                initTarefasListener(); // NOVO: Carrega tarefas do Firebase
-                carregarTarefasCompletadas();
-                
-                document.getElementById('loading-screen').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('loading-screen').style.display = 'none';
-                    document.getElementById('app-container').style.display = 'block';
-                }, 500);
-                
-            } catch (error) {
-                console.error('❌ Erro:', error);
-                mostrarNotificacao('Erro ao iniciar. Recarregue a página.', 'error');
-            }
-        }
-
-        async function loadUserData(anonId) {
-            try {
-                const userRef = db.collection('anonymous_users').doc(anonId);
-                const doc = await userRef.get();
-                
-                if (doc.exists) {
-                    const data = doc.data();
-                    currentUser = { id: anonId, ...data };
-                    
-                    document.getElementById('saldo').textContent = `R$ ${(data.saldo || 0).toFixed(2)}`;
-                    document.getElementById('saldo-pendente').textContent = (data.saldo_pendente || 0).toFixed(2);
-                    document.getElementById('total-ganho').textContent = (data.total_ganho || 0).toFixed(2);
-                    document.getElementById('tarefas-completadas').textContent = data.tarefas_completadas || 0;
-                    document.getElementById('saques-realizados').textContent = data.saques_realizados || 0;
-                    
-                    const shortId = anonId.substring(0, 20) + '...';
-                    document.getElementById('footer-user-id').textContent = shortId;
+                if (!isAdmin) {
+                    showToast(`Bem-vindo, ${username}!`);
                 }
-            } catch (error) {
-                console.error('❌ Erro ao carregar dados:', error);
             }
-        }
+        });
 
-        // ============================================
-        // SISTEMA DE TAREFAS DINÂMICAS (DO FIREBASE)
-        // ============================================
-        function initTarefasListener() {
-            // Carrega tarefas ativas do Firebase em tempo real
-            tarefasListener = db.collection('tarefas_sistema')
-                .where('ativa', '==', true)
-                .orderBy('ordem', 'asc')
-                .onSnapshot(snapshot => {
-                    const container = document.getElementById('tasks-container');
-                    container.innerHTML = '';
-                    
-                    if (snapshot.empty) {
-                        container.innerHTML = `
-                            <div style="text-align: center; padding: 40px; color: #b2bec3;">
-                                <i class="fas fa-tasks" style="font-size: 40px; margin-bottom: 15px;"></i>
-                                <p>Nenhuma tarefa disponível no momento.</p>
-                                <p style="font-size: 12px; margin-top: 10px;">Volte mais tarde!</p>
-                            </div>
-                        `;
-                        return;
-                    }
-                    
-                    snapshot.forEach(doc => {
-                        const tarefa = doc.data();
-                        const tarefaId = doc.id;
-                        
-                        // Verifica se usuário já completou esta tarefa
-                        const jaCompletou = tarefasCompletadas.includes(tarefaId);
-                        
-                        const card = document.createElement('div');
-                        card.className = `task-card ${jaCompletou ? 'completada' : ''}`;
-                        card.innerHTML = `
-                            <div class="task-icon" style="background: ${tarefa.cor}20; color: ${tarefa.cor};">
-                                ${tarefa.icone}
-                            </div>
-                            <div class="task-info">
-                                <div class="task-title">${tarefa.titulo}</div>
-                                <div class="task-desc">${tarefa.descricao}</div>
-                            </div>
-                            <div class="task-reward">
-                                <div class="reward-amount">+R$ ${tarefa.valor.toFixed(2)}</div>
-                                ${jaCompletou ? 
-                                    '<span class="task-completed-badge"><i class="fas fa-check"></i> Concluída</span>' :
-                                    `<button class="btn-do-task" onclick="iniciarTarefa('${tarefaId}', ${tarefa.valor}, '${tarefa.link || ''}')">
-                                        Fazer
-                                    </button>`
-                                }
-                            </div>
-                        `;
-                        container.appendChild(card);
-                    });
-                }, error => {
-                    console.error('❌ Erro ao carregar tarefas:', error);
-                    document.getElementById('tasks-container').innerHTML = `
-                        <div style="text-align: center; padding: 40px; color: #e17055;">
-                            <i class="fas fa-exclamation-triangle" style="font-size: 40px; margin-bottom: 15px;"></i>
-                            <p>Erro ao carregar tarefas.</p>
-                            <button onclick="initTarefasListener()" style="margin-top: 15px; padding: 10px 20px; background: #6c5ce7; color: white; border: none; border-radius: 20px; cursor: pointer;">
-                                Tentar novamente
-                            </button>
-                        </div>
-                    `;
-                });
-        }
-
-        async function carregarTarefasCompletadas() {
-            const userId = getAnonymousId();
-            try {
-                const snapshot = await db.collection('anonymous_users')
-                    .doc(userId)
-                    .collection('tarefas_completadas')
-                    .get();
-                
-                tarefasCompletadas = snapshot.docs.map(doc => doc.id);
-            } catch (error) {
-                console.error('❌ Erro:', error);
-            }
-        }
-
-        async function iniciarTarefa(tarefaId, valor, link) {
-            const userId = getAnonymousId();
+        function showApp() {
+            document.getElementById('userAvatar').textContent = currentUser.charAt(0).toUpperCase();
             
-            try {
-                // Verifica se já completou
-                const tarefaRef = db.collection('anonymous_users')
-                    .doc(userId)
-                    .collection('tarefas_completadas')
-                    .doc(tarefaId);
-                    
-                const tarefaDoc = await tarefaRef.get();
-                
-                if (tarefaDoc.exists) {
-                    mostrarNotificacao('⚠️ Você já completou esta tarefa!', 'error');
-                    return;
-                }
-                
-                // Abre link se existir
-                if (link && link.trim() !== '') {
-                    window.open(link, '_blank');
-                }
-                
-                // Mostra modal de verificação
-                mostrarModalVerificacao(tarefaId, valor);
-                
-            } catch (error) {
-                console.error('❌ Erro:', error);
-                mostrarNotificacao('Erro ao iniciar tarefa', 'error');
+            if (isAdmin) {
+                document.getElementById('adminBadge').classList.remove('hidden');
+                document.getElementById('btnAdmin').classList.remove('hidden');
+                document.getElementById('btnPendencias').classList.remove('hidden');
+                updatePendingCount();
+            } else {
+                document.getElementById('adminBadge').classList.add('hidden');
+                document.getElementById('btnAdmin').classList.add('hidden');
+                document.getElementById('btnPendencias').classList.add('hidden');
             }
+            
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            renderTasks();
+            updateBalance();
         }
 
-        // ============================================
-        // SISTEMA DE UPLOAD DE COMPROVANTE
-        // ============================================
-        function mostrarModalVerificacao(tarefaId, valor) {
-            const modal = document.createElement('div');
-            modal.className = 'modal-overlay';
-            modal.id = 'modal-verificacao';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-icon">📸</div>
-                    <h3 class="modal-title">Comprovante Necessário</h3>
-                    <p class="modal-text">
-                        Envie uma foto ou print da tarefa concluída para receber 
-                        <strong style="color: #00b894;">R$ ${valor.toFixed(2)}</strong>
-                    </p>
-                    
-                    <input type="file" id="foto-comprovante" accept="image/*" 
-                        style="display: none;" onchange="previewFoto(this)">
-                    
-                    <div id="upload-area" class="upload-area" 
-                        onclick="document.getElementById('foto-comprovante').click()">
-                        <div class="upload-icon">
-                            <i class="fas fa-camera"></i>
+        function renderTasks() {
+            const taskList = document.getElementById('taskList');
+            taskList.innerHTML = tasks.map(task => `
+                <div class="task-card" onclick="openDoTask(${task.id})">
+                    <div class="task-icon ${task.iconColor || 'blue'}">${task.icon || '📋'}</div>
+                    <div class="task-content">
+                        <div class="task-title">${task.title}</div>
+                        <div class="task-desc">${task.desc || 'Clique para ver detalhes'}</div>
+                        <div class="task-reward">
+                            <span class="money">💰 R$ ${parseFloat(task.reward).toFixed(2)}</span>
                         </div>
-                        <div class="upload-text">Clique para enviar foto</div>
-                        <div class="upload-hint">JPG, PNG (máx 5MB)</div>
                     </div>
-                    
-                    <img id="preview-img" class="preview-image">
-                    
-                    <button id="btn-enviar" class="btn-submit" onclick="enviarComprovante('${tarefaId}', ${valor})" disabled>
-                        <i class="fas fa-paper-plane"></i> Enviar para Análise
-                    </button>
-                    
-                    <button class="btn-cancel" onclick="fecharModalVerificacao()">
-                        Cancelar
-                    </button>
+                    <div class="task-action">
+                        <button class="btn-ganhar" onclick="event.stopPropagation(); openDoTask(${task.id})">Ganhar</button>
+                    </div>
                 </div>
-            `;
-            
-            document.body.appendChild(modal);
+            `).join('');
         }
 
-        function previewFoto(input) {
-            if (input.files && input.files[0]) {
+        // Admin Functions
+        function openAdminModal() {
+            if (!isAdmin) {
+                document.getElementById('adminLoginModal').style.display = 'flex';
+            } else {
+                openCreateTaskModal();
+            }
+        }
+
+        function closeAdminLoginModal() {
+            document.getElementById('adminLoginModal').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
+        }
+
+        function verifyAdmin() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === ADMIN_PASSWORD) {
+                isAdmin = true;
+                localStorage.setItem('tarefapix_isadmin', 'true');
+                document.getElementById('adminBadge').classList.remove('hidden');
+                document.getElementById('btnAdmin').classList.remove('hidden');
+                document.getElementById('btnPendencias').classList.remove('hidden');
+                closeAdminLoginModal();
+                openCreateTaskModal();
+                showToast('✓ Modo Admin ativado!');
+            } else {
+                showToast('❌ Senha incorreta!');
+            }
+        }
+
+        function openCreateTaskModal() {
+            if (!isAdmin) {
+                showToast('❌ Acesso negado!');
+                return;
+            }
+            document.getElementById('createTaskModal').style.display = 'flex';
+        }
+
+        function closeCreateTaskModal() {
+            document.getElementById('createTaskModal').style.display = 'none';
+            document.getElementById('taskTitle').value = '';
+            document.getElementById('taskDesc').value = '';
+            document.getElementById('taskLink').value = '';
+            document.getElementById('taskReward').value = '';
+            document.getElementById('taskCoins').value = '6000';
+        }
+
+        function createTask() {
+            if (!isAdmin) {
+                showToast('❌ Somente admin pode criar tarefas!');
+                return;
+            }
+
+            const title = document.getElementById('taskTitle').value;
+            const desc = document.getElementById('taskDesc').value;
+            const link = document.getElementById('taskLink').value;
+            const reward = document.getElementById('taskReward').value;
+            const taskCoins = document.getElementById('taskCoins').value;
+
+            if (!title || !desc || !link || !reward) {
+                showToast('❌ Preencha todos os campos!');
+                return;
+            }
+
+            const newTask = {
+                id: Date.now(),
+                title: title,
+                desc: desc,
+                link: link,
+                reward: parseFloat(reward),
+                coins: parseInt(taskCoins) || 6000,
+                icon: '💳',
+                iconColor: 'green'
+            };
+
+            tasks.push(newTask);
+            saveTasks();
+            renderTasks();
+            closeCreateTaskModal();
+            showToast('✓ Tarefa criada com sucesso!');
+        }
+
+        // Pending Approvals (Admin)
+        function updatePendingCount() {
+            const pending = submissions.filter(s => s.status === 'pending').length;
+            document.getElementById('pendingCount').textContent = pending;
+        }
+
+        function openPendingModal() {
+            if (!isAdmin) return;
+            renderPendingList();
+            document.getElementById('pendingModal').style.display = 'flex';
+        }
+
+        function closePendingModal() {
+            document.getElementById('pendingModal').style.display = 'none';
+        }
+
+        function renderPendingList() {
+            const pendingList = document.getElementById('pendingList');
+            const pending = submissions.filter(s => s.status === 'pending');
+            
+            if (pending.length === 0) {
+                pendingList.innerHTML = '<p style="text-align: center; color: #718096;">Nenhum comprovante pendente!</p>';
+                return;
+            }
+            
+            pendingList.innerHTML = pending.map(sub => `
+                <div class="pending-item">
+                    <div class="pending-item-header">
+                        <div>
+                            <div class="pending-item-title">${sub.taskTitle}</div>
+                            <div class="pending-item-user">Usuário: ${sub.user} | Data: ${new Date(sub.date).toLocaleString()}</div>
+                        </div>
+                        <div style="color: #ed8936; font-weight: bold;">R$ ${parseFloat(sub.reward).toFixed(2)}</div>
+                    </div>
+                    <img src="${sub.image}" class="pending-item-image" alt="Comprovante">
+                    <div class="pending-actions">
+                        <button class="btn-approve" onclick="approveSubmission(${sub.id})">✓ Aprovar</button>
+                        <button class="btn-reject" onclick="rejectSubmission(${sub.id})">✕ Rejeitar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function approveSubmission(submissionId) {
+            const sub = submissions.find(s => s.id === submissionId);
+            if (!sub) return;
+            
+            // Libera moedas para o usuário
+            let userCoins = parseInt(localStorage.getItem(`tarefapix_coins_${sub.user}`)) || 0;
+            userCoins += sub.coins;
+            localStorage.setItem(`tarefapix_coins_${sub.user}`, userCoins);
+            
+            // Atualiza status
+            sub.status = 'approved';
+            sub.approvedDate = new Date().toISOString();
+            sub.approvedBy = currentUser;
+            saveSubmissions();
+            
+            // Se for o usuário atual, atualiza saldo
+            if (sub.user === currentUser) {
+                coins = userCoins;
+                localStorage.setItem('tarefapix_coins', coins);
+                updateBalance();
+            }
+            
+            renderPendingList();
+            updatePendingCount();
+            showToast(`✓ Aprovado! ${sub.coins} moedas liberadas para ${sub.user}`);
+        }
+
+        function rejectSubmission(submissionId) {
+            const sub = submissions.find(s => s.id === submissionId);
+            if (!sub) return;
+            
+            sub.status = 'rejected';
+            sub.rejectedDate = new Date().toISOString();
+            sub.rejectedBy = currentUser;
+            saveSubmissions();
+            
+            renderPendingList();
+            updatePendingCount();
+            showToast('✕ Comprovante rejeitado!');
+        }
+
+        // My Submissions (User)
+        function openMySubmissions() {
+            renderMySubmissions();
+            document.getElementById('mySubmissionsModal').style.display = 'flex';
+        }
+
+        function closeMySubmissions() {
+            document.getElementById('mySubmissionsModal').style.display = 'none';
+        }
+
+        function renderMySubmissions() {
+            const mySubs = submissions.filter(s => s.user === currentUser);
+            const list = document.getElementById('mySubmissionsList');
+            
+            if (mySubs.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #718096;">Você ainda não enviou nenhum comprovante!</p>';
+                return;
+            }
+            
+            list.innerHTML = mySubs.map(sub => {
+                let statusColor = '#ed8936';
+                let statusText = '⏳ Pendente';
+                if (sub.status === 'approved') {
+                    statusColor = '#48bb78';
+                    statusText = '✓ Aprovado';
+                } else if (sub.status === 'rejected') {
+                    statusColor = '#e53e3e';
+                    statusText = '✕ Rejeitado';
+                }
+                
+                return `
+                    <div class="pending-item" style="border-left-color: ${statusColor};">
+                        <div class="pending-item-header">
+                            <div>
+                                <div class="pending-item-title">${sub.taskTitle}</div>
+                                <div class="pending-item-user">${new Date(sub.date).toLocaleString()}</div>
+                            </div>
+                            <div style="color: ${statusColor}; font-weight: bold;">${statusText}</div>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <strong>Recompensa:</strong> R$ ${parseFloat(sub.reward).toFixed(2)} (${sub.coins} moedas)
+                        </div>
+                        ${sub.status === 'approved' ? '<div style="color: #48bb78; margin-top: 5px;">✓ Moedas já creditadas!</div>' : ''}
+                        ${sub.status === 'rejected' ? '<div style="color: #e53e3e; margin-top: 5px;">✕ Comprovante não aceito</div>' : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Do Task
+        function openDoTask(taskId) {
+            currentTask = tasks.find(t => t.id === taskId);
+            if (!currentTask) return;
+
+            selectedFile = null;
+            
+            // Verifica se já tem envio pendente para esta tarefa
+            const existingSub = submissions.find(s => s.user === currentUser && s.taskId === taskId);
+            
+            document.getElementById('uploadSection').style.display = existingSub ? 'none' : 'none';
+            document.getElementById('btnSubmitProof').style.display = existingSub ? 'none' : 'none';
+            document.getElementById('btnGoTask').style.display = existingSub ? 'none' : 'block';
+            document.getElementById('statusPending').classList.toggle('hidden', !existingSub);
+            
+            if (!existingSub) {
+                document.getElementById('uploadArea').classList.remove('has-image');
+                document.getElementById('uploadIcon').style.display = 'block';
+                document.getElementById('uploadText').style.display = 'block';
+                document.getElementById('uploadPreview').classList.remove('show');
+                document.getElementById('btnSubmitProof').disabled = true;
+            }
+
+            document.getElementById('doTaskIcon').textContent = currentTask.icon || '💳';
+            document.getElementById('doTaskTitle').textContent = currentTask.title;
+            document.getElementById('doTaskReward').textContent = parseFloat(currentTask.reward).toFixed(2);
+            
+            const steps = document.getElementById('taskSteps');
+            if (currentTask.desc) {
+                steps.innerHTML = `
+                    <li>Clique em "Ir para Tarefa" abaixo</li>
+                    <li>${currentTask.desc}</li>
+                    <li>Volte aqui e envie o comprovante</li>
+                    <li>Aguarde aprovação do admin</li>
+                    <li>Receba as moedas após aprovação!</li>
+                `;
+            }
+            
+            document.getElementById('doTaskModal').style.display = 'flex';
+        }
+
+        function closeDoTaskModal() {
+            document.getElementById('doTaskModal').style.display = 'none';
+            currentTask = null;
+        }
+
+        function goToTask() {
+            if (currentTask && currentTask.link) {
+                window.open(currentTask.link, '_blank');
+                
+                setTimeout(() => {
+                    document.getElementById('uploadSection').style.display = 'block';
+                    document.getElementById('btnSubmitProof').style.display = 'block';
+                    document.getElementById('btnGoTask').style.display = 'none';
+                    showToast('✓ Agora envie o comprovante!');
+                }, 1000);
+            }
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            selectedFile = file;
+
+            if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const preview = document.getElementById('preview-img');
-                    const uploadArea = document.getElementById('upload-area');
-                    const btnEnviar = document.getElementById('btn-enviar');
-                    
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                    uploadArea.style.display = 'none';
-                    btnEnviar.disabled = false;
+                    document.getElementById('uploadPreview').src = e.target.result;
+                    document.getElementById('uploadPreview').classList.add('show');
+                    document.getElementById('uploadIcon').style.display = 'none';
+                    document.getElementById('uploadText').style.display = 'none';
+                    document.getElementById('uploadArea').classList.add('has-image');
                 };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        async function enviarComprovante(tarefaId, valor) {
-            const fileInput = document.getElementById('foto-comprovante');
-            const btnEnviar = document.getElementById('btn-enviar');
-            
-            if (!fileInput.files[0]) {
-                mostrarNotificacao('Selecione uma foto primeiro!', 'error');
-                return;
-            }
-            
-            btnEnviar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-            btnEnviar.disabled = true;
-            
-            try {
-                const userId = getAnonymousId();
-                const file = fileInput.files[0];
-                
-                // Upload para Firebase Storage
-                const storageRef = storage.ref();
-                const fotoRef = storageRef.child(`comprovantes/${userId}/${tarefaId}_${Date.now()}.jpg`);
-                
-                await fotoRef.put(file);
-                const fotoUrl = await fotoRef.getDownloadURL();
-                
-                // Busca informações da tarefa
-                const tarefaDoc = await db.collection('tarefas_sistema').doc(tarefaId).get();
-                const tarefaData = tarefaDoc.data();
-                
-                // Salva na coleção de pendentes
-                await db.collection('tarefas_pendentes').add({
-                    user_id: userId,
-                    tarefa_id: tarefaId,
-                    tarefa_nome: tarefaData?.titulo || 'Tarefa',
-                    valor: valor,
-                    foto_url: fotoUrl,
-                    status: 'pendente',
-                    data_envio: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                // Marca como completada
-                await db.collection('anonymous_users')
-                    .doc(userId)
-                    .collection('tarefas_completadas')
-                    .doc(tarefaId)
-                    .set({
-                        completada_em: firebase.firestore.FieldValue.serverTimestamp(),
-                        status: 'em_analise',
-                        valor: valor,
-                        foto_url: fotoUrl
-                    });
-                
-                // Atualiza saldo pendente
-                await db.collection('anonymous_users').doc(userId).update({
-                    saldo_pendente: firebase.firestore.FieldValue.increment(valor),
-                    tarefas_completadas: firebase.firestore.FieldValue.increment(1)
-                });
-                
-                fecharModalVerificacao();
-                mostrarNotificacao('✅ Comprovante enviado! Aguarde aprovação.', 'success');
-                
-                // Atualiza lista de tarefas completadas
-                tarefasCompletadas.push(tarefaId);
-                
-                // Recarrega dados
-                await loadUserData(userId);
-                
-            } catch (error) {
-                console.error('❌ Erro ao enviar:', error);
-                mostrarNotificacao('Erro ao enviar. Tente novamente.', 'error');
-                btnEnviar.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar para Análise';
-                btnEnviar.disabled = false;
-            }
-        }
-
-        function fecharModalVerificacao() {
-            const modal = document.getElementById('modal-verificacao');
-            if (modal) modal.remove();
-        }
-
-        // ============================================
-        // SISTEMA DE CHAT
-        // ============================================
-        function abrirChat() {
-            document.getElementById('chat-overlay').classList.add('active');
-            document.body.style.overflow = 'hidden';
-            
-            unreadMessages = 0;
-            atualizarBadgeChat();
-            
-            setTimeout(() => {
-                document.getElementById('chat-input').focus();
-            }, 300);
-            
-            scrollToBottom();
-            marcarComoLidas();
-        }
-
-        function fecharChat() {
-            document.getElementById('chat-overlay').classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        function initChatListener() {
-            const userId = getAnonymousId();
-            
-            const chatRef = db.collection('chats').doc(userId).collection('mensagens');
-            
-            chatListener = chatRef
-                .orderBy('timestamp', 'asc')
-                .onSnapshot(snapshot => {
-                    const messagesContainer = document.getElementById('chat-messages');
-                    const oldMessages = messagesContainer.querySelectorAll('.message');
-                    oldMessages.forEach(msg => msg.remove());
-                    
-                    let hasNewMessage = false;
-                    
-                    snapshot.forEach(doc => {
-                        const msg = doc.data();
-                        const isSent = msg.sender === 'user';
-                        
-                        if (msg.sender === 'admin' && !msg.lida && !document.getElementById('chat-overlay').classList.contains('active')) {
-                            unreadMessages++;
-                            hasNewMessage = true;
-                        }
-                        
-                        adicionarMensagemUI(msg.texto, isSent, msg.timestamp, msg.sender_name);
-                    });
-                    
-                    if (hasNewMessage) {
-                        atualizarBadgeChat();
-                    }
-                    
-                    scrollToBottom();
-                }, error => {
-                    console.error('❌ Erro no chat:', error);
-                });
-        }
-
-        function adicionarMensagemUI(texto, isSent, timestamp, senderName) {
-            const messagesContainer = document.getElementById('chat-messages');
-            const typingIndicator = document.getElementById('typing-indicator');
-            
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isSent ? 'message-sent' : 'message-received'}`;
-            
-            const time = timestamp ? 
-                new Date(timestamp.toDate()).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : 
-                new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-            
-            if (!isSent && senderName) {
-                messageDiv.innerHTML = `
-                    <div class="message-sender">${senderName}</div>
-                    ${texto}
-                    <div class="message-time">${time}</div>
-                `;
+                reader.readAsDataURL(file);
             } else {
-                messageDiv.innerHTML = `
-                    ${texto}
-                    <div class="message-time">${time}</div>
-                `;
+                document.getElementById('uploadIcon').textContent = '📄';
+                document.getElementById('uploadText').innerHTML = `Arquivo selecionado:<br><strong>${file.name}</strong>`;
+                document.getElementById('uploadArea').classList.add('has-image');
             }
-            
-            messagesContainer.insertBefore(messageDiv, typingIndicator);
+
+            document.getElementById('btnSubmitProof').disabled = false;
+            showToast('✓ Comprovante selecionado!');
         }
 
-        async function enviarMensagem() {
-            const input = document.getElementById('chat-input');
-            const texto = input.value.trim();
-            
-            if (!texto) return;
-            
-            const userId = getAnonymousId();
-            const btnSend = document.getElementById('btn-send');
-            
-            btnSend.disabled = true;
-            input.value = '';
-            
-            try {
-                await db.collection('chats').doc(userId).collection('mensagens').add({
-                    texto: texto,
-                    sender: 'user',
-                    sender_name: 'Você',
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    lida: false
-                });
-                
-                await db.collection('chats').doc(userId).set({
-                    user_id: userId,
-                    ultima_mensagem: texto,
-                    ultimo_remetente: 'user',
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'aguardando_resposta',
-                    nao_lidas_admin: firebase.firestore.FieldValue.increment(1)
-                }, { merge: true });
-                
-                scrollToBottom();
-                
-            } catch (error) {
-                console.error('❌ Erro:', error);
-                mostrarNotificacao('Erro ao enviar mensagem', 'error');
-                input.value = texto;
-            } finally {
-                btnSend.disabled = false;
-                input.focus();
-            }
-        }
-
-        function atualizarBadgeChat() {
-            const badge = document.getElementById('chat-badge');
-            if (unreadMessages > 0) {
-                badge.textContent = unreadMessages > 99 ? '99+' : unreadMessages;
-                badge.style.display = 'block';
-            } else {
-                badge.style.display = 'none';
-            }
-        }
-
-        function scrollToBottom() {
-            const messagesContainer = document.getElementById('chat-messages');
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        async function marcarComoLidas() {
-            const userId = getAnonymousId();
-            
-            try {
-                const mensagensNaoLidas = await db.collection('chats')
-                    .doc(userId)
-                    .collection('mensagens')
-                    .where('lida', '==', false)
-                    .where('sender', '==', 'admin')
-                    .get();
-                
-                const batch = db.batch();
-                mensagensNaoLidas.forEach(doc => {
-                    batch.update(doc.ref, { lida: true });
-                });
-                
-                await batch.commit();
-                
-                await db.collection('chats').doc(userId).update({
-                    nao_lidas_usuario: 0
-                });
-                
-            } catch (error) {
-                console.error('❌ Erro:', error);
-            }
-        }
-
-        // ============================================
-        // SISTEMA DE SAQUE
-        // ============================================
-        function abrirModalSaque() {
-            const saldo = currentUser?.saldo || 0;
-            
-            if (saldo < 0.30) {
-                mostrarNotificacao('Saldo mínimo para saque: R$ 0,30', 'error');
+        function submitProof() {
+            if (!selectedFile) {
+                showToast('❌ Selecione um comprovante!');
                 return;
             }
-            
-            const modal = document.createElement('div');
-            modal.className = 'modal-overlay';
-            modal.id = 'modal-saque';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <div class="modal-icon">🏦</div>
-                    <h3 class="modal-title">Sacar Dinheiro</h3>
-                    <p class="modal-text">
-                        Saldo disponível: <strong style="color: #00b894;">R$ ${saldo.toFixed(2)}</strong>
-                    </p>
-                    
-                    <div class="withdraw-options">
-                        <div class="withdraw-option ${saldo >= 0.30 ? '' : 'disabled'}" onclick="selecionarSaque(0.30, this)">
-                            <div class="withdraw-info">
-                                <div class="withdraw-icon">💳</div>
-                                <div class="withdraw-details"><h4>Saque Rápido</h4><p>Menor valor disponível</p></div>
-                            </div>
-                            <div class="withdraw-amount">R$ 0,30</div>
-                        </div>
-                        
-                        <div class="withdraw-option ${saldo >= 0.50 ? '' : 'disabled'}" onclick="selecionarSaque(0.50, this)">
-                            <div class="withdraw-info">
-                                <div class="withdraw-icon">💰</div>
-                                <div class="withdraw-details"><h4>Saque Padrão</h4><p>Valor intermediário</p></div>
-                            </div>
-                            <div class="withdraw-amount">R$ 0,50</div>
-                        </div>
-                        
-                        <div class="withdraw-option" onclick="selecionarSaque(${saldo}, this)">
-                            <div class="withdraw-info">
-                                <div class="withdraw-icon">🤑</div>
-                                <div class="withdraw-details"><h4>Tudo</h4><p>Sacar saldo total</p></div>
-                            </div>
-                            <div class="withdraw-amount">R$ ${saldo.toFixed(2)}</div>
-                        </div>
-                    </div>
-                    
-                    <input type="text" id="pix-key" class="pix-key-input" placeholder="Digite sua chave PIX (CPF, Email ou Telefone)">
-                    
-                    <button id="btn-confirmar-saque" class="btn-submit" onclick="confirmarSaque()" disabled>
-                        <i class="fas fa-check"></i> Confirmar Saque
-                    </button>
-                    
-                    <button class="btn-cancel" onclick="fecharModalSaque()">Cancelar</button>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-        }
 
-        let valorSaqueSelecionado = 0;
-
-        function selecionarSaque(valor, elemento) {
-            if (elemento.classList.contains('disabled')) return;
-            
-            valorSaqueSelecionado = valor;
-            
-            document.querySelectorAll('.withdraw-option').forEach(el => el.classList.remove('selected'));
-            elemento.classList.add('selected');
-            
-            document.getElementById('btn-confirmar-saque').disabled = false;
-        }
-
-        async function confirmarSaque() {
-            const pixKey = document.getElementById('pix-key').value.trim();
-            
-            if (!pixKey) {
-                mostrarNotificacao('Digite sua chave PIX!', 'error');
-                return;
-            }
-            
-            if (valorSaqueSelecionado <= 0) {
-                mostrarNotificacao('Selecione um valor!', 'error');
-                return;
-            }
-            
-            const btn = document.getElementById('btn-confirmar-saque');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+            const btn = document.getElementById('btnSubmitProof');
             btn.disabled = true;
-            
-            try {
-                const userId = getAnonymousId();
+            btn.textContent = '⏳ Enviando...';
+
+            // Converte imagem para base64
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const submission = {
+                    id: Date.now(),
+                    user: currentUser,
+                    taskId: currentTask.id,
+                    taskTitle: currentTask.title,
+                    reward: currentTask.reward,
+                    coins: currentTask.coins || 6000,
+                    image: e.target.result,
+                    date: new Date().toISOString(),
+                    status: 'pending'
+                };
                 
-                await db.collection('saques_pendentes').add({
-                    user_id: userId,
-                    valor: valorSaqueSelecionado,
-                    chave_pix: pixKey,
-                    status: 'pendente',
-                    data_solicitacao: firebase.firestore.FieldValue.serverTimestamp(),
-                    processado: false
-                });
+                submissions.push(submission);
+                saveSubmissions();
                 
-                await db.collection('anonymous_users').doc(userId).update({
-                    saldo: firebase.firestore.FieldValue.increment(-valorSaqueSelecionado),
-                    saques_realizados: firebase.firestore.FieldValue.increment(1)
-                });
+                // Esconde upload e mostra status
+                document.getElementById('uploadSection').style.display = 'none';
+                document.getElementById('btnSubmitProof').style.display = 'none';
+                document.getElementById('statusPending').classList.remove('hidden');
                 
-                fecharModalSaque();
-                mostrarNotificacao('✅ Saque solicitado! Aguarde processamento.', 'success');
-                
-                await loadUserData(userId);
-                
-            } catch (error) {
-                console.error('❌ Erro:', error);
-                mostrarNotificacao('Erro ao solicitar saque', 'error');
-                btn.innerHTML = '<i class="fas fa-check"></i> Confirmar Saque';
+                btn.textContent = '📤 Enviar para Análise';
                 btn.disabled = false;
+                
+                showToast('✓ Comprovante enviado! Aguarde aprovação.');
+                updatePendingCount();
+            };
+            reader.readAsDataURL(selectedFile);
+        }
+
+        function updateBalance() {
+            document.getElementById('coinBalance').textContent = coins.toLocaleString();
+            document.getElementById('realBalance').textContent = (coins / 1000).toFixed(2);
+        }
+
+        // Withdraw
+        function openWithdrawModal() {
+            document.getElementById('withdrawModal').style.display = 'flex';
+        }
+
+        function closeWithdrawModal() {
+            document.getElementById('withdrawModal').style.display = 'none';
+            selectedWithdrawAmount = 0;
+            selectedWithdrawCoins = 0;
+            document.querySelectorAll('.withdraw-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById('btnWithdraw').disabled = true;
+            document.getElementById('pixKey').value = '';
+        }
+
+        function selectWithdraw(amount, coinsNeeded) {
+            selectedWithdrawAmount = amount;
+            selectedWithdrawCoins = coinsNeeded;
+            document.querySelectorAll('.withdraw-card').forEach(c => c.classList.remove('selected'));
+            const idSuffix = amount.toString().replace('.', '');
+            document.getElementById(`withdraw${idSuffix}`).classList.add('selected');
+            document.getElementById('btnWithdraw').disabled = false;
+        }
+
+        function processWithdraw() {
+            if (coins < selectedWithdrawCoins) {
+                showToast(`❌ Saldo insuficiente!`);
+                return;
             }
+            const pixKey = document.getElementById('pixKey').value;
+            if (!pixKey) {
+                showToast('❌ Digite sua chave Pix');
+                return;
+            }
+            coins -= selectedWithdrawCoins;
+            localStorage.setItem('tarefapix_coins', coins);
+            updateBalance();
+            closeWithdrawModal();
+            showToast(`✓ Saque solicitado!`);
         }
 
-        function fecharModalSaque() {
-            const modal = document.getElementById('modal-saque');
-            if (modal) modal.remove();
-            valorSaqueSelecionado = 0;
-        }
-
-        // ============================================
-        // UTILITÁRIOS
-        // ============================================
-        function mostrarNotificacao(mensagem, tipo = 'info') {
-            const notif = document.createElement('div');
-            notif.className = `notification ${tipo}`;
-            notif.innerHTML = `<i class="fas fa-${tipo === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${mensagem}`;
-            document.body.appendChild(notif);
-            
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
             setTimeout(() => {
-                notif.style.animation = 'slideIn 0.3s ease reverse';
-                setTimeout(() => notif.remove(), 300);
+                toast.classList.remove('show');
             }, 3000);
         }
 
-        // ============================================
-        // INICIALIZAÇÃO
-        // ============================================
-        document.addEventListener('DOMContentLoaded', initApp);
+        function showSection(section) {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            event.target.closest('.nav-item').classList.add('active');
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
     </script>
 </body>
 </html>
