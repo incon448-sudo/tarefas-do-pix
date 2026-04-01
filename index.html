@@ -3,1204 +3,469 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#1A5F2A">
-    <title>Tarefas do Pix</title>
-    
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
+    <title>Renda Extra - Ganhe Dinheiro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #F5F5F5;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             overflow-x: hidden;
         }
         
-        html {
-            touch-action: pan-x pan-y;
-        }
-        
-        .screen {
-            display: none;
-            animation: fadeIn 0.3s;
-        }
-        
-        .screen.active {
-            display: block;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        @keyframes scaleIn {
-            from { transform: scale(0); }
-            to { transform: scale(1); }
-        }
-        
-        @keyframes pulse-processando {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-        
-        .auth-container {
-            background: #1A5F2A;
-            min-height: 100vh;
+        /* Loading Screen */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 99999;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            transition: opacity 0.5s ease;
         }
         
-        .auth-logo {
-            text-align: center;
-            margin-bottom: 30px;
+        .loading-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: pulse 1.5s infinite;
         }
         
-        .auth-logo h1 {
+        .loading-text {
             color: white;
             font-size: 28px;
-            margin-bottom: 8px;
+            font-weight: 800;
+            margin-bottom: 10px;
         }
         
-        .auth-logo p {
+        .loading-subtext {
             color: rgba(255,255,255,0.8);
             font-size: 14px;
         }
         
-        .auth-card {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            width: 100%;
-            max-width: 360px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            text-align: center;
-        }
-        
-        .auth-card h2 {
-            margin-bottom: 8px;
-            color: #333;
-        }
-        
-        .auth-card > p {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-        
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            background: #F5F5F5;
-            padding: 4px;
-            border-radius: 12px;
-        }
-        
-        .tab-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            background: transparent;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            color: #666;
-            transition: all 0.3s;
-        }
-        
-        .tab-btn.active {
-            background: #1A5F2A;
-            color: white;
-        }
-        
-        .input-group {
-            margin-bottom: 16px;
-            text-align: left;
-        }
-        
-        .input-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 14px;
-            color: #555;
-            font-weight: 500;
-        }
-        
-        .input-group input {
-            width: 100%;
-            padding: 16px;
-            border: 2px solid #E0E0E0;
-            border-radius: 12px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        
-        .input-group input:focus {
-            outline: none;
-            border-color: #1A5F2A;
-        }
-        
-        .btn-primary {
-            width: 100%;
-            padding: 16px;
-            background: #1A5F2A;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.3s;
-        }
-        
-        .btn-primary:active:not(:disabled) {
-            transform: scale(0.98);
-            background: #134a20;
-        }
-        
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s linear infinite;
-        }
-        
-        .terms {
+        .loading-bar {
+            width: 200px;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
             margin-top: 20px;
-            font-size: 12px;
-            color: #999;
+            overflow: hidden;
         }
         
-        .terms a {
-            color: #00B894;
-            text-decoration: none;
+        .loading-progress {
+            height: 100%;
+            background: white;
+            border-radius: 2px;
+            animation: loading 1.5s infinite;
         }
         
-        .error-message {
-            background: #FEF2F2;
-            border: 1px solid #E74C3C;
-            color: #E74C3C;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            margin-bottom: 16px;
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        @keyframes loading {
+            0% { width: 0%; margin-left: 0%; }
+            50% { width: 100%; margin-left: 0%; }
+            100% { width: 0%; margin-left: 100%; }
+        }
+        
+        /* App Container */
+        #app-container {
             display: none;
+            max-width: 480px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            min-height: 100vh;
+            position: relative;
         }
         
-        .error-message.show {
-            display: block;
-        }
-        
-        .success-message {
-            background: #F0FDF4;
-            border: 1px solid #22C55E;
-            color: #166534;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            margin-bottom: 16px;
-            display: none;
-        }
-        
-        .success-message.show {
-            display: block;
-        }
-        
+        /* Header */
         .header {
-            background: #1A5F2A;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
             color: white;
-            padding: 16px;
-            text-align: center;
             position: sticky;
             top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
         
-        .header h1 {
-            font-size: 20px;
-            font-weight: bold;
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
         
-        .logout-btn {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        
-        .saldo-card {
-            background: linear-gradient(135deg, #00B894 0%, #00A383 100%);
-            margin: 16px;
-            border-radius: 16px;
-            padding: 24px;
-            color: white;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,184,148,0.3);
-        }
-        
-        .user-info {
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 10px;
         }
         
-        .user-avatar-placeholder {
-            width: 48px;
-            height: 48px;
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-header {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            font-weight: bold;
-        }
-        
-        .user-details {
-            text-align: left;
-        }
-        
-        .user-name {
-            font-size: 16px;
-            font-weight: 600;
-        }
-        
-        .user-email {
-            font-size: 12px;
-            opacity: 0.9;
-        }
-        
-        .saldo-label {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 8px;
-        }
-        
-        .saldo-valor {
-            font-size: 42px;
-            font-weight: bold;
-            margin-bottom: 16px;
-        }
-        
-        .btn-saque {
-            background: white;
-            color: #00B894;
-            border: none;
-            padding: 14px 32px;
-            border-radius: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 14px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
             transition: all 0.3s;
+            position: relative;
         }
         
-        .btn-saque:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .btn-saque:not(:disabled):active {
-            transform: scale(0.98);
-        }
-        
-        .btn-historico {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: 2px solid rgba(255,255,255,0.3);
-            padding: 10px 20px;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 13px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 12px;
-            transition: all 0.3s;
-        }
-        
-        .btn-historico:active {
-            transform: scale(0.98);
+        .btn-header:hover {
             background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
         }
         
-        .btn-suporte {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 14px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 12px;
-            margin-left: 8px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-            animation: pulse 2s infinite;
-        }
-        
-        .btn-suporte:active {
-            transform: scale(0.98);
-        }
-        
-        .btn-suporte .badge {
-            background: #E74C3C;
+        .btn-header .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff6b6b;
             color: white;
             font-size: 11px;
+            font-weight: 700;
             padding: 2px 6px;
             border-radius: 10px;
             min-width: 18px;
             text-align: center;
         }
         
-        .tarefa-card {
-            background: white;
-            margin: 16px;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        
-        .tarefa-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .tarefa-badge {
-            background: #E8F5E9;
-            color: #1A5F2A;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            display: inline-block;
-            margin-bottom: 16px;
-        }
-        
-        .tarefa-badge.concluida {
-            background: #E0E0E0;
-            color: #666;
-        }
-        
-        .app-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #FF6B6B 0%, #EE5A6F 100%);
-            border-radius: 20px;
-            margin: 0 auto 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-        }
-        
-        .tarefa-nome {
-            font-size: 22px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 8px;
-        }
-        
-        .tarefa-desc {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 12px;
-            line-height: 1.5;
-        }
-        
-        .codigo-convite {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 16px;
-            border-radius: 12px;
-            margin: 16px 0;
-            text-align: center;
-        }
-        
-        .codigo-convite h4 {
-            font-size: 12px;
-            opacity: 0.9;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .codigo-convite .codigo {
-            font-size: 28px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            font-family: monospace;
-        }
-        
-        .tarefa-requisitos {
-            background: #F0F9FF;
-            border: 1px solid #BAE6FD;
-            border-radius: 12px;
-            padding: 16px;
-            margin: 16px 0;
-            text-align: left;
-        }
-        
-        .tarefa-requisitos h4 {
-            color: #0369A1;
-            font-size: 14px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .requisito-lista {
-            list-style: none;
-        }
-        
-        .requisito-lista li {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 0;
-            color: #475569;
-            font-size: 14px;
-            border-bottom: 1px solid #E0F2FE;
-        }
-        
-        .requisito-lista li:last-child {
-            border-bottom: none;
-        }
-        
-        .requisito-check {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #E0F2FE;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            color: #0369A1;
-            flex-shrink: 0;
-        }
-        
-        .requisito-check.feito {
-            background: #22C55E;
-            color: white;
-        }
-        
-        .tarefa-valor {
-            font-size: 36px;
-            font-weight: bold;
-            color: #00B894;
-            margin-top: 16px;
-        }
-        
-        .btn-tarefa {
-            width: 100%;
-            padding: 18px;
-            background: #1A5F2A;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.3s;
-        }
-        
-        .btn-tarefa:active:not(:disabled) {
-            transform: scale(0.98);
-        }
-        
-        .btn-tarefa:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-        
-        .estado {
-            display: none;
-        }
-        
-        .estado.active {
-            display: block;
-            animation: fadeIn 0.3s;
-        }
-        
-        .status-concluido {
-            text-align: center;
-            padding: 20px;
-        }
-        
-        .status-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            color: white;
-            font-size: 40px;
-            box-shadow: 0 10px 30px rgba(34,197,94,0.3);
-            animation: scaleIn 0.5s;
-        }
-        
-        .status-concluido h3 {
-            color: #065F46;
-            font-size: 20px;
-            margin-bottom: 8px;
-        }
-        
-        .status-concluido p {
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .status-bloqueado {
-            text-align: center;
-            padding: 30px 20px;
-            color: #666;
-        }
-        
-        .status-bloqueado .icone {
-            font-size: 64px;
-            margin-bottom: 16px;
-            opacity: 0.5;
-        }
-        
-        .status-bloqueado h3 {
-            color: #374151;
-            margin-bottom: 8px;
-        }
-        
-        .verificacao-box {
-            background: #F0FDF4;
-            border: 2px dashed #86EFAC;
-            border-radius: 16px;
-            padding: 24px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .verificacao-box h4 {
-            color: #166534;
-            font-size: 18px;
-            margin-bottom: 12px;
-        }
-        
-        .verificacao-box p {
-            color: #22C55E;
-            font-size: 14px;
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-        
-        .btn-verificar {
-            width: 100%;
-            padding: 16px;
-            background: #22C55E;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-bottom: 12px;
-        }
-        
-        .btn-voltar {
-            width: 100%;
-            padding: 14px;
-            background: transparent;
-            color: #6B7280;
-            border: 2px solid #E5E7EB;
-            border-radius: 12px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        
-        .info-card {
-            background: #FFF3E0;
-            margin: 16px;
-            border-radius: 12px;
-            padding: 20px;
-            border-left: 4px solid #FF9800;
-        }
-        
-        .info-card h3 {
-            color: #E65100;
-            font-size: 14px;
-            margin-bottom: 12px;
-        }
-        
-        .info-card ol {
-            padding-left: 20px;
-            color: #555;
-            font-size: 14px;
-            line-height: 1.8;
-        }
-        
-        .historico-header {
-            background: #1A5F2A;
-            color: white;
-            padding: 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        
-        .btn-voltar-historico {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            transition: all 0.3s;
-        }
-        
-        .btn-voltar-historico:active {
-            background: rgba(255,255,255,0.3);
-            transform: scale(0.95);
-        }
-        
-        .historico-header h1 {
-            font-size: 18px;
-            font-weight: bold;
-            flex: 1;
-            text-align: center;
-            margin-right: 40px;
-        }
-        
-        .abas-status {
-            display: flex;
-            background: white;
-            margin: 16px;
-            border-radius: 12px;
-            padding: 4px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            overflow-x: auto;
-            gap: 4px;
-            scrollbar-width: none;
-        }
-        
-        .abas-status::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .aba-status {
-            flex: 1;
-            min-width: 80px;
-            padding: 10px 8px;
-            border: none;
-            background: transparent;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            color: #666;
-            transition: all 0.3s;
-            white-space: nowrap;
-            text-align: center;
-        }
-        
-        .aba-status.active {
-            background: #1A5F2A;
-            color: white;
-        }
-        
-        .aba-status .contador {
-            display: block;
+        .user-id {
             font-size: 10px;
-            opacity: 0.8;
-            margin-top: 2px;
-        }
-        
-        .lista-saques {
-            padding: 0 16px 20px;
-        }
-        
-        .saque-item {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border-left: 4px solid #E0E0E0;
-            transition: all 0.3s;
-            animation: fadeIn 0.3s ease-out;
-        }
-        
-        .saque-item.pendente {
-            border-left-color: #F59E0B;
-        }
-        
-        .saque-item.processando {
-            border-left-color: #3B82F6;
-        }
-        
-        .saque-item.concluido {
-            border-left-color: #22C55E;
-        }
-        
-        .saque-item.rejeitado {
-            border-left-color: #E74C3C;
-        }
-        
-        .saque-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-        }
-        
-        .saque-valor {
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-        }
-        
-        .saque-status {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        
-        .saque-status.pendente {
-            background: #FEF3C7;
-            color: #92400E;
-        }
-        
-        .saque-status.processando {
-            background: #DBEAFE;
-            color: #1E40AF;
-            animation: pulse-processando 2s infinite;
-        }
-        
-        .saque-status.concluido {
-            background: #D1FAE5;
-            color: #065F46;
-        }
-        
-        .saque-status.rejeitado {
-            background: #FEE2E2;
-            color: #991B1B;
-        }
-        
-        .saque-detalhes {
-            display: grid;
-            gap: 8px;
-        }
-        
-        .saque-linha {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            color: #666;
-        }
-        
-        .saque-linha span:first-child {
-            color: #999;
-        }
-        
-        .saque-linha span:last-child {
-            color: #333;
-            font-weight: 500;
-        }
-        
-        .saque-chave {
-            font-family: monospace;
-            background: #F5F5F5;
+            opacity: 0.7;
+            background: rgba(255,255,255,0.2);
             padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
+            border-radius: 20px;
             max-width: 150px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
         
-        .rejeicao-motivo {
-            background: #FEF2F2;
-            border: 1px solid #FECACA;
-            border-radius: 8px;
-            padding: 12px;
-            margin-top: 12px;
-        }
-        
-        .rejeicao-motivo strong {
-            color: #991B1B;
-            font-size: 12px;
-            display: block;
-            margin-bottom: 4px;
-        }
-        
-        .rejeicao-motivo p {
-            color: #B91C1C;
-            font-size: 13px;
-            line-height: 1.4;
-        }
-        
-        .historico-vazio {
+        /* Balance Card */
+        .balance-card {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 25px;
             text-align: center;
-            padding: 60px 20px;
-            color: #999;
+            border: 1px solid rgba(255,255,255,0.2);
         }
         
-        .historico-vazio .icone {
-            font-size: 64px;
-            margin-bottom: 16px;
-            opacity: 0.3;
-        }
-        
-        .historico-vazio h3 {
-            color: #666;
-            margin-bottom: 8px;
-            font-size: 18px;
-        }
-        
-        .historico-vazio p {
+        .balance-label {
             font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 5px;
         }
         
-        .historico-loading {
+        .balance-amount {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .balance-pending {
+            font-size: 12px;
+            opacity: 0.8;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 20px;
+            background: white;
+            margin: 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        
+        .stat-item {
             text-align: center;
-            padding: 40px;
+            padding: 15px 10px;
         }
         
-        .historico-loading .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #E0E0E0;
-            border-top-color: #00B894;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 16px;
+        .stat-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
         }
         
-        .modal-overlay {
-            display: none;
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d3436;
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            color: #636e72;
+            margin-top: 3px;
+        }
+        
+        /* Withdraw Button */
+        .withdraw-section {
+            padding: 0 20px 20px;
+        }
+        
+        .btn-withdraw {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0,184,148,0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn-withdraw:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,184,148,0.5);
+        }
+        
+        .btn-withdraw:disabled {
+            background: #b2bec3;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        /* Tasks Section */
+        .section-title {
+            padding: 20px 20px 10px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d3436;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tasks-container {
+            padding: 0 20px 20px;
+        }
+        
+        .task-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.2s;
+        }
+        
+        .task-card:hover {
+            transform: translateX(5px);
+        }
+        
+        .task-card.completada {
+            opacity: 0.6;
+            background: #f1f2f6;
+        }
+        
+        .task-card.completada .btn-do-task {
+            background: #b2bec3;
+            cursor: not-allowed;
+        }
+        
+        .task-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+        
+        .task-info {
+            flex: 1;
+        }
+        
+        .task-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3436;
+            margin-bottom: 5px;
+        }
+        
+        .task-desc {
+            font-size: 12px;
+            color: #636e72;
+        }
+        
+        .task-reward {
+            text-align: right;
+        }
+        
+        .reward-amount {
+            font-size: 20px;
+            font-weight: 700;
+            color: #00b894;
+        }
+        
+        .btn-do-task {
+            margin-top: 8px;
+            padding: 8px 20px;
+            background: #6c5ce7;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-do-task:hover {
+            background: #5b4cdb;
+            transform: scale(1.05);
+        }
+        
+        .btn-do-task:disabled {
+            background: #b2bec3;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .task-completed-badge {
+            display: inline-block;
+            background: #00b894;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+        
+        /* Chat Overlay */
+        .chat-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: rgba(0,0,0,0.5);
-            z-index: 200;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        
-        .modal-overlay.active {
-            display: flex;
-            opacity: 1;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            width: 100%;
-            max-width: 360px;
-            max-height: 90vh;
-            overflow-y: auto;
-            transform: scale(0.9);
-            transition: transform 0.3s;
-        }
-        
-        .modal-overlay.active .modal-content {
-            transform: scale(1);
-        }
-        
-        .modal-title {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            text-align: center;
-            color: #333;
-        }
-        
-        .valor-options {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .valor-btn {
-            flex: 1;
-            padding: 16px;
-            border: 2px solid #E0E0E0;
-            background: white;
-            border-radius: 12px;
-            cursor: pointer;
-            text-align: center;
-            font-weight: bold;
-            transition: all 0.3s;
-            font-size: 14px;
-        }
-        
-        .valor-btn.selected {
-            border-color: #00B894;
-            background: #E8F5E9;
-            color: #00B894;
-        }
-        
-        .valor-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-            border-color: #E0E0E0;
-            background: #F5F5F5;
-        }
-        
-        .tipo-chave {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-        }
-        
-        .tipo-btn {
-            padding: 8px 16px;
-            border: 1px solid #DDD;
-            background: white;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.3s;
-        }
-        
-        .tipo-btn.selected {
-            background: #00B894;
-            color: white;
-            border-color: #00B894;
-        }
-        
-        .modal-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 20px;
-        }
-        
-        .modal-actions button {
-            flex: 1;
-            padding: 14px;
-            border-radius: 12px;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-        
-        .btn-cancelar {
-            background: #F5F5F5;
-            color: #666;
-        }
-        
-        .btn-cancelar:active {
-            background: #E0E0E0;
-        }
-        
-        .btn-confirmar {
-            background: #00B894;
-            color: white;
-        }
-        
-        .btn-confirmar:active {
-            background: #00A383;
-            transform: scale(0.98);
-        }
-        
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #333;
-            color: white;
-            padding: 16px 24px;
-            border-radius: 12px;
-            font-size: 14px;
-            z-index: 300;
-            opacity: 0;
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            max-width: 90%;
-            text-align: center;
-        }
-        
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-        
-        .toast.success {
-            background: #00B894;
-        }
-        
-        .toast.error {
-            background: #E74C3C;
-        }
-        
-        .toast.info {
-            background: #3B82F6;
-        }
-        
-        /* CHAT STYLES */
-        .chat-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            top: 0;
-            background: white;
-            z-index: 250;
+            z-index: 10000;
             display: none;
-            flex-direction: column;
-            animation: slideUp 0.3s ease-out;
+            justify-content: flex-end;
         }
         
-        .chat-container.active {
+        .chat-overlay.active {
             display: flex;
+        }
+        
+        .chat-container {
+            width: 100%;
+            max-width: 480px;
+            height: 100%;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            animation: slideInRight 0.3s ease;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
         }
         
         .chat-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 16px;
+            padding: 20px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
         
-        .btn-voltar-chat {
+        .btn-close-chat {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             background: rgba(255,255,255,0.2);
             border: none;
             color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
             transition: all 0.3s;
         }
         
-        .btn-voltar-chat:active {
+        .btn-close-chat:hover {
             background: rgba(255,255,255,0.3);
-            transform: scale(0.95);
         }
         
         .chat-header-info {
             flex: 1;
         }
         
-        .chat-header-info h2 {
+        .chat-header-title {
             font-size: 18px;
-            font-weight: bold;
-        }
-        
-        .chat-header-info p {
-            font-size: 12px;
-            opacity: 0.9;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .chat-status {
+            font-size: 12px;
+            opacity: 0.9;
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 12px;
+            gap: 5px;
         }
         
         .status-dot {
             width: 8px;
             height: 8px;
-            background: #22C55E;
+            background: #00b894;
             border-radius: 50%;
             animation: pulse 2s infinite;
         }
@@ -1208,1465 +473,1224 @@
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 16px;
-            background: #F8F9FA;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-        }
-        
-        .chat-messages::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: #CBD5E1;
-            border-radius: 3px;
+            gap: 15px;
         }
         
         .message {
             max-width: 80%;
             padding: 12px 16px;
-            border-radius: 18px;
+            border-radius: 20px;
             font-size: 14px;
             line-height: 1.4;
-            word-wrap: break-word;
-            animation: fadeIn 0.3s ease-out;
+            animation: fadeIn 0.3s ease;
         }
         
-        .message.received {
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message-received {
             align-self: flex-start;
             background: white;
-            color: #333;
-            border-bottom-left-radius: 4px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            color: #2d3436;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
         
-        .message.sent {
+        .message-sent {
             align-self: flex-end;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border-bottom-right-radius: 4px;
+            border-bottom-right-radius: 5px;
         }
         
         .message-time {
             font-size: 11px;
             opacity: 0.7;
-            margin-top: 4px;
+            margin-top: 5px;
         }
         
-        .message.sent .message-time {
-            color: rgba(255,255,255,0.8);
+        .message-sender {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #6c5ce7;
         }
         
-        .chat-input-container {
+        .chat-input-area {
             background: white;
-            padding: 12px 16px;
-            border-top: 1px solid #E5E7EB;
+            padding: 15px 20px;
+            border-top: 1px solid #e9ecef;
             display: flex;
-            gap: 12px;
+            gap: 10px;
             align-items: center;
         }
         
         .chat-input {
             flex: 1;
-            padding: 12px 16px;
-            border: 2px solid #E5E7EB;
-            border-radius: 24px;
+            padding: 12px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
             font-size: 14px;
+            font-family: 'Poppins', sans-serif;
             outline: none;
             transition: border-color 0.3s;
         }
         
         .chat-input:focus {
-            border-color: #667eea;
+            border-color: #6c5ce7;
         }
         
-        .btn-enviar {
-            width: 44px;
-            height: 44px;
+        .btn-send {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
-            border-radius: 50%;
             color: white;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s;
-            flex-shrink: 0;
         }
         
-        .btn-enviar:active {
-            transform: scale(0.95);
+        .btn-send:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(108,92,231,0.4);
         }
         
-        .btn-enviar:disabled {
+        .btn-send:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none;
         }
         
         .chat-welcome {
             text-align: center;
             padding: 40px 20px;
-            color: #666;
+            color: #636e72;
         }
         
-        .chat-welcome .icon {
-            font-size: 64px;
-            margin-bottom: 16px;
+        .chat-welcome-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
         }
         
         .chat-welcome h3 {
-            color: #333;
-            margin-bottom: 8px;
-        }
-        
-        .chat-welcome p {
-            font-size: 14px;
-            line-height: 1.6;
+            color: #2d3436;
+            margin-bottom: 10px;
         }
         
         .typing-indicator {
             display: none;
             align-self: flex-start;
             background: white;
-            padding: 12px 16px;
-            border-radius: 18px;
-            border-bottom-left-radius: 4px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            padding: 15px 20px;
+            border-radius: 20px;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
         
         .typing-indicator.active {
             display: flex;
-            gap: 4px;
+            align-items: center;
+            gap: 5px;
         }
         
         .typing-dot {
             width: 8px;
             height: 8px;
-            background: #CBD5E1;
+            background: #6c5ce7;
             border-radius: 50%;
-            animation: bounce 1.4s infinite ease-in-out both;
+            animation: typingBounce 1.4s infinite;
         }
         
-        .typing-dot:nth-child(1) {
-            animation-delay: -0.32s;
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
         }
         
-        .typing-dot:nth-child(2) {
-            animation-delay: -0.16s;
-        }
-        
-        .chat-fab {
+        /* Modals */
+        .modal-overlay {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 50%;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-            z-index: 150;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            animation: pulse 2s infinite;
-        }
-        
-        .chat-fab.active {
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 10001;
             display: flex;
-        }
-        
-        .chat-fab:active {
-            transform: scale(0.95);
-        }
-        
-        .chat-fab .badge {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            background: #E74C3C;
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
-            min-width: 20px;
-            height: 20px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
             justify-content: center;
-            padding: 0 6px;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
         }
         
-        .admin-badge {
-            background: #F59E0B;
-            color: white;
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-left: 6px;
-            font-weight: bold;
-        }
-        
-        .system-message {
-            align-self: center;
-            background: #E5E7EB;
-            color: #666;
-            padding: 8px 16px;
-            border-radius: 12px;
-            font-size: 12px;
+        .modal-content {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
             text-align: center;
-            max-width: 90%;
+            animation: modalSlide 0.3s ease;
+        }
+        
+        @keyframes modalSlide {
+            from { opacity: 0; transform: translateY(50px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .modal-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+        
+        .modal-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #2d3436;
+            margin-bottom: 10px;
+        }
+        
+        .modal-text {
+            color: #636e72;
+            font-size: 14px;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        
+        .upload-area {
+            border: 3px dashed #6c5ce7;
+            border-radius: 20px;
+            padding: 40px 20px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+        
+        .upload-area:hover {
+            border-color: #5b4cdb;
+            background: #f0e6ff;
+        }
+        
+        .upload-icon {
+            font-size: 50px;
+            color: #6c5ce7;
+            margin-bottom: 10px;
+        }
+        
+        .upload-text {
+            color: #6c5ce7;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .upload-hint {
+            color: #b2bec3;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #6c5ce7 0%, #5b4cdb 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+        
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108,92,231,0.4);
+        }
+        
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-cancel {
+            width: 100%;
+            padding: 16px;
+            background: transparent;
+            color: #636e72;
+            border: 2px solid #dfe6e9;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-cancel:hover {
+            background: #f8f9fa;
+            border-color: #b2bec3;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            z-index: 99999;
+            animation: slideIn 0.3s ease;
+            max-width: 300px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+        }
+        
+        .notification.error {
+            background: linear-gradient(135deg, #e17055 0%, #d63031 100%);
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .withdraw-options {
+            display: grid;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        
+        .withdraw-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .withdraw-option:hover {
+            background: #f0e6ff;
+            border-color: #6c5ce7;
+        }
+        
+        .withdraw-option.selected {
+            background: #f0e6ff;
+            border-color: #6c5ce7;
+        }
+        
+        .withdraw-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .withdraw-icon {
+            font-size: 30px;
+        }
+        
+        .withdraw-details h4 {
+            font-size: 16px;
+            color: #2d3436;
+            margin-bottom: 3px;
+        }
+        
+        .withdraw-details p {
+            font-size: 12px;
+            color: #636e72;
+        }
+        
+        .withdraw-amount {
+            font-size: 20px;
+            font-weight: 700;
+            color: #6c5ce7;
+        }
+        
+        .pix-key-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #dfe6e9;
+            border-radius: 12px;
+            font-size: 16px;
+            margin: 20px 0;
+            font-family: 'Poppins', sans-serif;
+            transition: border-color 0.2s;
+        }
+        
+        .pix-key-input:focus {
+            outline: none;
+            border-color: #6c5ce7;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: #636e72;
+            font-size: 12px;
+        }
+        
+        .footer i {
+            color: #e17055;
         }
     </style>
 </head>
 <body>
-    <div id="authScreen" class="screen active">
-        <div class="auth-container">
-            <div class="auth-logo">
-                <h1>💰 Tarefas do Pix</h1>
-                <p>Ganhe dinheiro realizando tarefas</p>
-            </div>
-            
-            <div class="auth-card">
-                <div class="tabs">
-                    <button class="tab-btn active" onclick="mostrarTab('login')" id="tabLogin">Entrar</button>
-                    <button class="tab-btn" onclick="mostrarTab('cadastro')" id="tabCadastro">Criar Conta</button>
-                </div>
-                
-                <div id="formLogin">
-                    <h2>Bem-vindo de volta!</h2>
-                    <p>Entre com seu email e senha</p>
-                    
-                    <div class="error-message" id="loginError"></div>
-                    <div class="success-message" id="loginSuccess"></div>
-                    
-                    <div class="input-group">
-                        <label>Email</label>
-                        <input type="email" id="loginEmail" placeholder="seu@email.com">
-                    </div>
-                    
-                    <div class="input-group">
-                        <label>Senha (4-12 caracteres)</label>
-                        <input type="password" id="loginSenha" placeholder="****" maxlength="12">
-                    </div>
-                    
-                    <button class="btn-primary" onclick="fazerLogin()" id="btnLogin">
-                        Entrar
-                    </button>
-                </div>
-                
-                <div id="formCadastro" style="display: none;">
-                    <h2>Criar conta</h2>
-                    <p>Cadastre-se para começar</p>
-                    
-                    <div class="error-message" id="cadastroError"></div>
-                    <div class="success-message" id="cadastroSuccess"></div>
-                    
-                    <div class="input-group">
-                        <label>Nome</label>
-                        <input type="text" id="cadastroNome" placeholder="Seu nome">
-                    </div>
-                    
-                    <div class="input-group">
-                        <label>Email</label>
-                        <input type="email" id="cadastroEmail" placeholder="seu@email.com">
-                    </div>
-                    
-                    <div class="input-group">
-                        <label>Senha (4-12 caracteres)</label>
-                        <input type="password" id="cadastroSenha" placeholder="Crie uma senha" maxlength="12">
-                    </div>
-                    
-                    <button class="btn-primary" onclick="fazerCadastro()" id="btnCadastro">
-                        Criar Conta
-                    </button>
-                </div>
-                
-                <p class="terms">
-                    Ao entrar, você concorda com nossos<br>
-                    <a href="#">Termos de Uso</a> e <a href="#">Política de Privacidade</a>
-                </p>
-            </div>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-icon">💰</div>
+        <div class="loading-text">Renda Extra</div>
+        <div class="loading-subtext">Iniciando...</div>
+        <div class="loading-bar">
+            <div class="loading-progress"></div>
         </div>
     </div>
 
-    <div id="homeScreen" class="screen">
+    <!-- App Container -->
+    <div id="app-container">
+        <!-- Header -->
         <div class="header">
-            <h1>💰 Tarefas do Pix</h1>
-            <button class="logout-btn" onclick="fazerLogout()">Sair</button>
-        </div>
-        
-        <div class="saldo-card">
-            <div class="user-info">
-                <div class="user-avatar-placeholder" id="avatarPlaceholder">U</div>
-                <div class="user-details">
-                    <div class="user-name" id="userName">Usuário</div>
-                    <div class="user-email" id="userEmail">email@exemplo.com</div>
+            <div class="header-top">
+                <div class="logo">
+                    <i class="fas fa-coins"></i>
+                    Renda Extra
                 </div>
-            </div>
-            <div class="saldo-label">Seu Saldo</div>
-            <div class="saldo-valor" id="saldoValor">R$ 0,00</div>
-            <button class="btn-saque" id="btnSaque" onclick="abrirModalSaque()" disabled>
-                💸 SACAR VIA PIX
-            </button>
-            <div style="margin-top: 12px;">
-                <button class="btn-historico" onclick="abrirTelaHistorico()">
-                    📋 HISTÓRICO
-                </button>
-                <button class="btn-suporte" onclick="abrirChatSuporte()" id="btnSuporte">
-                    💬 SUPORTE
-                    <span class="badge" id="badgeNovasMensagens" style="display: none;">0</span>
-                </button>
-            </div>
-        </div>
-        
-        <div class="tarefa-card" id="tarefaCard">
-            <div class="tarefa-header">
-                <span class="tarefa-badge" id="taskBadge">TAREFA DISPONÍVEL</span>
-                <div class="app-icon">🎬</div>
-                <div class="tarefa-nome">Registre-se no Worldance Drama</div>
-                <div class="tarefa-desc">
-                    Baixe o aplicativo Worldance Drama, crie sua conta usando o código de convite e ganhe sua recompensa!
-                </div>
-                
-                <div class="codigo-convite">
-                    <h4>🎁 Código de Convite</h4>
-                    <div class="codigo">BE764096</div>
-                </div>
-                
-                <div class="tarefa-requisitos">
-                    <h4>📋 O que você precisa fazer:</h4>
-                    <ul class="requisito-lista">
-                        <li>
-                            <span class="requisito-check" id="check1">1</span>
-                            <span>Baixar o app Worldance Drama na Play Store</span>
-                        </li>
-                        <li>
-                            <span class="requisito-check" id="check2">2</span>
-                            <span>Criar uma conta no aplicativo</span>
-                        </li>
-                        <li>
-                            <span class="requisito-check" id="check3">3</span>
-                            <span>Usar o código de convite <strong>BE764096</strong></span>
-                        </li>
-                    </ul>
-                </div>
-                
-                <div class="tarefa-valor">+ R$ 0,30</div>
-            </div>
-            
-            <div id="estadoDisponivel" class="estado active">
-                <button class="btn-tarefa" onclick="iniciarTarefa()">
-                    📲 BAIXAR APP E COMEÇAR
-                </button>
-            </div>
-            
-            <div id="estadoVerificacao" class="estado">
-                <div class="verificacao-box">
-                    <h4>✋ Quase lá!</h4>
-                    <p>
-                        Agora você precisa:<br>
-                        1. Instalar o app Worldance Drama<br>
-                        2. Criar sua conta<br>
-                        3. Usar o código de convite <strong>BE764096</strong>
-                    </p>
-                    <button class="btn-verificar" onclick="confirmarInstalacao()">
-                        ✅ JÁ FIZ TUDO - CONCLUIR TAREFA
-                    </button>
-                    <button class="btn-voltar" onclick="voltarParaDownload()">
-                        ← Voltar
+                <div class="header-actions">
+                    <button class="btn-header" onclick="abrirChat()" title="Suporte">
+                        <i class="fas fa-comments"></i>
+                        <span class="badge" id="chat-badge" style="display: none;">0</span>
                     </button>
                 </div>
             </div>
             
-            <div id="estadoConcluido" class="estado">
-                <div class="status-concluido">
-                    <div class="status-icon">✓</div>
-                    <h3>Tarefa Concluída!</h3>
-                    <p>R$ 0,30 foi adicionado ao seu saldo</p>
-                </div>
-            </div>
-            
-            <div id="estadoBloqueado" class="estado">
-                <div class="status-bloqueado">
-                    <div class="icone">✓</div>
-                    <h3>Você já completou esta tarefa</h3>
-                    <p>Aguarde novas tarefas em breve!</p>
+            <div class="balance-card">
+                <div class="balance-label">Seu Saldo Disponível</div>
+                <div class="balance-amount" id="saldo">R$ 0,00</div>
+                <div class="balance-pending">
+                    <i class="fas fa-clock"></i> Pendente: R$ <span id="saldo-pendente">0,00</span>
                 </div>
             </div>
         </div>
-        
-        <div class="info-card">
-            <h3>📋 Como funciona:</h3>
-            <ol>
-                <li>Clique em "Baixar App" para ir à Play Store</li>
-                <li>Instale e abra o Worldance Drama</li>
-                <li>Crie sua conta no app</li>
-                <li>Use o código de convite <strong>BE764096</strong></li>
-                <li>Volte aqui e clique em "Já fiz tudo"</li>
-                <li>Receba <strong>R$ 0,30</strong> no seu saldo!</li>
-            </ol>
-        </div>
-    </div>
 
-    <div id="historicoScreen" class="screen">
-        <div class="historico-header">
-            <button class="btn-voltar-historico" onclick="voltarParaHome()">←</button>
-            <h1>📋 Histórico de Saques</h1>
-        </div>
-        
-        <div class="abas-status">
-            <button class="aba-status active" onclick="filtrarSaques('todos')" id="abaTodos">
-                Todos
-                <span class="contador" id="contTodos">0</span>
-            </button>
-            <button class="aba-status" onclick="filtrarSaques('pendente')" id="abaPendente">
-                ⏳ Pendente
-                <span class="contador" id="contPendente">0</span>
-            </button>
-            <button class="aba-status" onclick="filtrarSaques('processando')" id="abaProcessando">
-                ⚙️ Processando
-                <span class="contador" id="contProcessando">0</span>
-            </button>
-            <button class="aba-status" onclick="filtrarSaques('concluido')" id="abaConcluido">
-                ✅ Concluído
-                <span class="contador" id="contConcluido">0</span>
-            </button>
-            <button class="aba-status" onclick="filtrarSaques('rejeitado')" id="abaRejeitado">
-                ❌ Rejeitado
-                <span class="contador" id="contRejeitado">0</span>
-            </button>
-        </div>
-        
-        <div class="lista-saques" id="listaSaques">
-            <div class="historico-loading">
-                <div class="spinner"></div>
-                <p>Carregando histórico...</p>
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-icon">💵</div>
+                <div class="stat-value" id="total-ganho">0</div>
+                <div class="stat-label">Total Ganho</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">✅</div>
+                <div class="stat-value" id="tarefas-completadas">0</div>
+                <div class="stat-label">Tarefas</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-icon">🏦</div>
+                <div class="stat-value" id="saques-realizados">0</div>
+                <div class="stat-label">Saques</div>
             </div>
         </div>
+
+        <!-- Withdraw Button -->
+        <div class="withdraw-section">
+            <button class="btn-withdraw" onclick="abrirModalSaque()">
+                <i class="fas fa-wallet"></i>
+                Sacar Dinheiro
+            </button>
+        </div>
+
+        <!-- Tasks Section -->
+        <div class="section-title">
+            <i class="fas fa-tasks"></i>
+            Tarefas Disponíveis
+        </div>
+        
+        <div class="tasks-container" id="tasks-container">
+            <div style="text-align: center; padding: 40px; color: #b2bec3;">
+                <i class="fas fa-spinner fa-spin" style="font-size: 30px;"></i>
+                <p style="margin-top: 15px;">Carregando tarefas...</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>ID: <span id="footer-user-id">...</span></p>
+            <p style="margin-top: 5px;">Feito com <i class="fas fa-heart"></i> para você ganhar dinheiro</p>
+        </div>
     </div>
 
-    <!-- CHAT SCREEN -->
-    <div id="chatScreen" class="chat-container">
-        <div class="chat-header">
-            <button class="btn-voltar-chat" onclick="fecharChatSuporte()">←</button>
-            <div class="chat-header-info">
-                <h2>Suporte Tarefas do Pix</h2>
-                <div class="chat-status">
-                    <span class="status-dot"></span>
-                    <span>Online</span>
+    <!-- Chat Overlay -->
+    <div id="chat-overlay" class="chat-overlay">
+        <div class="chat-container">
+            <div class="chat-header">
+                <button class="btn-close-chat" onclick="fecharChat()">
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+                <div class="chat-header-info">
+                    <div class="chat-header-title">
+                        <i class="fas fa-headset"></i>
+                        Suporte
+                    </div>
+                    <div class="chat-status">
+                        <span class="status-dot"></span>
+                        Online - Responde em breve
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="chat-messages" id="chatMessages">
-            <div class="chat-welcome" id="chatWelcome">
-                <div class="icon">💬</div>
-                <h3>Chat de Suporte</h3>
-                <p>Envie sua mensagem e nossa equipe responderá em breve.<br>Horário de atendimento: 9h às 18h</p>
+            
+            <div id="chat-messages" class="chat-messages">
+                <div class="chat-welcome">
+                    <div class="chat-welcome-icon">👋</div>
+                    <h3>Olá! Como podemos ajudar?</h3>
+                    <p>Envie sua dúvida ou problema. Nossa equipe responde em até 24h.</p>
+                </div>
+                
+                <div id="typing-indicator" class="typing-indicator">
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                    <span class="typing-dot"></span>
+                </div>
             </div>
             
-            <div class="typing-indicator" id="typingIndicator">
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
-            </div>
-        </div>
-        
-        <div class="chat-input-container">
-            <input type="text" class="chat-input" id="chatInput" placeholder="Digite sua mensagem..." maxlength="500">
-            <button class="btn-enviar" id="btnEnviar" onclick="enviarMensagemChat()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                </svg>
-            </button>
-        </div>
-    </div>
-
-    <div id="modalSaque" class="modal-overlay" onclick="fecharModalSaque(event)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-title">💸 Sacar via Pix</div>
-            
-            <label style="display: block; margin-bottom: 12px; font-weight: 500;">Escolha o valor:</label>
-            <div class="valor-options">
-                <button class="valor-btn selected" id="val30" onclick="selecionarValor(0.30)">R$ 0,30</button>
-                <button class="valor-btn" id="val50" onclick="selecionarValor(0.50)">R$ 0,50</button>
-            </div>
-            
-            <label style="display: block; margin-bottom: 12px; font-weight: 500;">Tipo de chave:</label>
-            <div class="tipo-chave">
-                <button class="tipo-btn selected" onclick="selecionarTipo('CPF', this)">CPF</button>
-                <button class="tipo-btn" onclick="selecionarTipo('EMAIL', this)">E-mail</button>
-                <button class="tipo-btn" onclick="selecionarTipo('TELEFONE', this)">Celular</button>
-            </div>
-            
-            <div class="input-group">
-                <label>Digite sua chave Pix</label>
-                <input type="text" id="chavePixInput" placeholder="123.456.789-00">
-            </div>
-            
-            <div class="modal-actions">
-                <button class="btn-cancelar" onclick="fecharModalSaque()">Cancelar</button>
-                <button class="btn-confirmar" onclick="confirmarSaque()">Confirmar</button>
+            <div class="chat-input-area">
+                <input type="text" id="chat-input" class="chat-input" 
+                    placeholder="Digite sua mensagem..." 
+                    onkeypress="if(event.key==='Enter')enviarMensagem()">
+                <button class="btn-send" onclick="enviarMensagem()" id="btn-send">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
             </div>
         </div>
     </div>
 
-    <div id="toast" class="toast"></div>
-    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
     <script>
-        // ============== CONFIGURAÇÃO FIREBASE ==============
+        // ============================================
+        // CONFIGURAÇÃO FIREBASE
+        // ============================================
         const firebaseConfig = {
-            apiKey: "AIzaSyBUI_gg3WisOWvOfCPM3rrKogrZNLJ-WUE",
-            authDomain: "tarefas-do-pix.firebaseapp.com",
-            databaseURL: "https://tarefas-do-pix-default-rtdb.firebase.io",
-            projectId: "tarefas-do-pix",
-            storageBucket: "tarefas-do-pix.firebasestorage.app",
-            messagingSenderId: "236400248524",
-            appId: "1:236400248524:web:62bd73e6da2c07504fa469"
+            apiKey: "AIzaSyChdKpWC0g4W2kFM8m2E7f6v9X8w2w3w4w",
+            authDomain: "renda-extra-app.firebaseapp.com",
+            projectId: "renda-extra-app",
+            storageBucket: "renda-extra-app.appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:1234567890:web:abc123def456"
         };
-        
+
         firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        
-        // ============== VARIÁVEIS GLOBAIS ==============
-        let usuarioAtual = null;
-        let dadosUsuario = null;
-        let valorSaqueSelecionado = 0.30;
-        let tipoChaveSelecionado = 'CPF';
-        let tarefaIniciada = false;
-        let listaSaquesCache = [];
-        let filtroAtual = 'todos';
-        let listenerHistorico = null;
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // ============================================
+        // VARIÁVEIS GLOBAIS
+        // ============================================
+        let currentUser = null;
         let chatListener = null;
-        let chatRoomId = null;
-        let mensagensNaoLidas = 0;
-        
-        // ============== SISTEMA DE LOGIN SIMPLES ==============
-        
-        // Mostrar tab (login ou cadastro)
-        function mostrarTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+        let unreadMessages = 0;
+        let tarefasListener = null;
+        let tarefasCompletadas = [];
+
+        // ============================================
+        // SISTEMA DE ID ANÔNIMO
+        // ============================================
+        function getAnonymousId() {
+            let anonId = localStorage.getItem('anonymous_user_id');
             
-            if (tab === 'login') {
-                document.getElementById('formLogin').style.display = 'block';
-                document.getElementById('formCadastro').style.display = 'none';
-            } else {
-                document.getElementById('formLogin').style.display = 'none';
-                document.getElementById('formCadastro').style.display = 'block';
+            if (!anonId) {
+                const timestamp = Date.now().toString(36);
+                const random = Math.random().toString(36).substr(2, 9);
+                const device = navigator.userAgent.replace(/\\s/g, '').substr(0, 20);
+                anonId = `anon_${timestamp}_${random}_${device}`;
+                
+                localStorage.setItem('anonymous_user_id', anonId);
+                localStorage.setItem('first_visit', new Date().toISOString());
             }
             
-            // Limpar mensagens
-            document.querySelectorAll('.error-message, .success-message').forEach(el => el.classList.remove('show'));
+            return anonId;
         }
-        
-        // Validar email
-        function validarEmail(email) {
-            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-        }
-        
-        // Validar senha (4-12 caracteres)
-        function validarSenha(senha) {
-            return senha.length >= 4 && senha.length <= 12;
-        }
-        
-        // Criar hash simples da senha (para não salvar em texto puro)
-        function hashSenha(senha) {
-            let hash = 0;
-            for (let i = 0; i < senha.length; i++) {
-                const char = senha.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash;
-            }
-            return hash.toString(16);
-        }
-        
-        // Fazer cadastro
-        function fazerCadastro() {
-            const btn = document.getElementById('btnCadastro');
-            const errorEl = document.getElementById('cadastroError');
-            const successEl = document.getElementById('cadastroSuccess');
+
+        async function initAnonymousUser() {
+            const anonId = getAnonymousId();
+            const userRef = db.collection('anonymous_users').doc(anonId);
             
-            const nome = document.getElementById('cadastroNome').value.trim();
-            const email = document.getElementById('cadastroEmail').value.trim().toLowerCase();
-            const senha = document.getElementById('cadastroSenha').value;
-            
-            // Validações
-            if (!nome) {
-                errorEl.textContent = 'Digite seu nome';
-                errorEl.classList.add('show');
-                return;
-            }
-            
-            if (!validarEmail(email)) {
-                errorEl.textContent = 'Email inválido';
-                errorEl.classList.add('show');
-                return;
-            }
-            
-            if (!validarSenha(senha)) {
-                errorEl.textContent = 'A senha deve ter entre 4 e 12 caracteres';
-                errorEl.classList.add('show');
-                return;
-            }
-            
-            btn.disabled = true;
-            btn.innerHTML = '<span class="loading"></span> Criando...';
-            errorEl.classList.remove('show');
-            successEl.classList.remove('show');
-            
-            // Verificar se email já existe
-            database.ref('usuarios').orderByChild('email').equalTo(email).once('value')
-                .then((snapshot) => {
-                    if (snapshot.exists()) {
-                        errorEl.textContent = 'Este email já está cadastrado';
-                        errorEl.classList.add('show');
-                        btn.disabled = false;
-                        btn.textContent = 'Criar Conta';
-                        return;
-                    }
-                    
-                    // Criar novo usuário
-                    const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                    const userData = {
-                        nome: nome,
-                        email: email,
-                        senhaHash: hashSenha(senha),
+            try {
+                const doc = await userRef.get();
+                
+                if (!doc.exists) {
+                    await userRef.set({
+                        anonymous_id: anonId,
                         saldo: 0,
-                        jaFeTarefa: false,
-                        dataCadastro: Date.now()
-                    };
-                    
-                    return database.ref('usuarios/' + userId).set(userData)
-                        .then(() => {
-                            successEl.textContent = 'Conta criada com sucesso! Faça login.';
-                            successEl.classList.add('show');
-                            
-                            // Limpar campos
-                            document.getElementById('cadastroNome').value = '';
-                            document.getElementById('cadastroEmail').value = '';
-                            document.getElementById('cadastroSenha').value = '';
-                            
-                            // Voltar para login após 1.5s
-                            setTimeout(() => {
-                                mostrarTab('login');
-                                document.getElementById('loginEmail').value = email;
-                                successEl.classList.remove('show');
-                            }, 1500);
-                            
-                            btn.disabled = false;
-                            btn.textContent = 'Criar Conta';
-                        });
-                })
-                .catch((error) => {
-                    console.error('Erro no cadastro:', error);
-                    errorEl.textContent = 'Erro ao criar conta. Tente novamente.';
-                    errorEl.classList.add('show');
-                    btn.disabled = false;
-                    btn.textContent = 'Criar Conta';
-                });
-        }
-        
-        // Fazer login
-        function fazerLogin() {
-            const btn = document.getElementById('btnLogin');
-            const errorEl = document.getElementById('loginError');
-            const successEl = document.getElementById('loginSuccess');
-            
-            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-            const senha = document.getElementById('loginSenha').value;
-            
-            if (!validarEmail(email)) {
-                errorEl.textContent = 'Email inválido';
-                errorEl.classList.add('show');
-                return;
-            }
-            
-            if (!senha) {
-                errorEl.textContent = 'Digite sua senha';
-                errorEl.classList.add('show');
-                return;
-            }
-            
-            btn.disabled = true;
-            btn.innerHTML = '<span class="loading"></span> Entrando...';
-            errorEl.classList.remove('show');
-            successEl.classList.remove('show');
-            
-            // Buscar usuário pelo email
-            database.ref('usuarios').orderByChild('email').equalTo(email).once('value')
-                .then((snapshot) => {
-                    if (!snapshot.exists()) {
-                        errorEl.textContent = 'Email ou senha incorretos';
-                        errorEl.classList.add('show');
-                        btn.disabled = false;
-                        btn.textContent = 'Entrar';
-                        return;
-                    }
-                    
-                    let userFound = null;
-                    let userId = null;
-                    
-                    snapshot.forEach((child) => {
-                        userFound = child.val();
-                        userId = child.key;
+                        saldo_pendente: 0,
+                        total_ganho: 0,
+                        tarefas_completadas: 0,
+                        saques_realizados: 0,
+                        data_criacao: firebase.firestore.FieldValue.serverTimestamp(),
+                        ultimo_acesso: firebase.firestore.FieldValue.serverTimestamp(),
+                        device_info: {
+                            user_agent: navigator.userAgent,
+                            language: navigator.language,
+                            platform: navigator.platform,
+                            screen: `${screen.width}x${screen.height}`,
+                            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                        },
+                        status: 'ativo'
                     });
-                    
-                    // Verificar senha
-                    if (userFound.senhaHash !== hashSenha(senha)) {
-                        errorEl.textContent = 'Email ou senha incorretos';
-                        errorEl.classList.add('show');
-                        btn.disabled = false;
-                        btn.textContent = 'Entrar';
-                        return;
-                    }
-                    
-                    // Login bem-sucedido
-                    usuarioAtual = {
-                        uid: userId,
-                        email: userFound.email,
-                        displayName: userFound.nome
-                    };
-                    dadosUsuario = userFound;
-                    
-                    // Salvar sessão no localStorage
-                    localStorage.setItem('tarefasPixUser', JSON.stringify({
-                        uid: userId,
-                        email: userFound.email,
-                        nome: userFound.nome
-                    }));
-                    
-                    successEl.textContent = 'Login realizado!';
-                    successEl.classList.add('show');
-                    
-                    setTimeout(() => {
-                        carregarDadosUsuario();
-                        inicializarChatListener();
-                        mostrarTela('homeScreen');
-                        
-                        // Resetar botão
-                        btn.disabled = false;
-                        btn.textContent = 'Entrar';
-                        document.getElementById('loginSenha').value = '';
-                    }, 500);
-                })
-                .catch((error) => {
-                    console.error('Erro no login:', error);
-                    errorEl.textContent = 'Erro ao fazer login. Tente novamente.';
-                    errorEl.classList.add('show');
-                    btn.disabled = false;
-                    btn.textContent = 'Entrar';
-                });
-        }
-        
-        // Verificar sessão salva ao carregar
-        function verificarSessao() {
-            const sessao = localStorage.getItem('tarefasPixUser');
-            if (sessao) {
-                try {
-                    const userData = JSON.parse(sessao);
-                    
-                    // Verificar se usuário ainda existe no banco
-                    database.ref('usuarios/' + userData.uid).once('value')
-                        .then((snapshot) => {
-                            if (snapshot.exists()) {
-                                usuarioAtual = {
-                                    uid: userData.uid,
-                                    email: userData.email,
-                                    displayName: snapshot.val().nome
-                                };
-                                dadosUsuario = snapshot.val();
-                                carregarDadosUsuario();
-                                inicializarChatListener();
-                                mostrarTela('homeScreen');
-                            } else {
-                                localStorage.removeItem('tarefasPixUser');
-                            }
-                        });
-                } catch (e) {
-                    localStorage.removeItem('tarefasPixUser');
-                }
-            }
-        }
-        
-        // ============== FUNÇÕES DO APP ==============
-        
-        function carregarDadosUsuario() {
-            if (!usuarioAtual || !dadosUsuario) return;
-            
-            document.getElementById('userName').textContent = dadosUsuario.nome || 'Usuário';
-            document.getElementById('userEmail').textContent = dadosUsuario.email;
-            
-            const initial = (dadosUsuario.nome || 'U').charAt(0).toUpperCase();
-            document.getElementById('avatarPlaceholder').textContent = initial;
-            
-            atualizarInterface();
-            
-            // Ouvir mudanças no usuário
-            database.ref('usuarios/' + usuarioAtual.uid).on('value', (snapshot) => {
-                dadosUsuario = snapshot.val();
-                atualizarInterface();
-            });
-        }
-        
-        function atualizarInterface() {
-            if (!dadosUsuario) return;
-            
-            const saldo = dadosUsuario.saldo || 0;
-            document.getElementById('saldoValor').textContent = 'R$ ' + saldo.toFixed(2).replace('.', ',');
-            
-            const btnSaque = document.getElementById('btnSaque');
-            btnSaque.disabled = saldo < 0.30;
-            
-            const jaFeTarefa = dadosUsuario.jaFeTarefa || false;
-            const badge = document.getElementById('taskBadge');
-            
-            if (jaFeTarefa) {
-                mostrarEstado('estadoBloqueado');
-                badge.textContent = 'TAREFA CONCLUÍDA';
-                badge.classList.add('concluida');
-                
-                ['check1', 'check2', 'check3'].forEach((id, i) => {
-                    const el = document.getElementById(id);
-                    el.classList.add('feito');
-                    el.textContent = '✓';
-                });
-            }
-        }
-        
-        function mostrarTela(telaId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(telaId).classList.add('active');
-        }
-        
-        function mostrarEstado(estadoId) {
-            document.querySelectorAll('.estado').forEach(e => e.classList.remove('active'));
-            document.getElementById(estadoId).classList.add('active');
-        }
-        
-        function iniciarTarefa() {
-            window.open('https://play.google.com/store/apps/details?id=com.worldance.drama', '_blank');
-            tarefaIniciada = true;
-            document.getElementById('check1').classList.add('feito');
-            document.getElementById('check1').textContent = '✓';
-            mostrarEstado('estadoVerificacao');
-        }
-        
-        function voltarParaDownload() {
-            tarefaIniciada = false;
-            mostrarEstado('estadoDisponivel');
-            ['check1', 'check2', 'check3'].forEach((id, i) => {
-                const el = document.getElementById(id);
-                el.classList.remove('feito');
-                el.textContent = (i + 1).toString();
-            });
-        }
-        
-        function confirmarInstalacao() {
-            document.getElementById('check2').classList.add('feito');
-            document.getElementById('check2').textContent = '✓';
-            document.getElementById('check3').classList.add('feito');
-            document.getElementById('check3').textContent = '✓';
-            concluirTarefa();
-        }
-        
-        function concluirTarefa() {
-            if (!usuarioAtual) return;
-            
-            const updates = {
-                jaFeTarefa: true,
-                saldo: (dadosUsuario.saldo || 0) + 0.30
-            };
-            
-            database.ref('usuarios/' + usuarioAtual.uid).update(updates)
-                .then(() => {
-                    mostrarEstado('estadoConcluido');
-                    showToast('✓ R$ 0,30 adicionado ao saldo!', 'success');
-                    
-                    database.ref('transacoes/' + usuarioAtual.uid).push({
-                        tipo: 'RECOMPENSA',
-                        valor: 0.30,
-                        descricao: 'Tarefa: Registro Worldance Drama',
-                        data: Date.now()
-                    });
-                });
-        }
-        
-        function abrirTelaHistorico() {
-            mostrarTela('historicoScreen');
-            carregarHistoricoSaques();
-        }
-        
-        function voltarParaHome() {
-            mostrarTela('homeScreen');
-            if (listenerHistorico) {
-                listenerHistorico.off();
-                listenerHistorico = null;
-            }
-        }
-        
-        function carregarHistoricoSaques() {
-            if (!usuarioAtual) return;
-            
-            const listaEl = document.getElementById('listaSaques');
-            listaEl.innerHTML = `
-                <div class="historico-loading">
-                    <div class="spinner"></div>
-                    <p>Carregando histórico...</p>
-                </div>
-            `;
-            
-            listenerHistorico = database.ref('saques')
-                .orderByChild('userId')
-                .equalTo(usuarioAtual.uid);
-                
-            listenerHistorico.on('value', (snapshot) => {
-                const saques = [];
-                snapshot.forEach((child) => {
-                    saques.push({
-                        id: child.key,
-                        ...child.val()
-                    });
-                });
-                
-                saques.sort((a, b) => b.dataSolicitacao - a.dataSolicitacao);
-                listaSaquesCache = saques;
-                atualizarContadores(saques);
-                renderizarListaSaques(saques, filtroAtual);
-            });
-        }
-        
-        function atualizarContadores(saques) {
-            const contadores = {
-                todos: saques.length,
-                pendente: saques.filter(s => s.status === 'PENDENTE').length,
-                processando: saques.filter(s => s.status === 'PROCESSANDO').length,
-                concluido: saques.filter(s => s.status === 'CONCLUIDO' || s.status === 'COMPLETO').length,
-                rejeitado: saques.filter(s => s.status === 'REJEITADO' || s.status === 'CANCELADO').length
-            };
-            
-            document.getElementById('contTodos').textContent = contadores.todos;
-            document.getElementById('contPendente').textContent = contadores.pendente;
-            document.getElementById('contProcessando').textContent = contadores.processando;
-            document.getElementById('contConcluido').textContent = contadores.concluido;
-            document.getElementById('contRejeitado').textContent = contadores.rejeitado;
-        }
-        
-        function filtrarSaques(status) {
-            filtroAtual = status;
-            document.querySelectorAll('.aba-status').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('aba' + status.charAt(0).toUpperCase() + status.slice(1)).classList.add('active');
-            renderizarListaSaques(listaSaquesCache, status);
-        }
-        
-        function renderizarListaSaques(saques, filtro) {
-            const listaEl = document.getElementById('listaSaques');
-            
-            let saquesFiltrados = saques;
-            if (filtro !== 'todos') {
-                const statusMap = {
-                    'pendente': ['PENDENTE'],
-                    'processando': ['PROCESSANDO'],
-                    'concluido': ['CONCLUIDO', 'COMPLETO'],
-                    'rejeitado': ['REJEITADO', 'CANCELADO']
-                };
-                const statusValidos = statusMap[filtro] || [];
-                saquesFiltrados = saques.filter(s => statusValidos.includes(s.status));
-            }
-            
-            if (saquesFiltrados.length === 0) {
-                const mensagens = {
-                    'todos': { msg: 'Nenhum saque encontrado', icone: '📭' },
-                    'pendente': { msg: 'Nenhum saque pendente', icone: '⏳' },
-                    'processando': { msg: 'Nenhum saque em processamento', icone: '⚙️' },
-                    'concluido': { msg: 'Nenhum saque concluído ainda', icone: '✅' },
-                    'rejeitado': { msg: 'Nenhum saque rejeitado', icone: '❌' }
-                };
-                const config = mensagens[filtro];
-                
-                listaEl.innerHTML = `
-                    <div class="historico-vazio">
-                        <div class="icone">${config.icone}</div>
-                        <h3>${config.msg}</h3>
-                        <p>Seus saques aparecerão aqui</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            let html = '';
-            saquesFiltrados.forEach(saque => {
-                html += renderizarItemSaque(saque);
-            });
-            
-            listaEl.innerHTML = html;
-        }
-        
-        function renderizarItemSaque(saque) {
-            const data = new Date(saque.dataSolicitacao);
-            const dataFormatada = data.toLocaleDateString('pt-BR');
-            const horaFormatada = data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-            
-            const statusConfig = getStatusConfig(saque.status);
-            const statusClass = statusConfig.class;
-            const statusTexto = statusConfig.texto;
-            const statusIcon = statusConfig.icone;
-            
-            let rejeicaoHtml = '';
-            if ((saque.status === 'REJEITADO' || saque.status === 'CANCELADO') && saque.motivoRejeicao) {
-                rejeicaoHtml = `
-                    <div class="rejeicao-motivo">
-                        <strong>Motivo da rejeição:</strong>
-                        <p>${saque.motivoRejeicao}</p>
-                    </div>
-                `;
-            }
-            
-            let dataInfo = `<span>${dataFormatada} às ${horaFormatada}</span>`;
-            if ((saque.status === 'CONCLUIDO' || saque.status === 'COMPLETO') && saque.dataConclusao) {
-                const dataConc = new Date(saque.dataConclusao);
-                dataInfo += ` <span style="color: #22C55E; font-size: 11px;">(Concluído em ${dataConc.toLocaleDateString('pt-BR')})</span>`;
-            }
-            
-            let extraInfo = '';
-            if (saque.dataProcessamento) {
-                extraInfo += `
-                    <div class="saque-linha">
-                        <span>Processado em:</span>
-                        <span>${new Date(saque.dataProcessamento).toLocaleDateString('pt-BR')}</span>
-                    </div>
-                `;
-            }
-            if (saque.codigoTransacao) {
-                extraInfo += `
-                    <div class="saque-linha">
-                        <span>Código:</span>
-                        <span style="font-family: monospace; font-size: 11px;">${saque.codigoTransacao.substring(0, 20)}...</span>
-                    </div>
-                `;
-            }
-            
-            let estornoInfo = '';
-            if ((saque.status === 'REJEITADO' || saque.status === 'CANCELADO') && saque.estornoAplicado) {
-                estornoInfo = `
-                    <div class="saque-linha">
-                        <span>💰 Estorno:</span>
-                        <span style="color: #22C55E;">Aplicado em ${new Date(saque.dataEstorno).toLocaleDateString('pt-BR')}</span>
-                    </div>
-                `;
-            }
-            
-            return `
-                <div class="saque-item ${statusClass}">
-                    <div class="saque-header">
-                        <div class="saque-valor">R$ ${saque.valor.toFixed(2).replace('.', ',')}</div>
-                        <div class="saque-status ${statusClass}">
-                            <span>${statusIcon}</span>
-                            <span>${statusTexto}</span>
-                        </div>
-                    </div>
-                    <div class="saque-detalhes">
-                        <div class="saque-linha">
-                            <span>Chave Pix:</span>
-                            <span class="saque-chave">${saque.tipoChavePix}: ${mascararChave(saque.chavePix)}</span>
-                        </div>
-                        <div class="saque-linha">
-                            <span>Solicitado em:</span>
-                            <span>${dataInfo}</span>
-                        </div>
-                        ${extraInfo}
-                        ${estornoInfo}
-                    </div>
-                    ${rejeicaoHtml}
-                </div>
-            `;
-        }
-        
-        function getStatusConfig(status) {
-            const configs = {
-                'PENDENTE': { class: 'pendente', texto: 'Pendente', icone: '⏳' },
-                'PROCESSANDO': { class: 'processando', texto: 'Processando', icone: '⚙️' },
-                'CONCLUIDO': { class: 'concluido', texto: 'Concluído', icone: '✅' },
-                'COMPLETO': { class: 'concluido', texto: 'Concluído', icone: '✅' },
-                'REJEITADO': { class: 'rejeitado', texto: 'Rejeitado', icone: '❌' },
-                'CANCELADO': { class: 'rejeitado', texto: 'Cancelado', icone: '❌' }
-            };
-            return configs[status] || { class: 'pendente', texto: status, icone: '⏳' };
-        }
-        
-        function mascararChave(chave) {
-            if (!chave) return '***';
-            if (chave.length <= 8) return chave;
-            return chave.substring(0, 4) + '***' + chave.substring(chave.length - 4);
-        }
-        
-        function abrirModalSaque() {
-            const saldo = dadosUsuario?.saldo || 0;
-            document.getElementById('val30').disabled = saldo < 0.30;
-            document.getElementById('val50').disabled = saldo < 0.50;
-            
-            if (saldo >= 0.30) {
-                selecionarValor(0.30);
-            } else if (saldo >= 0.50) {
-                selecionarValor(0.50);
-            }
-            
-            document.getElementById('modalSaque').classList.add('active');
-        }
-        
-        function fecharModalSaque(event) {
-            if (!event || event.target.id === 'modalSaque') {
-                document.getElementById('modalSaque').classList.remove('active');
-                document.getElementById('chavePixInput').value = '';
-            }
-        }
-        
-        function selecionarValor(valor) {
-            const btn30 = document.getElementById('val30');
-            const btn50 = document.getElementById('val50');
-            
-            if (valor === 0.30 && btn30.disabled) return;
-            if (valor === 0.50 && btn50.disabled) return;
-            
-            valorSaqueSelecionado = valor;
-            
-            document.querySelectorAll('.valor-btn').forEach(b => b.classList.remove('selected'));
-            
-            if (valor === 0.30) {
-                btn30.classList.add('selected');
-            } else {
-                btn50.classList.add('selected');
-            }
-        }
-        
-        function selecionarTipo(tipo, elemento) {
-            tipoChaveSelecionado = tipo;
-            document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('selected'));
-            elemento.classList.add('selected');
-            
-            const placeholders = {
-                'CPF': '123.456.789-00',
-                'EMAIL': 'seu@email.com',
-                'TELEFONE': '(11) 99999-9999'
-            };
-            document.getElementById('chavePixInput').placeholder = placeholders[tipo];
-        }
-        
-        function confirmarSaque() {
-            const chave = document.getElementById('chavePixInput').value.trim();
-            
-            if (!chave) {
-                showToast('Digite sua chave Pix', 'error');
-                return;
-            }
-            
-            if (!validarChavePix(chave, tipoChaveSelecionado)) {
-                showToast('Chave Pix inválida para o tipo selecionado', 'error');
-                return;
-            }
-            
-            const saldoAtual = dadosUsuario?.saldo || 0;
-            if (saldoAtual < valorSaqueSelecionado) {
-                showToast('Saldo insuficiente', 'error');
-                return;
-            }
-            
-            const novoSaldo = saldoAtual - valorSaqueSelecionado;
-            
-            Promise.all([
-                database.ref('usuarios/' + usuarioAtual.uid + '/saldo').set(novoSaldo),
-                database.ref('saques').push({
-                    userId: usuarioAtual.uid,
-                    nome: dadosUsuario.nome,
-                    email: dadosUsuario.email,
-                    valor: valorSaqueSelecionado,
-                    chavePix: chave,
-                    tipoChavePix: tipoChaveSelecionado,
-                    status: 'PENDENTE',
-                    dataSolicitacao: Date.now()
-                }),
-                database.ref('transacoes/' + usuarioAtual.uid).push({
-                    tipo: 'SAQUE',
-                    valor: -valorSaqueSelecionado,
-                    descricao: 'Saque via Pix - R$ ' + valorSaqueSelecionado.toFixed(2),
-                    data: Date.now()
-                })
-            ])
-            .then(() => {
-                fecharModalSaque();
-                showToast('✓ Saque solicitado com sucesso!', 'success');
-            })
-            .catch((error) => {
-                console.error('Erro no saque:', error);
-                showToast('Erro ao solicitar saque. Tente novamente.', 'error');
-            });
-        }
-        
-        function validarChavePix(chave, tipo) {
-            switch(tipo) {
-                case 'CPF':
-                    return /^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/.test(chave) || /^\d{11}$/.test(chave);
-                case 'EMAIL':
-                    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(chave);
-                case 'TELEFONE':
-                    return /^(\(?\d{2}\)?\s?)?\d{4,5}-?\d{4}$/.test(chave);
-                default:
-                    return chave.length >= 5;
-            }
-        }
-        
-        function fazerLogout() {
-            if (chatListener) {
-                chatListener.off();
-            }
-            
-            // Limpar sessão
-            localStorage.removeItem('tarefasPixUser');
-            usuarioAtual = null;
-            dadosUsuario = null;
-            tarefaIniciada = false;
-            mensagensNaoLidas = 0;
-            
-            if (listenerHistorico) {
-                listenerHistorico.off();
-                listenerHistorico = null;
-            }
-            
-            ['check1', 'check2', 'check3'].forEach((id, i) => {
-                const el = document.getElementById(id);
-                el.classList.remove('feito');
-                el.textContent = (i + 1).toString();
-            });
-            
-            // Limpar campos de login
-            document.getElementById('loginEmail').value = '';
-            document.getElementById('loginSenha').value = '';
-            document.getElementById('loginError').classList.remove('show');
-            document.getElementById('loginSuccess').classList.remove('show');
-            
-            mostrarTela('authScreen');
-        }
-        
-        function showToast(mensagem, tipo = 'success') {
-            const toast = document.getElementById('toast');
-            toast.textContent = mensagem;
-            toast.className = 'toast ' + tipo;
-            
-            setTimeout(() => toast.classList.add('show'), 10);
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-        
-        // ============== CHAT FUNCTIONS ==============
-        
-        function inicializarChatListener() {
-            if (!usuarioAtual) return;
-            
-            chatRoomId = usuarioAtual.uid + '_suporte';
-            
-            chatListener = database.ref('chats/' + chatRoomId + '/mensagens')
-                .orderByChild('timestamp')
-                .limitToLast(50);
-            
-            chatListener.on('child_added', (snapshot) => {
-                const mensagem = snapshot.val();
-                const msgId = snapshot.key;
-                
-                if (!document.getElementById('chatScreen').classList.contains('active') && 
-                    mensagem.remetente === 'suporte' && 
-                    !mensagem.lida) {
-                    mensagensNaoLidas++;
-                    atualizarBadgeMensagens();
-                }
-                
-                if (document.getElementById('chatScreen').classList.contains('active') && 
-                    mensagem.remetente === 'suporte' && 
-                    !mensagem.lida) {
-                    database.ref('chats/' + chatRoomId + '/mensagens/' + msgId + '/lida').set(true);
-                }
-                
-                if (document.getElementById('chatScreen').classList.contains('active')) {
-                    renderizarMensagem(mensagem, msgId);
-                }
-            });
-            
-            database.ref('chats/' + chatRoomId + '/suporteDigitando').on('value', (snapshot) => {
-                const digitando = snapshot.val();
-                const indicator = document.getElementById('typingIndicator');
-                if (digitando && document.getElementById('chatScreen').classList.contains('active')) {
-                    indicator.classList.add('active');
-                    scrollToBottom();
                 } else {
-                    indicator.classList.remove('active');
-                }
-            });
-        }
-        
-        function abrirChatSuporte() {
-            document.getElementById('chatScreen').classList.add('active');
-            document.getElementById('chatWelcome').style.display = 'none';
-            
-            const container = document.getElementById('chatMessages');
-            const welcome = document.getElementById('chatWelcome');
-            const typing = document.getElementById('typingIndicator');
-            container.innerHTML = '';
-            container.appendChild(welcome);
-            container.appendChild(typing);
-            
-            carregarHistoricoChat();
-            
-            mensagensNaoLidas = 0;
-            atualizarBadgeMensagens();
-            
-            setTimeout(() => document.getElementById('chatInput').focus(), 300);
-        }
-        
-        function fecharChatSuporte() {
-            document.getElementById('chatScreen').classList.remove('active');
-        }
-        
-        function carregarHistoricoChat() {
-            if (!chatRoomId) return;
-            
-            database.ref('chats/' + chatRoomId + '/mensagens')
-                .orderByChild('timestamp')
-                .limitToLast(50)
-                .once('value', (snapshot) => {
-                    const mensagens = [];
-                    snapshot.forEach((child) => {
-                        mensagens.push({
-                            id: child.key,
-                            ...child.val()
-                        });
+                    await userRef.update({
+                        ultimo_acesso: firebase.firestore.FieldValue.serverTimestamp()
                     });
+                }
+                
+                return anonId;
+            } catch (error) {
+                console.error('❌ Erro:', error);
+                throw error;
+            }
+        }
+
+        // ============================================
+        // INICIALIZAÇÃO DO APP
+        // ============================================
+        async function initApp() {
+            try {
+                const userId = await initAnonymousUser();
+                await loadUserData(userId);
+                
+                // Inicia listeners em tempo real
+                initChatListener();
+                initTarefasListener(); // NOVO: Carrega tarefas do Firebase
+                carregarTarefasCompletadas();
+                
+                document.getElementById('loading-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loading-screen').style.display = 'none';
+                    document.getElementById('app-container').style.display = 'block';
+                }, 500);
+                
+            } catch (error) {
+                console.error('❌ Erro:', error);
+                mostrarNotificacao('Erro ao iniciar. Recarregue a página.', 'error');
+            }
+        }
+
+        async function loadUserData(anonId) {
+            try {
+                const userRef = db.collection('anonymous_users').doc(anonId);
+                const doc = await userRef.get();
+                
+                if (doc.exists) {
+                    const data = doc.data();
+                    currentUser = { id: anonId, ...data };
                     
-                    if (mensagens.length > 0) {
-                        document.getElementById('chatWelcome').style.display = 'none';
-                        mensagens.forEach((msg) => {
-                            renderizarMensagem(msg, msg.id, false);
-                        });
-                        scrollToBottom();
+                    document.getElementById('saldo').textContent = `R$ ${(data.saldo || 0).toFixed(2)}`;
+                    document.getElementById('saldo-pendente').textContent = (data.saldo_pendente || 0).toFixed(2);
+                    document.getElementById('total-ganho').textContent = (data.total_ganho || 0).toFixed(2);
+                    document.getElementById('tarefas-completadas').textContent = data.tarefas_completadas || 0;
+                    document.getElementById('saques-realizados').textContent = data.saques_realizados || 0;
+                    
+                    const shortId = anonId.substring(0, 20) + '...';
+                    document.getElementById('footer-user-id').textContent = shortId;
+                }
+            } catch (error) {
+                console.error('❌ Erro ao carregar dados:', error);
+            }
+        }
+
+        // ============================================
+        // SISTEMA DE TAREFAS DINÂMICAS (DO FIREBASE)
+        // ============================================
+        function initTarefasListener() {
+            // Carrega tarefas ativas do Firebase em tempo real
+            tarefasListener = db.collection('tarefas_sistema')
+                .where('ativa', '==', true)
+                .orderBy('ordem', 'asc')
+                .onSnapshot(snapshot => {
+                    const container = document.getElementById('tasks-container');
+                    container.innerHTML = '';
+                    
+                    if (snapshot.empty) {
+                        container.innerHTML = `
+                            <div style="text-align: center; padding: 40px; color: #b2bec3;">
+                                <i class="fas fa-tasks" style="font-size: 40px; margin-bottom: 15px;"></i>
+                                <p>Nenhuma tarefa disponível no momento.</p>
+                                <p style="font-size: 12px; margin-top: 10px;">Volte mais tarde!</p>
+                            </div>
+                        `;
+                        return;
                     }
+                    
+                    snapshot.forEach(doc => {
+                        const tarefa = doc.data();
+                        const tarefaId = doc.id;
+                        
+                        // Verifica se usuário já completou esta tarefa
+                        const jaCompletou = tarefasCompletadas.includes(tarefaId);
+                        
+                        const card = document.createElement('div');
+                        card.className = `task-card ${jaCompletou ? 'completada' : ''}`;
+                        card.innerHTML = `
+                            <div class="task-icon" style="background: ${tarefa.cor}20; color: ${tarefa.cor};">
+                                ${tarefa.icone}
+                            </div>
+                            <div class="task-info">
+                                <div class="task-title">${tarefa.titulo}</div>
+                                <div class="task-desc">${tarefa.descricao}</div>
+                            </div>
+                            <div class="task-reward">
+                                <div class="reward-amount">+R$ ${tarefa.valor.toFixed(2)}</div>
+                                ${jaCompletou ? 
+                                    '<span class="task-completed-badge"><i class="fas fa-check"></i> Concluída</span>' :
+                                    `<button class="btn-do-task" onclick="iniciarTarefa('${tarefaId}', ${tarefa.valor}, '${tarefa.link || ''}')">
+                                        Fazer
+                                    </button>`
+                                }
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+                }, error => {
+                    console.error('❌ Erro ao carregar tarefas:', error);
+                    document.getElementById('tasks-container').innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #e17055;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 40px; margin-bottom: 15px;"></i>
+                            <p>Erro ao carregar tarefas.</p>
+                            <button onclick="initTarefasListener()" style="margin-top: 15px; padding: 10px 20px; background: #6c5ce7; color: white; border: none; border-radius: 20px; cursor: pointer;">
+                                Tentar novamente
+                            </button>
+                        </div>
+                    `;
                 });
         }
-        
-        function renderizarMensagem(mensagem, msgId, animar = true) {
-            if (document.querySelector(`[data-msg-id="${msgId}"]`)) return;
-            
-            const container = document.getElementById('chatMessages');
-            const typingIndicator = document.getElementById('typingIndicator');
-            
-            const div = document.createElement('div');
-            div.className = 'message ' + (mensagem.remetente === 'usuario' ? 'sent' : 'received');
-            div.setAttribute('data-msg-id', msgId);
-            
-            const hora = new Date(mensagem.timestamp).toLocaleTimeString('pt-BR', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            });
-            
-            let conteudo = mensagem.texto;
-            if (mensagem.remetente === 'suporte') {
-                conteudo += ' <span class="admin-badge">SUPORTE</span>';
-            }
-            
-            div.innerHTML = `
-                <div>${conteudo}</div>
-                <div class="message-time">${hora}</div>
-            `;
-            
-            container.insertBefore(div, typingIndicator);
-            
-            if (animar) {
-                scrollToBottom();
+
+        async function carregarTarefasCompletadas() {
+            const userId = getAnonymousId();
+            try {
+                const snapshot = await db.collection('anonymous_users')
+                    .doc(userId)
+                    .collection('tarefas_completadas')
+                    .get();
+                
+                tarefasCompletadas = snapshot.docs.map(doc => doc.id);
+            } catch (error) {
+                console.error('❌ Erro:', error);
             }
         }
-        
-        function enviarMensagemChat() {
-            const input = document.getElementById('chatInput');
+
+        async function iniciarTarefa(tarefaId, valor, link) {
+            const userId = getAnonymousId();
+            
+            try {
+                // Verifica se já completou
+                const tarefaRef = db.collection('anonymous_users')
+                    .doc(userId)
+                    .collection('tarefas_completadas')
+                    .doc(tarefaId);
+                    
+                const tarefaDoc = await tarefaRef.get();
+                
+                if (tarefaDoc.exists) {
+                    mostrarNotificacao('⚠️ Você já completou esta tarefa!', 'error');
+                    return;
+                }
+                
+                // Abre link se existir
+                if (link && link.trim() !== '') {
+                    window.open(link, '_blank');
+                }
+                
+                // Mostra modal de verificação
+                mostrarModalVerificacao(tarefaId, valor);
+                
+            } catch (error) {
+                console.error('❌ Erro:', error);
+                mostrarNotificacao('Erro ao iniciar tarefa', 'error');
+            }
+        }
+
+        // ============================================
+        // SISTEMA DE UPLOAD DE COMPROVANTE
+        // ============================================
+        function mostrarModalVerificacao(tarefaId, valor) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.id = 'modal-verificacao';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-icon">📸</div>
+                    <h3 class="modal-title">Comprovante Necessário</h3>
+                    <p class="modal-text">
+                        Envie uma foto ou print da tarefa concluída para receber 
+                        <strong style="color: #00b894;">R$ ${valor.toFixed(2)}</strong>
+                    </p>
+                    
+                    <input type="file" id="foto-comprovante" accept="image/*" 
+                        style="display: none;" onchange="previewFoto(this)">
+                    
+                    <div id="upload-area" class="upload-area" 
+                        onclick="document.getElementById('foto-comprovante').click()">
+                        <div class="upload-icon">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <div class="upload-text">Clique para enviar foto</div>
+                        <div class="upload-hint">JPG, PNG (máx 5MB)</div>
+                    </div>
+                    
+                    <img id="preview-img" class="preview-image">
+                    
+                    <button id="btn-enviar" class="btn-submit" onclick="enviarComprovante('${tarefaId}', ${valor})" disabled>
+                        <i class="fas fa-paper-plane"></i> Enviar para Análise
+                    </button>
+                    
+                    <button class="btn-cancel" onclick="fecharModalVerificacao()">
+                        Cancelar
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        function previewFoto(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('preview-img');
+                    const uploadArea = document.getElementById('upload-area');
+                    const btnEnviar = document.getElementById('btn-enviar');
+                    
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    uploadArea.style.display = 'none';
+                    btnEnviar.disabled = false;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function enviarComprovante(tarefaId, valor) {
+            const fileInput = document.getElementById('foto-comprovante');
+            const btnEnviar = document.getElementById('btn-enviar');
+            
+            if (!fileInput.files[0]) {
+                mostrarNotificacao('Selecione uma foto primeiro!', 'error');
+                return;
+            }
+            
+            btnEnviar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+            btnEnviar.disabled = true;
+            
+            try {
+                const userId = getAnonymousId();
+                const file = fileInput.files[0];
+                
+                // Upload para Firebase Storage
+                const storageRef = storage.ref();
+                const fotoRef = storageRef.child(`comprovantes/${userId}/${tarefaId}_${Date.now()}.jpg`);
+                
+                await fotoRef.put(file);
+                const fotoUrl = await fotoRef.getDownloadURL();
+                
+                // Busca informações da tarefa
+                const tarefaDoc = await db.collection('tarefas_sistema').doc(tarefaId).get();
+                const tarefaData = tarefaDoc.data();
+                
+                // Salva na coleção de pendentes
+                await db.collection('tarefas_pendentes').add({
+                    user_id: userId,
+                    tarefa_id: tarefaId,
+                    tarefa_nome: tarefaData?.titulo || 'Tarefa',
+                    valor: valor,
+                    foto_url: fotoUrl,
+                    status: 'pendente',
+                    data_envio: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Marca como completada
+                await db.collection('anonymous_users')
+                    .doc(userId)
+                    .collection('tarefas_completadas')
+                    .doc(tarefaId)
+                    .set({
+                        completada_em: firebase.firestore.FieldValue.serverTimestamp(),
+                        status: 'em_analise',
+                        valor: valor,
+                        foto_url: fotoUrl
+                    });
+                
+                // Atualiza saldo pendente
+                await db.collection('anonymous_users').doc(userId).update({
+                    saldo_pendente: firebase.firestore.FieldValue.increment(valor),
+                    tarefas_completadas: firebase.firestore.FieldValue.increment(1)
+                });
+                
+                fecharModalVerificacao();
+                mostrarNotificacao('✅ Comprovante enviado! Aguarde aprovação.', 'success');
+                
+                // Atualiza lista de tarefas completadas
+                tarefasCompletadas.push(tarefaId);
+                
+                // Recarrega dados
+                await loadUserData(userId);
+                
+            } catch (error) {
+                console.error('❌ Erro ao enviar:', error);
+                mostrarNotificacao('Erro ao enviar. Tente novamente.', 'error');
+                btnEnviar.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar para Análise';
+                btnEnviar.disabled = false;
+            }
+        }
+
+        function fecharModalVerificacao() {
+            const modal = document.getElementById('modal-verificacao');
+            if (modal) modal.remove();
+        }
+
+        // ============================================
+        // SISTEMA DE CHAT
+        // ============================================
+        function abrirChat() {
+            document.getElementById('chat-overlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            unreadMessages = 0;
+            atualizarBadgeChat();
+            
+            setTimeout(() => {
+                document.getElementById('chat-input').focus();
+            }, 300);
+            
+            scrollToBottom();
+            marcarComoLidas();
+        }
+
+        function fecharChat() {
+            document.getElementById('chat-overlay').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function initChatListener() {
+            const userId = getAnonymousId();
+            
+            const chatRef = db.collection('chats').doc(userId).collection('mensagens');
+            
+            chatListener = chatRef
+                .orderBy('timestamp', 'asc')
+                .onSnapshot(snapshot => {
+                    const messagesContainer = document.getElementById('chat-messages');
+                    const oldMessages = messagesContainer.querySelectorAll('.message');
+                    oldMessages.forEach(msg => msg.remove());
+                    
+                    let hasNewMessage = false;
+                    
+                    snapshot.forEach(doc => {
+                        const msg = doc.data();
+                        const isSent = msg.sender === 'user';
+                        
+                        if (msg.sender === 'admin' && !msg.lida && !document.getElementById('chat-overlay').classList.contains('active')) {
+                            unreadMessages++;
+                            hasNewMessage = true;
+                        }
+                        
+                        adicionarMensagemUI(msg.texto, isSent, msg.timestamp, msg.sender_name);
+                    });
+                    
+                    if (hasNewMessage) {
+                        atualizarBadgeChat();
+                    }
+                    
+                    scrollToBottom();
+                }, error => {
+                    console.error('❌ Erro no chat:', error);
+                });
+        }
+
+        function adicionarMensagemUI(texto, isSent, timestamp, senderName) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const typingIndicator = document.getElementById('typing-indicator');
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isSent ? 'message-sent' : 'message-received'}`;
+            
+            const time = timestamp ? 
+                new Date(timestamp.toDate()).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : 
+                new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            
+            if (!isSent && senderName) {
+                messageDiv.innerHTML = `
+                    <div class="message-sender">${senderName}</div>
+                    ${texto}
+                    <div class="message-time">${time}</div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    ${texto}
+                    <div class="message-time">${time}</div>
+                `;
+            }
+            
+            messagesContainer.insertBefore(messageDiv, typingIndicator);
+        }
+
+        async function enviarMensagem() {
+            const input = document.getElementById('chat-input');
             const texto = input.value.trim();
             
-            if (!texto || !usuarioAtual || !chatRoomId) return;
+            if (!texto) return;
             
+            const userId = getAnonymousId();
+            const btnSend = document.getElementById('btn-send');
+            
+            btnSend.disabled = true;
             input.value = '';
             
-            const mensagem = {
-                texto: texto,
-                remetente: 'usuario',
-                timestamp: Date.now(),
-                lida: false,
-                userId: usuarioAtual.uid,
-                userName: dadosUsuario?.nome || 'Usuário',
-                userEmail: dadosUsuario?.email
-            };
-            
-            database.ref('chats/' + chatRoomId + '/mensagens').push(mensagem)
-                .then(() => {
-                    database.ref('chats/' + chatRoomId).update({
-                        ultimaMensagem: texto,
-                        ultimaAtualizacao: Date.now(),
-                        userId: usuarioAtual.uid,
-                        userName: dadosUsuario?.nome || 'Usuário',
-                        userEmail: dadosUsuario?.email,
-                        status: 'aguardando_resposta'
-                    });
-                    
-                    document.getElementById('chatWelcome').style.display = 'none';
-                })
-                .catch((error) => {
-                    console.error('Erro ao enviar mensagem:', error);
-                    showToast('Erro ao enviar mensagem', 'error');
+            try {
+                await db.collection('chats').doc(userId).collection('mensagens').add({
+                    texto: texto,
+                    sender: 'user',
+                    sender_name: 'Você',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    lida: false
                 });
+                
+                await db.collection('chats').doc(userId).set({
+                    user_id: userId,
+                    ultima_mensagem: texto,
+                    ultimo_remetente: 'user',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'aguardando_resposta',
+                    nao_lidas_admin: firebase.firestore.FieldValue.increment(1)
+                }, { merge: true });
+                
+                scrollToBottom();
+                
+            } catch (error) {
+                console.error('❌ Erro:', error);
+                mostrarNotificacao('Erro ao enviar mensagem', 'error');
+                input.value = texto;
+            } finally {
+                btnSend.disabled = false;
+                input.focus();
+            }
         }
-        
-        function scrollToBottom() {
-            const container = document.getElementById('chatMessages');
-            container.scrollTop = container.scrollHeight;
-        }
-        
-        function atualizarBadgeMensagens() {
-            const badge = document.getElementById('badgeNovasMensagens');
-            if (mensagensNaoLidas > 0) {
-                badge.textContent = mensagensNaoLidas > 99 ? '99+' : mensagensNaoLidas;
-                badge.style.display = 'flex';
+
+        function atualizarBadgeChat() {
+            const badge = document.getElementById('chat-badge');
+            if (unreadMessages > 0) {
+                badge.textContent = unreadMessages > 99 ? '99+' : unreadMessages;
+                badge.style.display = 'block';
             } else {
                 badge.style.display = 'none';
             }
         }
-        
-        // Event listeners do chat
-        document.getElementById('chatInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                enviarMensagemChat();
+
+        function scrollToBottom() {
+            const messagesContainer = document.getElementById('chat-messages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        async function marcarComoLidas() {
+            const userId = getAnonymousId();
+            
+            try {
+                const mensagensNaoLidas = await db.collection('chats')
+                    .doc(userId)
+                    .collection('mensagens')
+                    .where('lida', '==', false)
+                    .where('sender', '==', 'admin')
+                    .get();
+                
+                const batch = db.batch();
+                mensagensNaoLidas.forEach(doc => {
+                    batch.update(doc.ref, { lida: true });
+                });
+                
+                await batch.commit();
+                
+                await db.collection('chats').doc(userId).update({
+                    nao_lidas_usuario: 0
+                });
+                
+            } catch (error) {
+                console.error('❌ Erro:', error);
             }
-        });
-        
-        let typingTimeout;
-        document.getElementById('chatInput').addEventListener('input', () => {
-            if (!chatRoomId) return;
+        }
+
+        // ============================================
+        // SISTEMA DE SAQUE
+        // ============================================
+        function abrirModalSaque() {
+            const saldo = currentUser?.saldo || 0;
             
-            database.ref('chats/' + chatRoomId + '/usuarioDigitando').set(true);
+            if (saldo < 0.30) {
+                mostrarNotificacao('Saldo mínimo para saque: R$ 0,30', 'error');
+                return;
+            }
             
-            clearTimeout(typingTimeout);
-            typingTimeout = setTimeout(() => {
-                database.ref('chats/' + chatRoomId + '/usuarioDigitando').set(false);
-            }, 2000);
-        });
-        
-        // ============== INICIALIZAÇÃO ==============
-        document.addEventListener('gesturestart', (e) => e.preventDefault());
-        document.addEventListener('dblclick', (e) => e.preventDefault());
-        
-        // Verificar sessão ao carregar
-        verificarSessao();
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.id = 'modal-saque';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-icon">🏦</div>
+                    <h3 class="modal-title">Sacar Dinheiro</h3>
+                    <p class="modal-text">
+                        Saldo disponível: <strong style="color: #00b894;">R$ ${saldo.toFixed(2)}</strong>
+                    </p>
+                    
+                    <div class="withdraw-options">
+                        <div class="withdraw-option ${saldo >= 0.30 ? '' : 'disabled'}" onclick="selecionarSaque(0.30, this)">
+                            <div class="withdraw-info">
+                                <div class="withdraw-icon">💳</div>
+                                <div class="withdraw-details"><h4>Saque Rápido</h4><p>Menor valor disponível</p></div>
+                            </div>
+                            <div class="withdraw-amount">R$ 0,30</div>
+                        </div>
+                        
+                        <div class="withdraw-option ${saldo >= 0.50 ? '' : 'disabled'}" onclick="selecionarSaque(0.50, this)">
+                            <div class="withdraw-info">
+                                <div class="withdraw-icon">💰</div>
+                                <div class="withdraw-details"><h4>Saque Padrão</h4><p>Valor intermediário</p></div>
+                            </div>
+                            <div class="withdraw-amount">R$ 0,50</div>
+                        </div>
+                        
+                        <div class="withdraw-option" onclick="selecionarSaque(${saldo}, this)">
+                            <div class="withdraw-info">
+                                <div class="withdraw-icon">🤑</div>
+                                <div class="withdraw-details"><h4>Tudo</h4><p>Sacar saldo total</p></div>
+                            </div>
+                            <div class="withdraw-amount">R$ ${saldo.toFixed(2)}</div>
+                        </div>
+                    </div>
+                    
+                    <input type="text" id="pix-key" class="pix-key-input" placeholder="Digite sua chave PIX (CPF, Email ou Telefone)">
+                    
+                    <button id="btn-confirmar-saque" class="btn-submit" onclick="confirmarSaque()" disabled>
+                        <i class="fas fa-check"></i> Confirmar Saque
+                    </button>
+                    
+                    <button class="btn-cancel" onclick="fecharModalSaque()">Cancelar</button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        let valorSaqueSelecionado = 0;
+
+        function selecionarSaque(valor, elemento) {
+            if (elemento.classList.contains('disabled')) return;
+            
+            valorSaqueSelecionado = valor;
+            
+            document.querySelectorAll('.withdraw-option').forEach(el => el.classList.remove('selected'));
+            elemento.classList.add('selected');
+            
+            document.getElementById('btn-confirmar-saque').disabled = false;
+        }
+
+        async function confirmarSaque() {
+            const pixKey = document.getElementById('pix-key').value.trim();
+            
+            if (!pixKey) {
+                mostrarNotificacao('Digite sua chave PIX!', 'error');
+                return;
+            }
+            
+            if (valorSaqueSelecionado <= 0) {
+                mostrarNotificacao('Selecione um valor!', 'error');
+                return;
+            }
+            
+            const btn = document.getElementById('btn-confirmar-saque');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+            btn.disabled = true;
+            
+            try {
+                const userId = getAnonymousId();
+                
+                await db.collection('saques_pendentes').add({
+                    user_id: userId,
+                    valor: valorSaqueSelecionado,
+                    chave_pix: pixKey,
+                    status: 'pendente',
+                    data_solicitacao: firebase.firestore.FieldValue.serverTimestamp(),
+                    processado: false
+                });
+                
+                await db.collection('anonymous_users').doc(userId).update({
+                    saldo: firebase.firestore.FieldValue.increment(-valorSaqueSelecionado),
+                    saques_realizados: firebase.firestore.FieldValue.increment(1)
+                });
+                
+                fecharModalSaque();
+                mostrarNotificacao('✅ Saque solicitado! Aguarde processamento.', 'success');
+                
+                await loadUserData(userId);
+                
+            } catch (error) {
+                console.error('❌ Erro:', error);
+                mostrarNotificacao('Erro ao solicitar saque', 'error');
+                btn.innerHTML = '<i class="fas fa-check"></i> Confirmar Saque';
+                btn.disabled = false;
+            }
+        }
+
+        function fecharModalSaque() {
+            const modal = document.getElementById('modal-saque');
+            if (modal) modal.remove();
+            valorSaqueSelecionado = 0;
+        }
+
+        // ============================================
+        // UTILITÁRIOS
+        // ============================================
+        function mostrarNotificacao(mensagem, tipo = 'info') {
+            const notif = document.createElement('div');
+            notif.className = `notification ${tipo}`;
+            notif.innerHTML = `<i class="fas fa-${tipo === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${mensagem}`;
+            document.body.appendChild(notif);
+            
+            setTimeout(() => {
+                notif.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => notif.remove(), 300);
+            }, 3000);
+        }
+
+        // ============================================
+        // INICIALIZAÇÃO
+        // ============================================
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
