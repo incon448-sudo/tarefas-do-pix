@@ -7,31 +7,15 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: #f5f5f5; color: #333; }
-
-        /* APP */
         .app-container { min-height: 100vh; padding-bottom: 80px; }
-
-        /* HEADER */
         .header { background: #2d3748; color: white; padding: 15px 20px; position: sticky; top: 0; z-index: 100; }
         .header-top { display: flex; justify-content: space-between; align-items: center; }
         .balance { display: flex; align-items: center; gap: 10px; }
         .coin-icon { width: 30px; height: 30px; background: linear-gradient(135deg, #ffd700, #ffed4e); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #b8860b; }
         .balance-text { font-size: 20px; font-weight: bold; }
         .balance-conversion { color: #ffd700; font-size: 14px; }
+        .user-id { background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 20px; font-size: 11px; color: #a0aec0; margin-top: 5px; display: inline-block; }
         .user-avatar { width: 40px; height: 40px; background: #48bb78; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; }
-
-        /* ID DO USUÁRIO */
-        .user-id { 
-            background: rgba(255,255,255,0.1); 
-            padding: 5px 10px; 
-            border-radius: 20px; 
-            font-size: 11px; 
-            color: #a0aec0;
-            margin-top: 5px;
-            display: inline-block;
-        }
-
-        /* TAREFAS */
         .task-list { padding: 15px; }
         .task-card { background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; align-items: center; gap: 15px; }
         .task-icon { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
@@ -41,15 +25,11 @@
         .task-desc { font-size: 12px; color: #718096; margin-bottom: 6px; }
         .task-reward { color: #e53e3e; font-weight: bold; font-size: 14px; }
         .btn-ganhar { background: #84cc16; color: white; border: none; padding: 10px 24px; border-radius: 20px; font-weight: bold; font-size: 14px; cursor: pointer; }
-
-        /* MENU INFERIOR */
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 100; }
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #a0aec0; text-decoration: none; font-size: 12px; position: relative; }
         .nav-item.active { color: #84cc16; }
         .nav-badge { position: absolute; top: -5px; right: -5px; background: #e53e3e; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; }
         .hidden { display: none !important; }
-
-        /* MODAIS */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; justify-content: center; align-items: center; padding: 20px; }
         .modal-content { background: white; border-radius: 20px; padding: 30px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; }
         .modal-header { text-align: center; margin-bottom: 25px; }
@@ -58,35 +38,25 @@
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; margin-bottom: 5px; color: #555; font-size: 14px; }
         .form-group input, .form-group select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; }
-
-        /* UPLOAD */
         .upload-area { border: 2px dashed #cbd5e0; border-radius: 16px; padding: 30px; text-align: center; cursor: pointer; background: #f7fafc; }
         .upload-area.has-image { border-color: #84cc16; background: #f0fff4; padding: 15px; }
         .upload-preview { max-width: 100%; max-height: 200px; border-radius: 8px; display: none; }
         .upload-preview.show { display: block; margin: 0 auto; }
         .file-input { display: none; }
-
-        /* SAQUE */
         .withdraw-info { background: #f7fafc; padding: 15px; border-radius: 12px; margin-bottom: 15px; text-align: center; }
         .withdraw-card { border: 2px solid #e2e8f0; border-radius: 16px; padding: 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; margin-bottom: 10px; }
         .withdraw-card.selected { border-color: #84cc16; background: #f0fff4; }
         .withdraw-amount { font-size: 24px; font-weight: bold; color: #84cc16; }
         .btn-withdraw { width: 100%; margin-top: 20px; padding: 16px; background: #84cc16; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; }
         .btn-withdraw:disabled { background: #cbd5e0; cursor: not-allowed; }
-
-        /* STATUS */
         .status-pending { background: #fffaf0; color: #c05621; padding: 15px; border-radius: 12px; text-align: center; margin-top: 15px; border: 2px solid #ed8936; }
         .status-approved { background: #f0fff4; color: #22543d; padding: 15px; border-radius: 12px; text-align: center; margin-top: 15px; border: 2px solid #48bb78; }
         .status-rejected { background: #fff5f5; color: #c53030; padding: 15px; border-radius: 12px; text-align: center; margin-top: 15px; border: 2px solid #e53e3e; }
-
-        /* TOAST */
         .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px); background: #2d3748; color: white; padding: 16px 24px; border-radius: 12px; font-weight: 500; opacity: 0; transition: all 0.3s; z-index: 300; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     </style>
 </head>
 <body>
-
-    <!-- APP - ENTRA DIRETO -->
     <div class="app-container" id="appContainer">
         <div class="header">
             <div class="header-top">
@@ -102,28 +72,15 @@
             </div>
         </div>
 
-        <div id="tabContent">
-            <div class="task-list" id="taskList"></div>
-        </div>
+        <div id="tabContent"><div class="task-list" id="taskList"></div></div>
 
         <nav class="bottom-nav">
-            <a href="#" class="nav-item active" onclick="showTab('tasks', this); return false;">
-                <span>📦</span>
-                <span>Tarefa</span>
-            </a>
-            <a href="#" class="nav-item" onclick="showTab('myTasks', this); return false;">
-                <span>📋</span>
-                <span>Minhas tarefas</span>
-                <span class="nav-badge hidden" id="myTasksBadge">0</span>
-            </a>
-            <a href="#" class="nav-item" onclick="showTab('withdraw', this); return false;">
-                <span>🏧</span>
-                <span>Saque</span>
-            </a>
+            <a href="#" class="nav-item active" onclick="showTab('tasks', this); return false;"><span>📦</span><span>Tarefa</span></a>
+            <a href="#" class="nav-item" onclick="showTab('myTasks', this); return false;"><span>📋</span><span>Minhas tarefas</span><span class="nav-badge hidden" id="myTasksBadge">0</span></a>
+            <a href="#" class="nav-item" onclick="showTab('withdraw', this); return false;"><span>🏧</span><span>Saque</span></a>
         </nav>
     </div>
 
-    <!-- MODAL: Fazer Tarefa -->
     <div class="modal" id="doTaskModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -132,9 +89,7 @@
                 <p style="color:#e53e3e;font-weight:bold;">💰 R$ <span id="doTaskReward">0.00</span></p>
             </div>
             <div id="taskSteps" style="background:#f7fafc;padding:15px;border-radius:12px;margin-bottom:15px;"></div>
-
             <button class="btn-confirm" id="btnGoTask" onclick="goToTask()" style="background:#4299e1;">🚀 Ir para Tarefa</button>
-
             <div id="uploadSection" style="display:none;margin-top:15px;">
                 <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
                     <div id="uploadIcon">📷</div>
@@ -143,16 +98,12 @@
                 </div>
                 <input type="file" class="file-input" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
             </div>
-
             <button class="btn-confirm" id="btnSubmitProof" onclick="submitProof()" disabled style="display:none;">📤 Enviar</button>
-
             <div id="statusContainer"></div>
-
             <button class="btn-cancel" onclick="closeModal('doTaskModal')">Fechar</button>
         </div>
     </div>
 
-    <!-- MODAL: Saque -->
     <div class="modal" id="withdrawModal">
         <div class="modal-content">
             <div class="modal-header"><h2>💸 Saque via Pix</h2></div>
@@ -163,7 +114,6 @@
                 <p style="margin-top:10px;color:#718096;font-size:12px;">💳 Forma de pagamento: <strong>Pix</strong></p>
             </div>
             <div id="withdrawOptions"></div>
-            
             <div class="form-group" style="margin-top:15px;">
                 <label>Tipo de Chave Pix</label>
                 <select id="pixType" onchange="updatePixPlaceholder()">
@@ -174,12 +124,10 @@
                     <option value="random">Chave Aleatória</option>
                 </select>
             </div>
-            
             <div class="form-group">
                 <label>Chave Pix</label>
                 <input type="text" id="pixKey" placeholder="Digite seu CPF">
             </div>
-            
             <button class="btn-withdraw" id="btnWithdraw" onclick="processWithdraw()" disabled>Sacar via Pix</button>
             <button class="btn-cancel" onclick="closeModal('withdrawModal')">Cancelar</button>
         </div>
@@ -188,49 +136,22 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // ===== CONFIG =====
         const DB_PREFIX = 'tarefapix_';
-        
-        // ===== STATE =====
-        let userId = null;  // ID único do usuário
-        let coins = 0;
-        let tasks = [];
-        let mySubmissions = [];
-        let currentTask = null;
-        let selectedFile = null;
-        let selectedWithdrawAmount = 0;
-        let selectedWithdrawCoins = 0;
+        let userId = null, coins = 0, tasks = [], mySubmissions = [], currentTask = null, selectedFile = null, selectedWithdrawAmount = 0, selectedWithdrawCoins = 0;
 
-        // ===== GERAR ID ÚNICO =====
         function generateUserId() {
-            // Gera ID tipo: USER_XXXXXX (6 números aleatórios)
-            const random = Math.floor(100000 + Math.random() * 900000);
-            return 'USER_' + random;
+            return 'USER_' + Math.floor(100000 + Math.random() * 900000);
         }
 
-        // ===== INIT - ENTRA DIRETO =====
         function init() {
-            console.log('Inicializando app...');
-            
-            // Verifica se já tem ID salvo
             let savedId = localStorage.getItem(DB_PREFIX + 'userId');
-            
             if (!savedId) {
-                // Primeira vez - gera novo ID
                 savedId = generateUserId();
                 localStorage.setItem(DB_PREFIX + 'userId', savedId);
-                console.log('Novo usuário criado:', savedId);
-            } else {
-                console.log('Usuário existente:', savedId);
             }
-            
             userId = savedId;
-            
-            // Carrega dados do usuário
             coins = parseInt(localStorage.getItem(DB_PREFIX + 'coins_' + userId)) || 0;
             loadTasks();
-            
-            // Mostra interface
             showApp();
         }
 
@@ -248,106 +169,53 @@
             mySubmissions = all.filter(s => s.user === userId);
         }
 
-        // ===== APP =====
         function showApp() {
-            // Mostra ID do usuário no header
             document.getElementById('userIdDisplay').textContent = 'ID: ' + userId;
-            
             loadMySubmissions();
             showTab('tasks', document.querySelector('.nav-item.active'));
             updateBalance();
             updateBadge();
         }
 
-        // ===== TABS =====
         function showTab(tab, element) {
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             if (element) element.classList.add('active');
-
-            if (tab === 'tasks') {
-                renderTasks();
-            } else if (tab === 'myTasks') {
-                renderMyTasks();
-            } else if (tab === 'withdraw') {
-                openWithdraw();
-            }
+            if (tab === 'tasks') renderTasks();
+            else if (tab === 'myTasks') renderMyTasks();
+            else if (tab === 'withdraw') openWithdraw();
         }
 
         function renderTasks() {
             const list = document.getElementById('taskList');
             loadMySubmissions();
-            
             if (tasks.length === 0) {
                 list.innerHTML = '<div style="text-align:center;padding:40px;color:#718096;"><h3>📦 Tarefas</h3><p>Nenhuma tarefa disponível no momento.<br>Volte mais tarde!</p></div>';
                 return;
             }
-            
             list.innerHTML = tasks.map(t => {
                 const existing = mySubmissions.find(s => s.taskId === t.id);
-                let btnText = 'Ganhar';
-                let btnStyle = '';
-                
+                let btnText = 'Ganhar', btnStyle = '';
                 if (existing) {
-                    if (existing.status === 'pending') {
-                        btnText = '⏳ Pendente';
-                        btnStyle = 'background:#ed8936;';
-                    } else if (existing.status === 'approved') {
-                        btnText = '✓ Concluído';
-                        btnStyle = 'background:#48bb78;';
-                    } else {
-                        btnText = '✕ Rejeitado';
-                        btnStyle = 'background:#e53e3e;';
-                    }
+                    if (existing.status === 'pending') { btnText = '⏳ Pendente'; btnStyle = 'background:#ed8936;'; }
+                    else if (existing.status === 'approved') { btnText = '✓ Concluído'; btnStyle = 'background:#48bb78;'; }
+                    else { btnText = '✕ Rejeitado'; btnStyle = 'background:#e53e3e;'; }
                 }
-                
-                return `
-                    <div class="task-card" onclick="openDoTask(${t.id})">
-                        <div class="task-icon ${t.iconColor}">${t.icon}</div>
-                        <div class="task-content">
-                            <div class="task-title">${t.title}</div>
-                            <div class="task-desc">${t.desc}</div>
-                            <div class="task-reward">💰 R$ ${t.reward.toFixed(2)}</div>
-                        </div>
-                        <button class="btn-ganhar" style="${btnStyle}" onclick="event.stopPropagation(); openDoTask(${t.id})">${btnText}</button>
-                    </div>
-                `;
+                return `<div class="task-card" onclick="openDoTask(${t.id})"><div class="task-icon ${t.iconColor}">${t.icon}</div><div class="task-content"><div class="task-title">${t.title}</div><div class="task-desc">${t.desc}</div><div class="task-reward">💰 R$ ${t.reward.toFixed(2)}</div></div><button class="btn-ganhar" style="${btnStyle}" onclick="event.stopPropagation(); openDoTask(${t.id})">${btnText}</button></div>`;
             }).join('');
         }
 
         function renderMyTasks() {
             loadMySubmissions();
             const list = document.getElementById('taskList');
-
             if (mySubmissions.length === 0) {
                 list.innerHTML = '<div style="text-align:center;padding:40px;color:#718096;"><h3>📋 Minhas Tarefas</h3><p>Você ainda não enviou comprovantes!</p></div>';
                 return;
             }
-
             list.innerHTML = '<h3 style="padding:15px;color:#2d3748;">📋 Minhas Tarefas</h3>' + mySubmissions.map(sub => {
-                let statusClass = 'status-pending';
-                let statusText = '⏳ Aguardando aprovação';
-                
-                if (sub.status === 'approved') {
-                    statusClass = 'status-approved';
-                    statusText = '✓ Aprovado - ' + sub.coins + ' moedas creditadas';
-                } else if (sub.status === 'rejected') {
-                    statusClass = 'status-rejected';
-                    statusText = '✕ Rejeitado';
-                }
-                
-                return `
-                    <div class="task-card" style="border-left:4px solid ${sub.status === 'approved' ? '#48bb78' : sub.status === 'rejected' ? '#e53e3e' : '#ed8936'};">
-                        <div class="task-icon green">💳</div>
-                        <div class="task-content">
-                            <div class="task-title">${sub.taskTitle}</div>
-                            <div class="task-desc">${new Date(sub.date).toLocaleString()}</div>
-                            <div class="task-reward">💰 R$ ${sub.reward.toFixed(2)}</div>
-                            <div class="${statusClass}" style="margin-top:8px;padding:8px;font-size:12px;">
-                                ${statusText}
-                            </div>
-                        </div>
-                    </div>
-                `;
+                let statusClass = 'status-pending', statusText = '⏳ Aguardando aprovação';
+                if (sub.status === 'approved') { statusClass = 'status-approved'; statusText = '✓ Aprovado - ' + sub.coins + ' moedas creditadas'; }
+                else if (sub.status === 'rejected') { statusClass = 'status-rejected'; statusText = '✕ Rejeitado'; }
+                return `<div class="task-card" style="border-left:4px solid ${sub.status === 'approved' ? '#48bb78' : sub.status === 'rejected' ? '#e53e3e' : '#ed8936'};"><div class="task-icon green">💳</div><div class="task-content"><div class="task-title">${sub.taskTitle}</div><div class="task-desc">${new Date(sub.date).toLocaleString()}</div><div class="task-reward">💰 R$ ${sub.reward.toFixed(2)}</div><div class="${statusClass}" style="margin-top:8px;padding:8px;font-size:12px;">${statusText}</div></div></div>`;
             }).join('');
         }
 
@@ -355,71 +223,36 @@
             loadMySubmissions();
             const pending = mySubmissions.filter(s => s.status === 'pending').length;
             const badge = document.getElementById('myTasksBadge');
-            
-            if (pending > 0) {
-                badge.textContent = pending;
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-            }
+            if (pending > 0) { badge.textContent = pending; badge.classList.remove('hidden'); }
+            else badge.classList.add('hidden');
         }
 
-        // ===== DO TASK =====
         function openDoTask(taskId) {
             currentTask = tasks.find(t => t.id === taskId);
             if (!currentTask) return;
-
             loadMySubmissions();
             const existing = mySubmissions.find(s => s.taskId === taskId);
-
             document.getElementById('doTaskIcon').textContent = currentTask.icon;
             document.getElementById('doTaskTitle').textContent = currentTask.title;
             document.getElementById('doTaskReward').textContent = currentTask.reward.toFixed(2);
-            document.getElementById('taskSteps').innerHTML = `
-                <p style="margin-bottom:10px;"><strong>📋 Instruções:</strong></p>
-                <ol style="padding-left:20px;line-height:1.8;">
-                    <li>Clique em "Ir para Tarefa" abaixo</li>
-                    <li>${currentTask.desc}</li>
-                    <li>Volte e envie o comprovante</li>
-                    <li>Aguarde aprovação do administrador</li>
-                    <li>Receba ${currentTask.coins} moedas!</li>
-                </ol>
-            `;
-
-            const statusContainer = document.getElementById('statusContainer');
-            const btnGoTask = document.getElementById('btnGoTask');
-            const uploadSection = document.getElementById('uploadSection');
-            const btnSubmit = document.getElementById('btnSubmitProof');
-
-            // Reset
-            uploadSection.style.display = 'none';
-            btnSubmit.style.display = 'none';
-            btnGoTask.style.display = 'block';
+            document.getElementById('taskSteps').innerHTML = `<p style="margin-bottom:10px;"><strong>📋 Instruções:</strong></p><ol style="padding-left:20px;line-height:1.8;"><li>Clique em "Ir para Tarefa" abaixo</li><li>${currentTask.desc}</li><li>Volte e envie o comprovante</li><li>Aguarde aprovação do administrador</li><li>Receba ${currentTask.coins} moedas!</li></ol>`;
+            
+            const statusContainer = document.getElementById('statusContainer'), btnGoTask = document.getElementById('btnGoTask'), uploadSection = document.getElementById('uploadSection'), btnSubmit = document.getElementById('btnSubmitProof');
+            uploadSection.style.display = 'none'; btnSubmit.style.display = 'none'; btnGoTask.style.display = 'block';
             document.getElementById('uploadArea').classList.remove('has-image');
             document.getElementById('uploadPreview').classList.remove('show');
             document.getElementById('uploadIcon').style.display = 'block';
             document.getElementById('uploadText').style.display = 'block';
-            btnSubmit.disabled = true;
-            selectedFile = null;
+            btnSubmit.disabled = true; selectedFile = null;
 
             if (existing) {
-                btnGoTask.style.display = 'none';
-                uploadSection.style.display = 'none';
-                btnSubmit.style.display = 'none';
-                
+                btnGoTask.style.display = 'none'; uploadSection.style.display = 'none'; btnSubmit.style.display = 'none';
                 let statusHtml = '';
-                if (existing.status === 'pending') {
-                    statusHtml = '<div class="status-pending">⏳ Aguardando aprovação do administrador</div>';
-                } else if (existing.status === 'approved') {
-                    statusHtml = '<div class="status-approved">✓ Aprovado! ' + existing.coins + ' moedas creditadas</div>';
-                } else {
-                    statusHtml = '<div class="status-rejected">✕ Rejeitado. Tente novamente.</div>';
-                }
+                if (existing.status === 'pending') statusHtml = '<div class="status-pending">⏳ Aguardando aprovação do administrador</div>';
+                else if (existing.status === 'approved') statusHtml = '<div class="status-approved">✓ Aprovado! ' + existing.coins + ' moedas creditadas</div>';
+                else statusHtml = '<div class="status-rejected">✕ Rejeitado. Tente novamente.</div>';
                 statusContainer.innerHTML = statusHtml;
-            } else {
-                statusContainer.innerHTML = '';
-            }
-
+            } else statusContainer.innerHTML = '';
             document.getElementById('doTaskModal').style.display = 'flex';
         }
 
@@ -439,7 +272,6 @@
             const file = e.target.files[0];
             if (!file) return;
             selectedFile = file;
-
             const reader = new FileReader();
             reader.onload = function(evt) {
                 document.getElementById('uploadPreview').src = evt.target.result;
@@ -454,84 +286,49 @@
         }
 
         function submitProof() {
-            if (!selectedFile) {
-                showToast('❌ Selecione uma imagem!');
-                return;
-            }
-
+            if (!selectedFile) { showToast('❌ Selecione uma imagem!'); return; }
             const reader = new FileReader();
             reader.onload = function(evt) {
                 const all = JSON.parse(localStorage.getItem(DB_PREFIX + 'submissions') || '[]');
-                
-                all.push({
-                    id: Date.now(),
-                    user: userId,  // Usa o ID único
-                    taskId: currentTask.id,
-                    taskTitle: currentTask.title,
-                    reward: currentTask.reward,
-                    coins: currentTask.coins,
-                    image: evt.target.result,
-                    date: new Date().toISOString(),
-                    status: 'pending'
-                });
-                
+                all.push({ id: Date.now(), user: userId, taskId: currentTask.id, taskTitle: currentTask.title, reward: currentTask.reward, coins: currentTask.coins, image: evt.target.result, date: new Date().toISOString(), status: 'pending' });
                 localStorage.setItem(DB_PREFIX + 'submissions', JSON.stringify(all));
-                
                 document.getElementById('uploadSection').style.display = 'none';
                 document.getElementById('btnSubmitProof').style.display = 'none';
                 document.getElementById('statusContainer').innerHTML = '<div class="status-pending">⏳ Aguardando aprovação do administrador</div>';
-                
                 showToast('✅ Enviado! Aguarde aprovação.');
                 updateBadge();
             };
             reader.readAsDataURL(selectedFile);
         }
 
-        // ===== WITHDRAW =====
         function openWithdraw() {
             const balance = coins / 1000;
             document.getElementById('withdrawBalance').textContent = balance.toFixed(2);
             document.getElementById('withdrawCoins').textContent = coins.toLocaleString();
-
             const optionsDiv = document.getElementById('withdrawOptions');
             optionsDiv.innerHTML = '';
-
-            // Saque apenas de R$ 1,00 a R$ 5,00
             if (balance < 1) {
                 optionsDiv.innerHTML = '<p style="text-align:center;color:#718096;padding:20px;">Saldo insuficiente.<br>Minimo para saque: <strong>R$ 1,00</strong></p>';
             } else {
                 const maxWithdraw = Math.min(5, Math.floor(balance));
-                
                 for (let amount = 1; amount <= maxWithdraw; amount++) {
                     const coinsNeeded = amount * 1000;
                     optionsDiv.innerHTML += createWithdrawCard(amount, coinsNeeded, `R$ ${amount.toFixed(2)}`, `${coinsNeeded.toLocaleString()} moedas`);
                 }
-                
                 if (balance >= 5) {
                     optionsDiv.innerHTML += '<p style="text-align:center;color:#718096;margin:15px 0;">Ou sacar valor máximo:</p>';
                     optionsDiv.innerHTML += createWithdrawCard(5, 5000, 'R$ 5,00', '5.000 moedas (máximo)', true);
                 }
             }
-
             document.getElementById('withdrawModal').style.display = 'flex';
         }
 
         function createWithdrawCard(amount, coinsNeeded, label, sublabel, isMax = false) {
-            return `
-                <div class="withdraw-card" onclick="selectWithdraw(${amount}, ${coinsNeeded})" id="withdraw_${amount}">
-                    <div>
-                        <strong style="font-size:18px;color:#2d3748;">${label}</strong>
-                        <br><small style="color:#718096;">${sublabel}</small>
-                        ${isMax ? '<br><span style="color:#48bb78;font-size:12px;">⭐ MÁXIMO</span>' : ''}
-                    </div>
-                    <div class="withdraw-amount">${label}</div>
-                </div>
-            `;
+            return `<div class="withdraw-card" onclick="selectWithdraw(${amount}, ${coinsNeeded})" id="withdraw_${amount}"><div><strong style="font-size:18px;color:#2d3748;">${label}</strong><br><small style="color:#718096;">${sublabel}</small>${isMax ? '<br><span style="color:#48bb78;font-size:12px;">⭐ MÁXIMO</span>' : ''}</div><div class="withdraw-amount">${label}</div></div>`;
         }
 
         function selectWithdraw(amount, coinsNeeded) {
-            selectedWithdrawAmount = amount;
-            selectedWithdrawCoins = coinsNeeded;
+            selectedWithdrawAmount = amount; selectedWithdrawCoins = coinsNeeded;
             document.querySelectorAll('.withdraw-card').forEach(c => c.classList.remove('selected'));
             document.getElementById('withdraw_' + amount).classList.add('selected');
             document.getElementById('btnWithdraw').disabled = false;
@@ -539,73 +336,30 @@
 
         function updatePixPlaceholder() {
             const type = document.getElementById('pixType').value;
-            const placeholders = {
-                cpf: 'Digite seu CPF (apenas números)',
-                cnpj: 'Digite seu CNPJ (apenas números)',
-                email: 'Digite seu e-mail',
-                phone: 'Digite seu celular (com DDD)',
-                random: 'Digite a chave aleatória'
-            };
+            const placeholders = { cpf: 'Digite seu CPF (apenas números)', cnpj: 'Digite seu CNPJ (apenas números)', email: 'Digite seu e-mail', phone: 'Digite seu celular (com DDD)', random: 'Digite a chave aleatória' };
             document.getElementById('pixKey').placeholder = placeholders[type];
         }
 
         function processWithdraw() {
-            if (coins < selectedWithdrawCoins) {
-                showToast('❌ Saldo insuficiente!');
-                return;
-            }
-            
+            if (coins < selectedWithdrawCoins) { showToast('❌ Saldo insuficiente!'); return; }
             const pixType = document.getElementById('pixType').value;
             const pixKey = document.getElementById('pixKey').value.trim();
-            
-            if (!pixKey) {
-                showToast('❌ Digite sua chave Pix!');
-                return;
-            }
-
-            // Salvar solicitação de saque
+            if (!pixKey) { showToast('❌ Digite sua chave Pix!'); return; }
             const withdrawals = JSON.parse(localStorage.getItem(DB_PREFIX + 'withdrawals') || '[]');
-            withdrawals.push({
-                id: Date.now(),
-                user: userId,  // Usa o ID único
-                amount: selectedWithdrawAmount,
-                coins: selectedWithdrawCoins,
-                pixType: pixType,
-                pixKey: pixKey,
-                date: new Date().toISOString(),
-                status: 'pending'
-            });
+            withdrawals.push({ id: Date.now(), user: userId, amount: selectedWithdrawAmount, coins: selectedWithdrawCoins, pixType: pixType, pixKey: pixKey, date: new Date().toISOString(), status: 'pending' });
             localStorage.setItem(DB_PREFIX + 'withdrawals', JSON.stringify(withdrawals));
-
-            coins -= selectedWithdrawCoins;
-            saveUser();
-            updateBalance();
-            closeModal('withdrawModal');
+            coins -= selectedWithdrawCoins; saveUser(); updateBalance(); closeModal('withdrawModal');
             showToast('✅ Saque de R$ ' + selectedWithdrawAmount.toFixed(2) + ' solicitado via Pix!');
         }
 
-        // ===== UTILS =====
         function updateBalance() {
             document.getElementById('coinBalance').textContent = coins.toLocaleString();
             document.getElementById('realBalance').textContent = (coins / 1000).toFixed(2);
         }
 
-        function closeModal(id) {
-            document.getElementById(id).style.display = 'none';
-        }
-
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-
-        window.onclick = function(e) {
-            if (e.target.classList.contains('modal')) e.target.style.display = 'none';
-        }
-
-        // ===== INICIAR =====
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function showToast(msg) { const toast = document.getElementById('toast'); toast.textContent = msg; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 3000); }
+        window.onclick = function(e) { if (e.target.classList.contains('modal')) e.target.style.display = 'none'; }
         init();
     </script>
 </body>
