@@ -54,6 +54,19 @@
         .status-rejected { background: #fff5f5; color: #c53030; padding: 15px; border-radius: 12px; text-align: center; margin-top: 15px; border: 2px solid #e53e3e; }
         .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px); background: #2d3748; color: white; padding: 16px 24px; border-radius: 12px; font-weight: 500; opacity: 0; transition: all 0.3s; z-index: 300; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        
+        /* Status badges na lista de tarefas */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+        .status-badge-pending { background: #fffaf0; color: #c05621; border: 1px solid #ed8936; }
+        .status-badge-approved { background: #f0fff4; color: #22543d; border: 1px solid #48bb78; }
+        .status-badge-rejected { background: #fff5f5; color: #c53030; border: 1px solid #e53e3e; }
     </style>
 </head>
 <body>
@@ -185,37 +198,77 @@
             else if (tab === 'withdraw') openWithdraw();
         }
 
+        // ABA "TAREFA" - Mostra apenas tarefas NÃO enviadas (disponíveis para fazer)
         function renderTasks() {
             const list = document.getElementById('taskList');
             loadMySubmissions();
-            if (tasks.length === 0) {
-                list.innerHTML = '<div style="text-align:center;padding:40px;color:#718096;"><h3>📦 Tarefas</h3><p>Nenhuma tarefa disponível no momento.<br>Volte mais tarde!</p></div>';
+            
+            // Filtrar apenas tarefas que o usuário NUNCA enviou
+            const availableTasks = tasks.filter(t => {
+                const existing = mySubmissions.find(s => s.taskId === t.id);
+                return !existing; // Só mostra se NÃO existe submission
+            });
+            
+            if (availableTasks.length === 0) {
+                if (tasks.length === 0) {
+                    list.innerHTML = '<div style="text-align:center;padding:40px;color:#718096;"><h3>📦 Tarefas</h3><p>Nenhuma tarefa disponível no momento.<br>Volte mais tarde!</p></div>';
+                } else {
+                    list.innerHTML = '<div style="text-align:center;padding:40px;color:#718096;"><h3>📦 Tarefas</h3><p>Você já enviou comprovante de todas as tarefas!<br>Aguarde aprovação ou veja em "Minhas tarefas".</p></div>';
+                }
                 return;
             }
-            list.innerHTML = tasks.map(t => {
-                const existing = mySubmissions.find(s => s.taskId === t.id);
-                let btnText = 'Ganhar', btnStyle = '';
-                if (existing) {
-                    if (existing.status === 'pending') { btnText = '⏳ Pendente'; btnStyle = 'background:#ed8936;'; }
-                    else if (existing.status === 'approved') { btnText = '✓ Concluído'; btnStyle = 'background:#48bb78;'; }
-                    else { btnText = '✕ Rejeitado'; btnStyle = 'background:#e53e3e;'; }
-                }
-                return `<div class="task-card" onclick="openDoTask(${t.id})"><div class="task-icon ${t.iconColor}">${t.icon}</div><div class="task-content"><div class="task-title">${t.title}</div><div class="task-desc">${t.desc}</div><div class="task-reward">💰 R$ ${t.reward.toFixed(2)}</div></div><button class="btn-ganhar" style="${btnStyle}" onclick="event.stopPropagation(); openDoTask(${t.id})">${btnText}</button></div>`;
-            }).join('');
+            
+            // Mostra apenas tarefas disponíveis (botão verde "Ganhar")
+            list.innerHTML = availableTasks.map(t => `
+                <div class="task-card" onclick="openDoTask(${t.id})">
+                    <div class="task-icon ${t.iconColor}">${t.icon}</div>
+                    <div class="task-content">
+                        <div class="task-title">${t.title}</div>
+                        <div class="task-desc">${t.desc}</div>
+                        <div class="task-reward">💰 R$ ${t.reward.toFixed(2)}</div>
+                    </div>
+                    <button class="btn-ganhar" onclick="event.stopPropagation(); openDoTask(${t.id})">Ganhar</button>
+                </div>
+            `).join('');
         }
 
+        // ABA "MINHAS TAREFAS" - Mostra todas as tarefas que o usuário já enviou
         function renderMyTasks() {
             loadMySubmissions();
             const list = document.getElementById('taskList');
+
             if (mySubmissions.length === 0) {
-                list.innerHTML = '<div style="text-align:center;padding:40px;color:#718096;"><h3>📋 Minhas Tarefas</h3><p>Você ainda não enviou comprovantes!</p></div>';
+                list.innerHTML = '<div style="text-align:center;padding:40px;color:#718096;"><h3>📋 Minhas Tarefas</h3><p>Você ainda não enviou comprovantes!<br>Volte para "Tarefa" e comece a ganhar.</p></div>';
                 return;
             }
+
+            // Mostra todas as tarefas enviadas com seu status
             list.innerHTML = '<h3 style="padding:15px;color:#2d3748;">📋 Minhas Tarefas</h3>' + mySubmissions.map(sub => {
-                let statusClass = 'status-pending', statusText = '⏳ Aguardando aprovação';
-                if (sub.status === 'approved') { statusClass = 'status-approved'; statusText = '✓ Aprovado - ' + sub.coins + ' moedas creditadas'; }
-                else if (sub.status === 'rejected') { statusClass = 'status-rejected'; statusText = '✕ Rejeitado'; }
-                return `<div class="task-card" style="border-left:4px solid ${sub.status === 'approved' ? '#48bb78' : sub.status === 'rejected' ? '#e53e3e' : '#ed8936'};"><div class="task-icon green">💳</div><div class="task-content"><div class="task-title">${sub.taskTitle}</div><div class="task-desc">${new Date(sub.date).toLocaleString()}</div><div class="task-reward">💰 R$ ${sub.reward.toFixed(2)}</div><div class="${statusClass}" style="margin-top:8px;padding:8px;font-size:12px;">${statusText}</div></div></div>`;
+                let statusClass = 'status-badge-pending';
+                let statusText = '⏳ Aguardando aprovação';
+                let borderColor = '#ed8936';
+                
+                if (sub.status === 'approved') { 
+                    statusClass = 'status-badge-approved'; 
+                    statusText = '✓ Aprovado - ' + sub.coins + ' moedas creditadas'; 
+                    borderColor = '#48bb78';
+                } else if (sub.status === 'rejected') { 
+                    statusClass = 'status-badge-rejected'; 
+                    statusText = '✕ Rejeitado - Envie novamente'; 
+                    borderColor = '#e53e3e';
+                }
+                
+                return `
+                    <div class="task-card" style="border-left:4px solid ${borderColor};">
+                        <div class="task-icon green">💳</div>
+                        <div class="task-content">
+                            <div class="task-title">${sub.taskTitle}</div>
+                            <div class="task-desc">${new Date(sub.date).toLocaleString()}</div>
+                            <div class="task-reward">💰 R$ ${sub.reward.toFixed(2)}</div>
+                            <div class="status-badge ${statusClass}">${statusText}</div>
+                        </div>
+                    </div>
+                `;
             }).join('');
         }
 
@@ -250,7 +303,7 @@
                 let statusHtml = '';
                 if (existing.status === 'pending') statusHtml = '<div class="status-pending">⏳ Aguardando aprovação do administrador</div>';
                 else if (existing.status === 'approved') statusHtml = '<div class="status-approved">✓ Aprovado! ' + existing.coins + ' moedas creditadas</div>';
-                else statusHtml = '<div class="status-rejected">✕ Rejeitado. Tente novamente.</div>';
+                else statusHtml = '<div class="status-rejected">✕ Rejeitado. Tente novamente clicando em "Ganhar" na tarefa.</div>';
                 statusContainer.innerHTML = statusHtml;
             } else statusContainer.innerHTML = '';
             document.getElementById('doTaskModal').style.display = 'flex';
@@ -297,6 +350,8 @@
                 document.getElementById('statusContainer').innerHTML = '<div class="status-pending">⏳ Aguardando aprovação do administrador</div>';
                 showToast('✅ Enviado! Aguarde aprovação.');
                 updateBadge();
+                // Atualiza a lista para sumir da aba "Tarefa"
+                setTimeout(() => renderTasks(), 500);
             };
             reader.readAsDataURL(selectedFile);
         }
