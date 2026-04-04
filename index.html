@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -54,7 +54,7 @@
         .status-rejected { background: #fff5f5; color: #c53030; padding: 15px; border-radius: 12px; text-align: center; margin-top: 15px; border: 2px solid #e53e3e; }
         .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px); background: #2d3748; color: white; padding: 16px 24px; border-radius: 12px; font-weight: 500; opacity: 0; transition: all 0.3s; z-index: 300; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
+        
         /* Status badges na lista de tarefas */
         .status-badge {
             display: inline-block;
@@ -67,83 +67,6 @@
         .status-badge-pending { background: #fffaf0; color: #c05621; border: 1px solid #ed8936; }
         .status-badge-approved { background: #f0fff4; color: #22543d; border: 1px solid #48bb78; }
         .status-badge-rejected { background: #fff5f5; color: #c53030; border: 1px solid #e53e3e; }
-
-        /* === NOVO: Fotos de instrução === */
-        .instruction-photos {
-            margin: 15px 0;
-            padding: 15px;
-            background: #f0fff4;
-            border-radius: 12px;
-            border: 2px solid #84cc16;
-        }
-        .instruction-photos h4 {
-            color: #2d3748;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-        .instruction-photos h4::before {
-            content: "📸 ";
-        }
-        .photo-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-        .instruction-photo {
-            width: 100%;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .instruction-photo:hover {
-            transform: scale(1.05);
-        }
-        .photo-fullscreen {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 400;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .photo-fullscreen img {
-            max-width: 100%;
-            max-height: 90vh;
-            border-radius: 8px;
-        }
-        .photo-fullscreen .close-btn {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            color: white;
-            font-size: 30px;
-            cursor: pointer;
-        }
-
-        /* === NOVO: Cooldown de saque === */
-        .withdraw-cooldown {
-            background: #fffaf0;
-            border: 2px solid #ed8936;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        .withdraw-cooldown h4 {
-            color: #c05621;
-            margin-bottom: 8px;
-        }
-        .cooldown-timer {
-            font-size: 24px;
-            font-weight: bold;
-            color: #e53e3e;
-            font-family: monospace;
-        }
     </style>
 </head>
 <body>
@@ -178,13 +101,6 @@
                 <h2 id="doTaskTitle">Tarefa</h2>
                 <p style="color:#e53e3e;font-weight:bold;">💰 R$ <span id="doTaskReward">0.00</span></p>
             </div>
-
-            <!-- === NOVO: Container para fotos de instrução === -->
-            <div id="instructionPhotosContainer" class="instruction-photos" style="display:none;">
-                <h4>Veja como fazer:</h4>
-                <div class="photo-grid" id="instructionPhotosGrid"></div>
-            </div>
-
             <div id="taskSteps" style="background:#f7fafc;padding:15px;border-radius:12px;margin-bottom:15px;"></div>
             <button class="btn-confirm" id="btnGoTask" onclick="goToTask()" style="background:#4299e1;">🚀 Ir para Tarefa</button>
             <div id="uploadSection" style="display:none;margin-top:15px;">
@@ -201,24 +117,9 @@
         </div>
     </div>
 
-    <!-- === NOVO: Modal para foto em tela cheia === -->
-    <div class="photo-fullscreen" id="photoFullscreen" onclick="closePhotoFullscreen()">
-        <span class="close-btn">&times;</span>
-        <img id="fullscreenImg" src="" alt="Instrução">
-    </div>
-
     <div class="modal" id="withdrawModal">
         <div class="modal-content">
             <div class="modal-header"><h2>💸 Saque via Pix</h2></div>
-
-            <!-- === NOVO: Alerta de cooldown === -->
-            <div id="withdrawCooldownAlert" class="withdraw-cooldown" style="display:none;">
-                <h4>⏳ Aguarde para sacar novamente</h4>
-                <p style="font-size:12px;color:#718096;margin-bottom:8px;">Limite: 1 saque a cada 12 horas</p>
-                <div class="cooldown-timer" id="cooldownTimer">00:00:00</div>
-                <p style="font-size:11px;color:#a0aec0;margin-top:8px;">Próximo saque disponível às <span id="nextWithdrawTime">--:--</span></p>
-            </div>
-
             <div class="withdraw-info">
                 <h3>Seu Saldo</h3>
                 <p style="font-size:24px;font-weight:bold;color:#84cc16;">R$ <span id="withdrawBalance">0.00</span></p>
@@ -297,15 +198,17 @@
             else if (tab === 'withdraw') openWithdraw();
         }
 
+        // ABA "TAREFA" - Mostra apenas tarefas NÃO enviadas (disponíveis para fazer)
         function renderTasks() {
             const list = document.getElementById('taskList');
             loadMySubmissions();
-
+            
+            // Filtrar apenas tarefas que o usuário NUNCA enviou
             const availableTasks = tasks.filter(t => {
                 const existing = mySubmissions.find(s => s.taskId === t.id);
-                return !existing;
+                return !existing; // Só mostra se NÃO existe submission
             });
-
+            
             if (availableTasks.length === 0) {
                 if (tasks.length === 0) {
                     list.innerHTML = '<div style="text-align:center;padding:40px;color:#718096;"><h3>📦 Tarefas</h3><p>Nenhuma tarefa disponível no momento.<br>Volte mais tarde!</p></div>';
@@ -314,7 +217,8 @@
                 }
                 return;
             }
-
+            
+            // Mostra apenas tarefas disponíveis (botão verde "Ganhar")
             list.innerHTML = availableTasks.map(t => `
                 <div class="task-card" onclick="openDoTask(${t.id})">
                     <div class="task-icon ${t.iconColor}">${t.icon}</div>
@@ -328,6 +232,7 @@
             `).join('');
         }
 
+        // ABA "MINHAS TAREFAS" - Mostra todas as tarefas que o usuário já enviou
         function renderMyTasks() {
             loadMySubmissions();
             const list = document.getElementById('taskList');
@@ -337,11 +242,12 @@
                 return;
             }
 
+            // Mostra todas as tarefas enviadas com seu status
             list.innerHTML = '<h3 style="padding:15px;color:#2d3748;">📋 Minhas Tarefas</h3>' + mySubmissions.map(sub => {
                 let statusClass = 'status-badge-pending';
                 let statusText = '⏳ Aguardando aprovação';
                 let borderColor = '#ed8936';
-
+                
                 if (sub.status === 'approved') { 
                     statusClass = 'status-badge-approved'; 
                     statusText = '✓ Aprovado - ' + sub.coins + ' moedas creditadas'; 
@@ -351,7 +257,7 @@
                     statusText = '✕ Rejeitado - Envie novamente'; 
                     borderColor = '#e53e3e';
                 }
-
+                
                 return `
                     <div class="task-card" style="border-left:4px solid ${borderColor};">
                         <div class="task-icon green">💳</div>
@@ -374,16 +280,6 @@
             else badge.classList.add('hidden');
         }
 
-        // === NOVO: Função para mostrar foto em tela cheia ===
-        function openPhotoFullscreen(src) {
-            document.getElementById('fullscreenImg').src = src;
-            document.getElementById('photoFullscreen').style.display = 'flex';
-        }
-
-        function closePhotoFullscreen() {
-            document.getElementById('photoFullscreen').style.display = 'none';
-        }
-
         function openDoTask(taskId) {
             currentTask = tasks.find(t => t.id === taskId);
             if (!currentTask) return;
@@ -393,21 +289,7 @@
             document.getElementById('doTaskTitle').textContent = currentTask.title;
             document.getElementById('doTaskReward').textContent = currentTask.reward.toFixed(2);
             document.getElementById('taskSteps').innerHTML = `<p style="margin-bottom:10px;"><strong>📋 Instruções:</strong></p><ol style="padding-left:20px;line-height:1.8;"><li>Clique em "Ir para Tarefa" abaixo</li><li>${currentTask.desc}</li><li>Volte e envie o comprovante</li><li>Aguarde aprovação do administrador</li><li>Receba ${currentTask.coins} moedas!</li></ol>`;
-
-            // === NOVO: Mostrar fotos de instrução se existirem ===
-            const photosContainer = document.getElementById('instructionPhotosContainer');
-            const photosGrid = document.getElementById('instructionPhotosGrid');
-
-            if (currentTask.instructionPhotos && currentTask.instructionPhotos.length > 0) {
-                photosContainer.style.display = 'block';
-                photosGrid.innerHTML = currentTask.instructionPhotos.map((photo, index) => `
-                    <img src="${photo}" class="instruction-photo" onclick="event.stopPropagation(); openPhotoFullscreen('${photo}')" alt="Instrução ${index + 1}">
-                `).join('');
-            } else {
-                photosContainer.style.display = 'none';
-                photosGrid.innerHTML = '';
-            }
-
+            
             const statusContainer = document.getElementById('statusContainer'), btnGoTask = document.getElementById('btnGoTask'), uploadSection = document.getElementById('uploadSection'), btnSubmit = document.getElementById('btnSubmitProof');
             uploadSection.style.display = 'none'; btnSubmit.style.display = 'none'; btnGoTask.style.display = 'block';
             document.getElementById('uploadArea').classList.remove('has-image');
@@ -468,101 +350,20 @@
                 document.getElementById('statusContainer').innerHTML = '<div class="status-pending">⏳ Aguardando aprovação do administrador</div>';
                 showToast('✅ Enviado! Aguarde aprovação.');
                 updateBadge();
+                // Atualiza a lista para sumir da aba "Tarefa"
                 setTimeout(() => renderTasks(), 500);
             };
             reader.readAsDataURL(selectedFile);
         }
 
-        // === NOVO: Funções para controle de cooldown de saque ===
-        function getLastWithdrawTime() {
-            return localStorage.getItem(DB_PREFIX + 'lastWithdraw_' + userId);
-        }
-
-        function setLastWithdrawTime() {
-            localStorage.setItem(DB_PREFIX + 'lastWithdraw_' + userId, new Date().toISOString());
-        }
-
-        function canWithdraw() {
-            const lastWithdraw = getLastWithdrawTime();
-            if (!lastWithdraw) return { can: true, remaining: 0 };
-
-            const lastDate = new Date(lastWithdraw);
-            const now = new Date();
-            const diffMs = now - lastDate;
-            const diffHours = diffMs / (1000 * 60 * 60);
-
-            if (diffHours >= 12) {
-                return { can: true, remaining: 0 };
-            } else {
-                const remainingMs = (12 * 60 * 60 * 1000) - diffMs;
-                return { can: false, remaining: remainingMs };
-            }
-        }
-
-        function formatTimeRemaining(ms) {
-            const totalSeconds = Math.floor(ms / 1000);
-            const hours = Math.floor(totalSeconds / 3600);
-            const minutes = Math.floor((totalSeconds % 3600) / 60);
-            const seconds = totalSeconds % 60;
-            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        function getNextMidnight() {
-            const now = new Date();
-            const midnight = new Date(now);
-            midnight.setHours(24, 0, 0, 0);
-            return midnight;
-        }
-
-        let cooldownInterval;
-
         function openWithdraw() {
             const balance = coins / 1000;
             document.getElementById('withdrawBalance').textContent = balance.toFixed(2);
             document.getElementById('withdrawCoins').textContent = coins.toLocaleString();
-
-            // === NOVO: Verificar cooldown ===
-            const withdrawCheck = canWithdraw();
-            const cooldownAlert = document.getElementById('withdrawCooldownAlert');
             const optionsDiv = document.getElementById('withdrawOptions');
-            const btnWithdraw = document.getElementById('btnWithdraw');
-
-            if (!withdrawCheck.can) {
-                cooldownAlert.style.display = 'block';
-                optionsDiv.innerHTML = '<p style="text-align:center;color:#718096;padding:20px;">⏳ Aguarde o tempo de cooldown para realizar novo saque.</p>';
-                btnWithdraw.disabled = true;
-
-                // Atualizar timer
-                if (cooldownInterval) clearInterval(cooldownInterval);
-                function updateTimer() {
-                    const check = canWithdraw();
-                    if (check.can) {
-                        document.getElementById('cooldownTimer').textContent = '00:00:00';
-                        clearInterval(cooldownInterval);
-                        if (document.getElementById('withdrawModal').style.display === 'flex') {
-                            openWithdraw();
-                        }
-                        return;
-                    }
-                    document.getElementById('cooldownTimer').textContent = formatTimeRemaining(check.remaining);
-                }
-                updateTimer();
-                cooldownInterval = setInterval(updateTimer, 1000);
-
-                const nextMidnight = getNextMidnight();
-                document.getElementById('nextWithdrawTime').textContent = nextMidnight.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-
-                document.getElementById('withdrawModal').style.display = 'flex';
-                return;
-            }
-
-            cooldownAlert.style.display = 'none';
-            if (cooldownInterval) clearInterval(cooldownInterval);
-
             optionsDiv.innerHTML = '';
             if (balance < 1) {
                 optionsDiv.innerHTML = '<p style="text-align:center;color:#718096;padding:20px;">Saldo insuficiente.<br>Minimo para saque: <strong>R$ 1,00</strong></p>';
-                btnWithdraw.disabled = true;
             } else {
                 const maxWithdraw = Math.min(5, Math.floor(balance));
                 for (let amount = 1; amount <= maxWithdraw; amount++) {
@@ -595,13 +396,6 @@
         }
 
         function processWithdraw() {
-            // === NOVO: Verificar cooldown novamente ===
-            const withdrawCheck = canWithdraw();
-            if (!withdrawCheck.can) {
-                showToast('❌ Aguarde ' + formatTimeRemaining(withdrawCheck.remaining) + ' para sacar novamente!');
-                return;
-            }
-
             if (coins < selectedWithdrawCoins) { showToast('❌ Saldo insuficiente!'); return; }
             const pixType = document.getElementById('pixType').value;
             const pixKey = document.getElementById('pixKey').value.trim();
@@ -609,10 +403,6 @@
             const withdrawals = JSON.parse(localStorage.getItem(DB_PREFIX + 'withdrawals') || '[]');
             withdrawals.push({ id: Date.now(), user: userId, amount: selectedWithdrawAmount, coins: selectedWithdrawCoins, pixType: pixType, pixKey: pixKey, date: new Date().toISOString(), status: 'pending' });
             localStorage.setItem(DB_PREFIX + 'withdrawals', JSON.stringify(withdrawals));
-
-            // === NOVO: Registrar hora do saque ===
-            setLastWithdrawTime();
-
             coins -= selectedWithdrawCoins; saveUser(); updateBalance(); closeModal('withdrawModal');
             showToast('✅ Saque de R$ ' + selectedWithdrawAmount.toFixed(2) + ' solicitado via Pix!');
         }
@@ -622,24 +412,9 @@
             document.getElementById('realBalance').textContent = (coins / 1000).toFixed(2);
         }
 
-        function closeModal(id) { 
-            document.getElementById(id).style.display = 'none'; 
-            if (id === 'withdrawModal' && cooldownInterval) {
-                clearInterval(cooldownInterval);
-            }
-        }
-
-        function showToast(msg) { 
-            const toast = document.getElementById('toast'); 
-            toast.textContent = msg; 
-            toast.classList.add('show'); 
-            setTimeout(() => toast.classList.remove('show'), 3000); 
-        }
-
-        window.onclick = function(e) { 
-            if (e.target.classList.contains('modal')) e.target.style.display = 'none'; 
-        }
-
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function showToast(msg) { const toast = document.getElementById('toast'); toast.textContent = msg; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 3000); }
+        window.onclick = function(e) { if (e.target.classList.contains('modal')) e.target.style.display = 'none'; }
         init();
     </script>
 </body>
