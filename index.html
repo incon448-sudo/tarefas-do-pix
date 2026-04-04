@@ -29,7 +29,10 @@
         .btn-cancel { width: 100%; margin-top: 10px; padding: 12px; background: #f5f5f5; border: none; border-radius: 8px; cursor: pointer; }
         .upload-area { border: 2px dashed #cbd5e0; border-radius: 16px; padding: 30px; text-align: center; cursor: pointer; background: #f7fafc; margin-top: 15px; }
         .upload-preview { max-width: 100%; max-height: 200px; border-radius: 8px; display: none; margin: 0 auto; }
-        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #2d3748; color: white; padding: 12px 20px; border-radius: 10px; opacity: 0; transition: 0.3s; z-index: 1000; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #e2e8f0; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #a0aec0; text-decoration: none; font-size: 12px; }
+        .nav-item.active { color: #84cc16; }
+        .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #2d3748; color: white; padding: 12px 20px; border-radius: 10px; opacity: 0; transition: 0.3s; z-index: 1000; pointer-events: none; }
         .toast.show { opacity: 1; }
     </style>
 </head>
@@ -49,32 +52,41 @@
         </div>
 
         <div class="task-list" id="taskList"></div>
+
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active"><span>📦 Tarefas</span></a>
+            <a href="#" class="nav-item" onclick="openWithdrawModal()"><span>🏧 Saque</span></a>
+        </nav>
     </div>
 
     <div class="modal" id="doTaskModal">
         <div class="modal-content">
-            <div style="text-align:center; margin-bottom:15px;">
-                <div id="doTaskIcon" style="font-size:40px;">💳</div>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div id="doTaskIcon" style="font-size: 48px; margin-bottom: 10px;">💳</div>
                 <h2 id="doTaskTitle">Tarefa</h2>
-                <p id="doTaskReward" style="color:#e53e3e;font-weight:bold;">R$ 0.00</p>
+                <p style="color: #e53e3e; font-weight: bold; font-size: 18px; margin-top: 5px;">R$ <span id="doTaskReward">0.00</span></p>
+            </div>
+            
+            <div id="taskSteps" style="background: #f7fafc; padding: 15px; border-radius: 12px; margin-bottom: 20px; font-size: 14px;"></div>
+            
+            <div id="tutorialBox" style="display: none; margin-bottom: 15px;">
+                <p style="font-size: 12px; font-weight: bold; color: #667eea; margin-bottom: 5px;">📸 Exemplo de como fazer:</p>
+                <img id="displayTutImg" style="width: 100%; border-radius: 12px; border: 2px solid #667eea;">
             </div>
 
-            <div id="taskSteps" style="background:#f7fafc;padding:15px;border-radius:12px;margin-bottom:15px; font-size:14px;"></div>
+            <button class="btn-confirm" id="btnGoTask" onclick="goToTask()" style="background: #4299e1;">🚀 Ir para Tarefa</button>
             
-            <div id="tutBox" style="display:none; margin-bottom:15px;">
-                <p style="font-weight:bold; font-size:12px; color:#667eea; margin-bottom:5px;">📸 Exemplo (Onde clicar):</p>
-                <img id="tutImg" style="width:100%; border-radius:10px; border:1px solid #ddd;">
-            </div>
-
-            <button class="btn-confirm" id="btnGoTask" onclick="goToTask()" style="background:#4299e1;">🚀 Ir para Tarefa</button>
-            
-            <div id="uploadSection" style="display:none;">
-                <div class="upload-area" onclick="document.getElementById('fileIn').click()">
-                    <div id="upTxt">Enviar Print Comprovante</div>
-                    <img class="upload-preview" id="upPrev">
+            <div id="uploadSection" style="display: none;">
+                <div class="upload-area" onclick="document.getElementById('fileProof').click()">
+                    <div id="uploadText">
+                        <p style="font-size: 24px; margin-bottom: 10px;">📸</p>
+                        <p style="font-weight: bold;">Tirar Print do Comprovante</p>
+                        <p style="font-size: 12px; color: #718096; margin-top: 5px;">Clique aqui para enviar</p>
+                    </div>
+                    <img class="upload-preview" id="proofPreview">
                 </div>
-                <input type="file" id="fileIn" hidden accept="image/*" onchange="handleFile(this)">
-                <button class="btn-confirm" onclick="submitProof()">📤 Confirmar Envio</button>
+                <input type="file" id="fileProof" hidden accept="image/*" onchange="handleFile(this)">
+                <button class="btn-confirm" id="btnSubmitProof" onclick="submitProof()">📤 Confirmar Envio</button>
             </div>
 
             <div id="statusContainer"></div>
@@ -82,24 +94,56 @@
         </div>
     </div>
 
+    <div class="modal" id="withdrawModal">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 20px; text-align: center;">🏧 Solicitar Saque</h2>
+            <div id="withdrawAmounts" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                <button class="btn-cancel" style="border: 2px solid #e2e8f0;" onclick="selectAmount(20, 20000, this)">R$ 20,00</button>
+                <button class="btn-cancel" style="border: 2px solid #e2e8f0;" onclick="selectAmount(50, 50000, this)">R$ 50,00</button>
+                <button class="btn-cancel" style="border: 2px solid #e2e8f0;" onclick="selectAmount(100, 100000, this)">R$ 100,00</button>
+                <button class="btn-cancel" style="border: 2px solid #e2e8f0;" onclick="selectAmount(200, 200000, this)">R$ 200,00</button>
+            </div>
+            <div class="input-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-size: 14px;">Tipo de Chave Pix</label>
+                <select id="pixType" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <option>CPF</option><option>E-mail</option><option>Telefone</option><option>Chave Aleatória</option>
+                </select>
+            </div>
+            <div class="input-group" style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 5px; font-size: 14px;">Chave Pix</label>
+                <input type="text" id="pixKey" placeholder="Sua chave aqui" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+            </div>
+            <button class="btn-confirm" onclick="requestWithdrawal()">SOLICITAR PIX</button>
+            <button class="btn-cancel" onclick="closeModal('withdrawModal')">Cancelar</button>
+        </div>
+    </div>
+
     <div class="toast" id="toast"></div>
 
     <script>
         const DB_PREFIX = 'tarefapix_';
-        let userId, coins, tasks, currentTask, proofBase64;
+        let userId, coins, tasks = [], currentTask = null, proofBase64 = null;
+        let selectedWithdrawAmount = 0, selectedWithdrawCoins = 0;
 
         function init() {
-            userId = localStorage.getItem(DB_PREFIX + 'userId') || 'USER_' + Math.floor(Math.random()*900000);
+            userId = localStorage.getItem(DB_PREFIX + 'userId') || 'USER_' + Math.floor(Math.random() * 900000 + 100000);
             localStorage.setItem(DB_PREFIX + 'userId', userId);
             coins = parseInt(localStorage.getItem(DB_PREFIX + 'coins_' + userId)) || 0;
             document.getElementById('userIdDisplay').textContent = 'ID: ' + userId;
             updateBalance();
             renderTasks();
+            setInterval(renderTasks, 5000);
+        }
+
+        function updateBalance() {
+            document.getElementById('coinBalance').textContent = coins.toLocaleString();
+            document.getElementById('realBalance').textContent = (coins / 1000).toFixed(2);
         }
 
         function renderTasks() {
             tasks = JSON.parse(localStorage.getItem(DB_PREFIX + 'tasks') || '[]');
             const list = document.getElementById('taskList');
+            if (tasks.length === 0) { list.innerHTML = '<div style="text-align: center; padding: 40px; color: #a0aec0;">Nenhuma tarefa disponível no momento.</div>'; return; }
             list.innerHTML = tasks.map(t => `
                 <div class="task-card">
                     <div class="task-icon green">${t.icon}</div>
@@ -112,24 +156,33 @@
             `).join('');
         }
 
-        function openDoTask(id) {
-            currentTask = tasks.find(t => t.id === id);
+        function openDoTask(taskId) {
+            currentTask = tasks.find(t => t.id === taskId);
+            if (!currentTask) return;
+            const subs = JSON.parse(localStorage.getItem(DB_PREFIX + 'submissions') || '[]');
+            const existing = subs.find(s => s.taskId === taskId && s.user === userId);
+
             document.getElementById('doTaskIcon').textContent = currentTask.icon;
             document.getElementById('doTaskTitle').textContent = currentTask.title;
-            document.getElementById('doTaskReward').textContent = 'R$ ' + currentTask.reward.toFixed(2);
-            document.getElementById('taskSteps').innerHTML = `<strong>Passos:</strong><br>${currentTask.desc}`;
-            
-            // MOSTRAR FOTO TUTORIAL SE EXISTIR
-            if(currentTask.tutorialImg) {
-                document.getElementById('tutImg').src = currentTask.tutorialImg;
-                document.getElementById('tutBox').style.display = 'block';
-            } else {
-                document.getElementById('tutBox').style.display = 'none';
-            }
+            document.getElementById('doTaskReward').textContent = currentTask.reward.toFixed(2);
+            document.getElementById('taskSteps').innerHTML = `<p><strong>📋 Instruções:</strong></p><p>${currentTask.desc}</p>`;
 
-            document.getElementById('btnGoTask').style.display = 'block';
-            document.getElementById('uploadSection').style.display = 'none';
-            document.getElementById('statusContainer').innerHTML = '';
+            // TUTORIAL DISPLAY LOGIC
+            const tutBox = document.getElementById('tutorialBox');
+            if(currentTask.tutorialImg) {
+                document.getElementById('displayTutImg').src = currentTask.tutorialImg;
+                tutBox.style.display = 'block';
+            } else { tutBox.style.display = 'none'; }
+
+            if (existing) {
+                document.getElementById('statusContainer').innerHTML = `<div style="padding:15px; border-radius:12px; text-align:center; background:#eee;">Status: ${existing.status}</div>`;
+                document.getElementById('btnGoTask').style.display = 'none';
+                document.getElementById('uploadSection').style.display = 'none';
+            } else {
+                document.getElementById('statusContainer').innerHTML = '';
+                document.getElementById('btnGoTask').style.display = 'block';
+                document.getElementById('uploadSection').style.display = 'none';
+            }
             document.getElementById('doTaskModal').style.display = 'flex';
         }
 
@@ -140,40 +193,48 @@
         }
 
         function handleFile(input) {
+            const file = input.files[0];
             const reader = new FileReader();
-            reader.onload = (e) => {
-                proofBase64 = e.target.result;
-                document.getElementById('upPrev').src = e.target.result;
-                document.getElementById('upPrev').style.display = 'block';
-                document.getElementById('upTxt').style.display = 'none';
+            reader.onloadend = () => {
+                proofBase64 = reader.result;
+                document.getElementById('proofPreview').src = reader.result;
+                document.getElementById('proofPreview').style.display = 'block';
+                document.getElementById('uploadText').style.display = 'none';
             };
-            reader.readAsDataURL(input.files[0]);
+            if (file) reader.readAsDataURL(file);
         }
 
         function submitProof() {
-            if(!proofBase64) return showToast('Selecione a imagem!');
+            if (!proofBase64) { showToast('❌ Envie o comprovante!'); return; }
             const subs = JSON.parse(localStorage.getItem(DB_PREFIX + 'submissions') || '[]');
-            subs.push({
-                id: Date.now(),
-                user: userId,
-                taskId: currentTask.id,
-                taskTitle: currentTask.title,
-                coins: currentTask.coins,
-                image: proofBase64,
-                status: 'pending'
-            });
+            subs.push({ id: Date.now(), user: userId, taskId: currentTask.id, taskTitle: currentTask.title, coins: currentTask.coins, image: proofBase64, status: 'pending' });
             localStorage.setItem(DB_PREFIX + 'submissions', JSON.stringify(subs));
-            showToast('✅ Enviado com sucesso!');
+            showToast('✅ Enviado para análise!');
             closeModal('doTaskModal');
         }
 
-        function updateBalance() {
-            document.getElementById('coinBalance').textContent = coins.toLocaleString();
-            document.getElementById('realBalance').textContent = (coins / 1000).toFixed(2);
+        function openWithdrawModal() { document.getElementById('withdrawModal').style.display = 'flex'; }
+        function selectAmount(amt, cns, btn) {
+            selectedWithdrawAmount = amt; selectedWithdrawCoins = cns;
+            document.querySelectorAll('#withdrawAmounts button').forEach(b => b.style.borderColor = '#e2e8f0');
+            btn.style.borderColor = '#84cc16';
+        }
+
+        function requestWithdrawal() {
+            if (coins < selectedWithdrawCoins) { showToast('❌ Saldo insuficiente!'); return; }
+            const pixKey = document.getElementById('pixKey').value.trim();
+            if (!pixKey) { showToast('❌ Digite a chave Pix!'); return; }
+            const ws = JSON.parse(localStorage.getItem(DB_PREFIX + 'withdrawals') || '[]');
+            ws.push({ id: Date.now(), user: userId, amount: selectedWithdrawAmount, coins: selectedWithdrawCoins, pixType: document.getElementById('pixType').value, pixKey, status: 'pending' });
+            localStorage.setItem(DB_PREFIX + 'withdrawals', JSON.stringify(ws));
+            coins -= selectedWithdrawCoins;
+            localStorage.setItem(DB_PREFIX + 'coins_' + userId, coins);
+            updateBalance(); closeModal('withdrawModal');
+            showToast('✅ Saque solicitado!');
         }
 
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 3000); }
+        function showToast(msg) { const toast = document.getElementById('toast'); toast.textContent = msg; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 3000); }
         init();
     </script>
 </body>
