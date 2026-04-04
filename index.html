@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TarefaPix</title>
     <style>
-        /* Estilos originais mantidos */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: #f5f5f5; color: #333; }
         .app-container { min-height: 100vh; padding-bottom: 80px; }
@@ -21,40 +20,21 @@
         .task-icon { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
         .task-icon.green { background: #e6fffa; color: #38b2ac; }
         .task-content { flex: 1; }
-        .task-title { font-weight: bold; font-size: 15px; margin-bottom: 6px; color: #2d3748; }
-        .task-desc { font-size: 12px; color: #718096; margin-bottom: 6px; }
+        .task-title { font-weight: bold; font-size: 15px; margin-bottom: 4px; color: #2d3748; }
         .task-reward { color: #e53e3e; font-weight: bold; font-size: 14px; }
         .btn-ganhar { background: #84cc16; color: white; border: none; padding: 10px 24px; border-radius: 20px; font-weight: bold; font-size: 14px; cursor: pointer; }
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 10px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 100; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #a0aec0; text-decoration: none; font-size: 12px; position: relative; }
-        .nav-item.active { color: #84cc16; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background: white; border-radius: 20px; padding: 30px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; }
-        .btn-confirm { width: 100%; padding: 16px; background: #84cc16; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; }
-        .btn-cancel { width: 100%; margin-top: 10px; padding: 12px; background: #e2e8f0; border: none; border-radius: 8px; cursor: pointer; }
-        .upload-area { border: 2px dashed #cbd5e0; border-radius: 16px; padding: 30px; text-align: center; cursor: pointer; background: #f7fafc; }
+        .modal-content { background: white; border-radius: 20px; padding: 25px; width: 100%; max-width: 400px; max-height: 90vh; overflow-y: auto; position: relative; }
+        .btn-confirm { width: 100%; padding: 16px; background: #84cc16; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        .btn-cancel { width: 100%; margin-top: 10px; padding: 12px; background: #f5f5f5; border: none; border-radius: 8px; cursor: pointer; }
+        .upload-area { border: 2px dashed #cbd5e0; border-radius: 16px; padding: 30px; text-align: center; cursor: pointer; background: #f7fafc; margin-top: 15px; }
         .upload-preview { max-width: 100%; max-height: 200px; border-radius: 8px; display: none; margin: 0 auto; }
-        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(100px); background: #2d3748; color: white; padding: 16px 24px; border-radius: 12px; font-weight: 500; opacity: 0; transition: all 0.3s; z-index: 300; }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-        
-        /* ESTILO PARA A IMAGEM DE TUTORIAL NO APP */
-        .tutorial-container {
-            background: #fff;
-            border: 2px solid #84cc16;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            padding: 10px;
-            text-align: center;
-        }
-        .tutorial-container img {
-            max-width: 100%;
-            border-radius: 8px;
-            margin-top: 5px;
-        }
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #2d3748; color: white; padding: 12px 20px; border-radius: 10px; opacity: 0; transition: 0.3s; z-index: 1000; }
+        .toast.show { opacity: 1; }
     </style>
 </head>
 <body>
-    <div class="app-container" id="appContainer">
+    <div class="app-container">
         <div class="header">
             <div class="header-top">
                 <div class="balance">
@@ -68,38 +48,33 @@
             </div>
         </div>
 
-        <div id="tabContent"><div class="task-list" id="taskList"></div></div>
-
-        <nav class="bottom-nav">
-            <a href="#" class="nav-item active" onclick="showTab('tasks', this); return false;"><span>📦</span><span>Tarefa</span></a>
-            <a href="#" class="nav-item" onclick="showTab('myTasks', this); return false;"><span>📋</span><span>Minhas tarefas</span></a>
-            <a href="#" class="nav-item" onclick="showTab('withdraw', this); return false;"><span>🏧</span><span>Saque</span></a>
-        </nav>
+        <div class="task-list" id="taskList"></div>
     </div>
 
     <div class="modal" id="doTaskModal">
         <div class="modal-content">
-            <div style="text-align:center; margin-bottom: 20px;">
+            <div style="text-align:center; margin-bottom:15px;">
+                <div id="doTaskIcon" style="font-size:40px;">💳</div>
                 <h2 id="doTaskTitle">Tarefa</h2>
-                <p id="doTaskRewardDisplay" style="color:#e53e3e; font-weight:bold;">R$ 0.00</p>
+                <p id="doTaskReward" style="color:#e53e3e;font-weight:bold;">R$ 0.00</p>
             </div>
 
-            <div id="tutorialArea" class="tutorial-container" style="display:none;">
-                <p style="font-size:13px; font-weight:bold; color:#2d3748;">📸 Veja como fazer (Exemplo):</p>
-                <img id="tutorialImgView" src="">
-            </div>
-
-            <div id="taskSteps" style="background:#f7fafc;padding:15px;border-radius:12px;margin-bottom:15px; font-size: 14px;"></div>
+            <div id="taskSteps" style="background:#f7fafc;padding:15px;border-radius:12px;margin-bottom:15px; font-size:14px;"></div>
             
+            <div id="tutBox" style="display:none; margin-bottom:15px;">
+                <p style="font-weight:bold; font-size:12px; color:#667eea; margin-bottom:5px;">📸 Exemplo (Onde clicar):</p>
+                <img id="tutImg" style="width:100%; border-radius:10px; border:1px solid #ddd;">
+            </div>
+
             <button class="btn-confirm" id="btnGoTask" onclick="goToTask()" style="background:#4299e1;">🚀 Ir para Tarefa</button>
             
-            <div id="uploadSection" style="display:none;margin-top:15px;">
-                <div class="upload-area" onclick="document.getElementById('fileInput').click()">
-                    <div id="uploadText">Clique para enviar comprovante</div>
-                    <img class="upload-preview" id="uploadPreview">
+            <div id="uploadSection" style="display:none;">
+                <div class="upload-area" onclick="document.getElementById('fileIn').click()">
+                    <div id="upTxt">Enviar Print Comprovante</div>
+                    <img class="upload-preview" id="upPrev">
                 </div>
-                <input type="file" id="fileInput" hidden accept="image/*" onchange="handleFileSelect(event)">
-                <button class="btn-confirm" id="btnSubmitProof" onclick="submitProof()" style="margin-top:10px;">📤 Enviar Comprovante</button>
+                <input type="file" id="fileIn" hidden accept="image/*" onchange="handleFile(this)">
+                <button class="btn-confirm" onclick="submitProof()">📤 Confirmar Envio</button>
             </div>
 
             <div id="statusContainer"></div>
@@ -107,64 +82,49 @@
         </div>
     </div>
 
-    <div class="modal" id="withdrawModal">
-        <div class="modal-content">
-            <h2>💸 Sacar</h2>
-            <p>Saldo: R$ <span id="withdrawBalance">0.00</span></p>
-            <input type="text" id="pixKey" placeholder="Chave PIX" style="width:100%; padding:10px; margin: 10px 0;">
-            <button class="btn-confirm" onclick="processWithdraw()">Solicitar Saque</button>
-            <button class="btn-cancel" onclick="closeModal('withdrawModal')">Cancelar</button>
-        </div>
-    </div>
-
     <div class="toast" id="toast"></div>
 
     <script>
         const DB_PREFIX = 'tarefapix_';
-        let userId, coins, tasks, currentTask, selectedFile;
+        let userId, coins, tasks, currentTask, proofBase64;
 
         function init() {
-            userId = localStorage.getItem(DB_PREFIX + 'userId') || ('USER_' + Math.floor(Math.random()*900000+100000));
+            userId = localStorage.getItem(DB_PREFIX + 'userId') || 'USER_' + Math.floor(Math.random()*900000);
             localStorage.setItem(DB_PREFIX + 'userId', userId);
             coins = parseInt(localStorage.getItem(DB_PREFIX + 'coins_' + userId)) || 0;
+            document.getElementById('userIdDisplay').textContent = 'ID: ' + userId;
             updateBalance();
             renderTasks();
-            document.getElementById('userIdDisplay').textContent = 'ID: ' + userId;
         }
 
         function renderTasks() {
-            const list = document.getElementById('taskList');
             tasks = JSON.parse(localStorage.getItem(DB_PREFIX + 'tasks') || '[]');
-            const subs = JSON.parse(localStorage.getItem(DB_PREFIX + 'submissions') || '[]');
-            
-            const available = tasks.filter(t => !subs.find(s => s.taskId === t.id && s.user === userId));
-            
-            list.innerHTML = available.length ? available.map(t => `
-                <div class="task-card" onclick="openDoTask(${t.id})">
-                    <div class="task-icon green">💳</div>
+            const list = document.getElementById('taskList');
+            list.innerHTML = tasks.map(t => `
+                <div class="task-card">
+                    <div class="task-icon green">${t.icon}</div>
                     <div class="task-content">
                         <div class="task-title">${t.title}</div>
                         <div class="task-reward">R$ ${t.reward.toFixed(2)}</div>
                     </div>
-                    <button class="btn-ganhar">Ganhar</button>
+                    <button class="btn-ganhar" onclick="openDoTask(${t.id})">Ganhar</button>
                 </div>
-            `).join('') : '<p style="text-align:center; padding:20px;">Nenhuma tarefa disponível.</p>';
+            `).join('');
         }
 
-        function openDoTask(taskId) {
-            currentTask = tasks.find(t => t.id === taskId);
+        function openDoTask(id) {
+            currentTask = tasks.find(t => t.id === id);
+            document.getElementById('doTaskIcon').textContent = currentTask.icon;
             document.getElementById('doTaskTitle').textContent = currentTask.title;
-            document.getElementById('doTaskRewardDisplay').textContent = 'R$ ' + currentTask.reward.toFixed(2);
-            document.getElementById('taskSteps').innerHTML = `<strong>Instruções:</strong><br>${currentTask.desc}`;
+            document.getElementById('doTaskReward').textContent = 'R$ ' + currentTask.reward.toFixed(2);
+            document.getElementById('taskSteps').innerHTML = `<strong>Passos:</strong><br>${currentTask.desc}`;
             
-            // LÓGICA DA IMAGEM DE TUTORIAL
-            const tutorialArea = document.getElementById('tutorialArea');
-            const tutorialImg = document.getElementById('tutorialImgView');
-            if (currentTask.tutorialImg) {
-                tutorialImg.src = currentTask.tutorialImg;
-                tutorialArea.style.display = 'block';
+            // MOSTRAR FOTO TUTORIAL SE EXISTIR
+            if(currentTask.tutorialImg) {
+                document.getElementById('tutImg').src = currentTask.tutorialImg;
+                document.getElementById('tutBox').style.display = 'block';
             } else {
-                tutorialArea.style.display = 'none';
+                document.getElementById('tutBox').style.display = 'none';
             }
 
             document.getElementById('btnGoTask').style.display = 'block';
@@ -179,86 +139,41 @@
             document.getElementById('uploadSection').style.display = 'block';
         }
 
-        function handleFileSelect(e) {
-            const file = e.target.files[0];
-            if(file) {
-                selectedFile = file;
-                const reader = new FileReader();
-                reader.onload = (evt) => {
-                    document.getElementById('uploadPreview').src = evt.target.result;
-                    document.getElementById('uploadPreview').style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            }
+        function handleFile(input) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                proofBase64 = e.target.result;
+                document.getElementById('upPrev').src = e.target.result;
+                document.getElementById('upPrev').style.display = 'block';
+                document.getElementById('upTxt').style.display = 'none';
+            };
+            reader.readAsDataURL(input.files[0]);
         }
 
         function submitProof() {
-            if(!selectedFile) return showToast('Selecione a foto do comprovante!');
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const subs = JSON.parse(localStorage.getItem(DB_PREFIX + 'submissions') || '[]');
-                subs.push({
-                    id: Date.now(),
-                    user: userId,
-                    taskId: currentTask.id,
-                    taskTitle: currentTask.title,
-                    coins: currentTask.coins,
-                    image: e.target.result,
-                    status: 'pending'
-                });
-                localStorage.setItem(DB_PREFIX + 'submissions', JSON.stringify(subs));
-                showToast('Enviado com sucesso!');
-                closeModal('doTaskModal');
-                renderTasks();
-            };
-            reader.readAsDataURL(selectedFile);
-        }
-
-        function showTab(tab, el) {
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            el.classList.add('active');
-            if(tab === 'tasks') renderTasks();
-            if(tab === 'withdraw') {
-                document.getElementById('withdrawBalance').textContent = (coins/1000).toFixed(2);
-                document.getElementById('withdrawModal').style.display = 'flex';
-            }
-            if(tab === 'myTasks') renderMySubmissions();
-        }
-
-        function renderMySubmissions() {
-            const list = document.getElementById('taskList');
-            const subs = JSON.parse(localStorage.getItem(DB_PREFIX + 'submissions') || '[]').filter(s => s.user === userId);
-            list.innerHTML = '<h3>Minhas Tarefas</h3>' + subs.map(s => `
-                <div class="task-card">
-                    <div class="task-content">
-                        <strong>${s.taskTitle}</strong><br>
-                        <small>Status: ${s.status}</small>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function processWithdraw() {
-            const key = document.getElementById('pixKey').value;
-            if(!key || coins < 1000) return showToast('Saldo insuficiente ou chave vazia!');
-            const ws = JSON.parse(localStorage.getItem(DB_PREFIX + 'withdrawals') || '[]');
-            ws.push({ id: Date.now(), user: userId, amount: coins/1000, pixKey: key, pixType: 'Pix', status: 'pending', coins: coins });
-            localStorage.setItem(DB_PREFIX + 'withdrawals', JSON.stringify(ws));
-            coins = 0;
-            localStorage.setItem(DB_PREFIX + 'coins_' + userId, 0);
-            updateBalance();
-            closeModal('withdrawModal');
-            showToast('Saque solicitado!');
+            if(!proofBase64) return showToast('Selecione a imagem!');
+            const subs = JSON.parse(localStorage.getItem(DB_PREFIX + 'submissions') || '[]');
+            subs.push({
+                id: Date.now(),
+                user: userId,
+                taskId: currentTask.id,
+                taskTitle: currentTask.title,
+                coins: currentTask.coins,
+                image: proofBase64,
+                status: 'pending'
+            });
+            localStorage.setItem(DB_PREFIX + 'submissions', JSON.stringify(subs));
+            showToast('✅ Enviado com sucesso!');
+            closeModal('doTaskModal');
         }
 
         function updateBalance() {
-            document.getElementById('coinBalance').textContent = coins;
-            document.getElementById('realBalance').textContent = (coins/1000).toFixed(2);
+            document.getElementById('coinBalance').textContent = coins.toLocaleString();
+            document.getElementById('realBalance').textContent = (coins / 1000).toFixed(2);
         }
 
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
         function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 3000); }
-
         init();
     </script>
 </body>
