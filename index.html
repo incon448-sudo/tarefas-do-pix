@@ -101,7 +101,7 @@
                 <h2 id="doTaskTitle">Tarefa</h2>
                 <p style="color:#e53e3e;font-weight:bold;">💰 R$ <span id="doTaskReward">0.00</span></p>
             </div>
-            <img id="displayTutImg" style="width: 100%; border-radius: 12px; display: none; margin-bottom: 15px; border: 2px solid #667eea;">
+            <div id="taskSteps" style="background:#f7fafc;padding:15px;border-radius:12px;margin-bottom:15px;"></div>
             <button class="btn-confirm" id="btnGoTask" onclick="goToTask()" style="background:#4299e1;">🚀 Ir para Tarefa</button>
             <div id="uploadSection" style="display:none;margin-top:15px;">
                 <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
@@ -183,14 +183,12 @@
         }
 
         function showApp() {
-                    // Código para carregar a imagem
-            const tutImg = document.getElementById('displayTutImg');
-            if (currentTask.tutorialImg) {
-                tutImg.src = currentTask.tutorialImg;
-                tutImg.style.display = 'block';
-            } else {
-                tutImg.style.display = 'none';
-            }
+            document.getElementById('userIdDisplay').textContent = 'ID: ' + userId;
+            loadMySubmissions();
+            showTab('tasks', document.querySelector('.nav-item.active'));
+            updateBalance();
+            updateBadge();
+        }
 
         function showTab(tab, element) {
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
