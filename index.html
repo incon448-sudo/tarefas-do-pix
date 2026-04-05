@@ -1,132 +1,145 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TarefaPix</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    <style>
-        /* Mantendo seu estilo original */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: #f5f5f5; color: #333; }
-        .app-container { min-height: 100vh; padding-bottom: 80px; }
-        .header { background: #2d3748; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .balance-card { background: white; margin: 15px; padding: 20px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); text-align: center; }
-        .coin-amount { font-size: 32px; font-weight: bold; color: #2d3748; }
-        .task-card { background: white; margin: 10px 15px; padding: 15px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #eee; }
-        .task-info h3 { font-size: 16px; margin-bottom: 4px; }
-        .task-reward { color: #38a169; font-weight: bold; font-size: 14px; }
-        .btn-earn { background: #4a90e2; color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; }
-        
-        /* Modal da Tarefa */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
-        .modal-content { background: white; width: 90%; max-width: 400px; border-radius: 20px; padding: 20px; max-height: 90vh; overflow-y: auto; }
-        .tut-img { width: 100%; border-radius: 12px; margin-top: 15px; border: 1px solid #ddd; display: none; }
-        .btn-go { background: #38a169; color: white; width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; margin-top: 15px; }
-    </style>
-</head>
-<body>
+import { useState, useEffect } from "react"; import { Card, CardContent } from "@/components/ui/card"; import { Button } from "@/components/ui/button"; import { Input } from "@/components/ui/input"; import { Textarea } from "@/components/ui/textarea"; import { Upload } from "lucide-react";
 
-    <div class="app-container">
-        <div class="header">
-            <span>TarefaPix</span>
-            <div id="userBalance">R$ 0,00</div>
+// 🔥 FIREBASE import { initializeApp } from "firebase/app"; import { getDatabase, ref, push, onValue, update } from "firebase/database";
+
+const firebaseConfig = { databaseURL: "https://tarefa-pix-default-rtdb.firebaseio.com/", };
+
+const app = initializeApp(firebaseConfig); const db = getDatabase(app);
+
+export default function TaskApp() { // 🔐 ADMIN const [isAdmin, setIsAdmin] = useState(false); const [password, setPassword] = useState(""); const ADMIN_PASSWORD = "1234";
+
+const [tasks, setTasks] = useState([]); const [title, setTitle] = useState(""); const [description, setDescription] = useState(""); const [image, setImage] = useState(null);
+
+const login = () => { if (password === ADMIN_PASSWORD) { setIsAdmin(true); setPassword(""); } else { alert("Senha incorreta"); } };
+
+// 🔥 CARREGAR DO FIREBASE useEffect(() => { const taskRef = ref(db, "tarefas");
+
+onValue(taskRef, (snapshot) => {
+  const data = snapshot.val();
+  if (data) {
+    const lista = Object.keys(data).map((key) => ({
+      id: key,
+      ...data[key],
+    }));
+    setTasks(lista);
+  } else {
+    setTasks([]);
+  }
+});
+
+}, []);
+
+// ➕ ADICIONAR TAREFA (FIREBASE) const addTask = () => { if (!title) return;
+
+const taskRef = ref(db, "tarefas");
+
+push(taskRef, {
+  title,
+  description,
+  image: image ? URL.createObjectURL(image) : null,
+  completed: false,
+});
+
+setTitle("");
+setDescription("");
+setImage(null);
+
+};
+
+// ✅ CONCLUIR TAREFA (ATUALIZA NO FIREBASE) const toggleTask = (task) => { const taskRef = ref(db, tarefas/${task.id});
+
+update(taskRef, {
+  completed: !task.completed,
+});
+
+};
+
+return ( <div className="p-6 max-w-3xl mx-auto"> <h1 className="text-2xl font-bold mb-4">TarefaPix</h1>
+
+{/* LOGIN */}
+  {!isAdmin && (
+    <Card className="mb-6">
+      <CardContent className="p-4 space-y-3">
+        <h2 className="font-semibold">Painel do Administrador</h2>
+        <Input
+          type="password"
+          placeholder="Digite a senha"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <Button onClick={login}>Entrar</Button>
+      </CardContent>
+    </Card>
+  )}
+
+  {/* CRIAR TAREFA */}
+  {isAdmin && (
+    <Card className="mb-6">
+      <CardContent className="p-4 space-y-3">
+        <h2 className="font-semibold">Criar Tarefa</h2>
+
+        <Input
+          placeholder="Título da tarefa"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+
+        <Textarea
+          placeholder="Descrição / tutorial"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <Upload size={18} />
+            <span>Enviar imagem</span>
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => setImage(e.target.files[0])}
+            />
+          </label>
+
+          <Button onClick={addTask}>Adicionar</Button>
         </div>
+      </CardContent>
+    </Card>
+  )}
 
-        <div class="balance-card">
-            <p>Seu Saldo</p>
-            <div class="coin-amount" id="coinDisplay">0</div>
-            <p style="color: #718096; font-size: 14px;">Moedas acumuladas</p>
-        </div>
+  {/* LISTA */}
+  <div className="space-y-4">
+    {tasks.map((task) => (
+      <Card key={task.id}>
+        <CardContent className="p-4">
+          <div className="flex justify-between items-center">
+            <h2
+              className={`font-semibold ${
+                task.completed ? "line-through text-gray-400" : ""
+              }`}
+            >
+              {task.title}
+            </h2>
 
-        <div id="taskList">
-            <p style="text-align:center; margin-top:20px;">Carregando tarefas...</p>
-        </div>
-    </div>
+            <Button size="sm" onClick={() => toggleTask(task)}>
+              {task.completed ? "Desfazer" : "Concluir"}
+            </Button>
+          </div>
 
-    <div id="taskModal" class="modal">
-        <div class="modal-content">
-            <h2 id="mTitle">Título</h2>
-            <div id="mDesc" style="margin-top:10px; color: #4a5568;"></div>
-            
-            <img id="displayTutImg" class="tut-img">
-            
-            <button id="btnGo" class="btn-go" onclick="irParaTarefa()">IR PARA TAREFA</button>
-            <button onclick="closeModal()" style="width:100%; background:none; border:none; color:#718096; margin-top:10px;">Fechar</button>
-        </div>
-    </div>
+          <p className="text-sm mt-2">{task.description}</p>
 
-    <script>
-        // CONFIGURAÇÃO FIREBASE
-        const firebaseConfig = { databaseURL: "https://tarefa-pix-default-rtdb.firebaseio.com/" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+          {task.image && (
+            <img
+              src={task.image}
+              alt="tutorial"
+              className="mt-3 rounded-xl max-h-60"
+            />
+          )}
+        </CardContent>
+      </Card>
+    ))}
+  </div>
+</div>
 
-        let tasks = [];
-        let currentTask = null;
-
-        // 1. CARREGAR TAREFAS EM TEMPO REAL
-        function initApp() {
-            db.ref('tasks').on('value', (snapshot) => {
-                const data = snapshot.val();
-                tasks = [];
-                const listDiv = document.getElementById('taskList');
-                listDiv.innerHTML = "";
-
-                if (!data) {
-                    listDiv.innerHTML = "<p style='text-align:center;'>Nenhuma tarefa disponível.</p>";
-                    return;
-                }
-
-                for (let id in data) {
-                    const t = data[id];
-                    tasks.push({ id: id, ...t });
-                    
-                    listDiv.innerHTML += `
-                        <div class="task-card">
-                            <div class="task-info">
-                                <h3>${t.title}</h3>
-                                <div class="task-reward">Ganhe R$ ${t.reward.toFixed(2)}</div>
-                            </div>
-                            <button class="btn-earn" onclick="openTask('${id}')">GANHAR</button>
-                        </div>
-                    `;
-                }
-            });
-        }
-
-        // 2. ABRIR MODAL COM FOTO DO TUTORIAL
-        function openTask(id) {
-            currentTask = tasks.find(t => t.id === id);
-            if (!currentTask) return;
-
-            document.getElementById('mTitle').textContent = currentTask.title;
-            document.getElementById('mDesc').innerHTML = `<strong>Instruções:</strong><br>${currentTask.desc}`;
-
-            const imgTag = document.getElementById('displayTutImg');
-            if (currentTask.tutorialImg) {
-                imgTag.src = currentTask.tutorialImg;
-                imgTag.style.display = 'block';
-            } else {
-                imgTag.style.display = 'none';
-            }
-
-            document.getElementById('taskModal').style.display = 'flex';
-        }
-
-        function irParaTarefa() {
-            if (currentTask && currentTask.link) {
-                window.open(currentTask.link, '_blank');
-            }
-        }
-
-        function closeModal() {
-            document.getElementById('taskModal').style.display = 'none';
-        }
-
-        // Inicia o App
-        initApp();
-    </script>
-</body>
-</html>
+); }
