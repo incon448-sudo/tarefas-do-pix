@@ -8,7 +8,7 @@ const app = initializeApp(firebaseConfig); const db = getDatabase(app);
 
 export default function TaskApp() { // 🔐 ADMIN const [isAdmin, setIsAdmin] = useState(false); const [password, setPassword] = useState(""); const ADMIN_PASSWORD = "1234";
 
-const [tasks, setTasks] = useState([]); const [title, setTitle] = useState(""); const [description, setDescription] = useState(""); const [image, setImage] = useState(null);
+const [tasks, setTasks] = useState([]); const [title, setTitle] = useState(""); const [description, setDescription] = useState(""); const [image, setImage] = useState(null); const [value, setValue] = useState(""); // 💰 valor da tarefa
 
 const login = () => { if (password === ADMIN_PASSWORD) { setIsAdmin(true); setPassword(""); } else { alert("Senha incorreta"); } };
 
@@ -29,24 +29,27 @@ onValue(taskRef, (snapshot) => {
 
 }, []);
 
-// ➕ ADICIONAR TAREFA (FIREBASE) const addTask = () => { if (!title) return;
+// ➕ ADICIONAR TAREFA COM VALOR 💰 const addTask = () => { if (!title || !value) return;
 
 const taskRef = ref(db, "tarefas");
 
 push(taskRef, {
   title,
   description,
+  value,
   image: image ? URL.createObjectURL(image) : null,
   completed: false,
+  paid: false, // controle de pagamento
 });
 
 setTitle("");
 setDescription("");
 setImage(null);
+setValue("");
 
 };
 
-// ✅ CONCLUIR TAREFA (ATUALIZA NO FIREBASE) const toggleTask = (task) => { const taskRef = ref(db, tarefas/${task.id});
+// ✅ CONCLUIR TAREFA const toggleTask = (task) => { const taskRef = ref(db, tarefas/${task.id});
 
 update(taskRef, {
   completed: !task.completed,
@@ -54,7 +57,15 @@ update(taskRef, {
 
 };
 
-return ( <div className="p-6 max-w-3xl mx-auto"> <h1 className="text-2xl font-bold mb-4">TarefaPix</h1>
+// 💸 MARCAR COMO PAGO (ADMIN) const markAsPaid = (task) => { const taskRef = ref(db, tarefas/${task.id});
+
+update(taskRef, {
+  paid: true,
+});
+
+};
+
+return ( <div className="p-6 max-w-3xl mx-auto"> <h1 className="text-2xl font-bold mb-4">TarefaPix 💰</h1>
 
 {/* LOGIN */}
   {!isAdmin && (
@@ -90,6 +101,12 @@ return ( <div className="p-6 max-w-3xl mx-auto"> <h1 className="text-2xl font-bo
           onChange={(e) => setDescription(e.target.value)}
         />
 
+        <Input
+          placeholder="Valor (R$)"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
+
         <div className="flex items-center gap-2">
           <label className="flex items-center gap-2 cursor-pointer">
             <Upload size={18} />
@@ -114,13 +131,16 @@ return ( <div className="p-6 max-w-3xl mx-auto"> <h1 className="text-2xl font-bo
       <Card key={task.id}>
         <CardContent className="p-4">
           <div className="flex justify-between items-center">
-            <h2
-              className={`font-semibold ${
-                task.completed ? "line-through text-gray-400" : ""
-              }`}
-            >
-              {task.title}
-            </h2>
+            <div>
+              <h2
+                className={`font-semibold ${
+                  task.completed ? "line-through text-gray-400" : ""
+                }`}
+              >
+                {task.title}
+              </h2>
+              <p className="text-green-600 font-bold">R$ {task.value}</p>
+            </div>
 
             <Button size="sm" onClick={() => toggleTask(task)}>
               {task.completed ? "Desfazer" : "Concluir"}
@@ -136,6 +156,19 @@ return ( <div className="p-6 max-w-3xl mx-auto"> <h1 className="text-2xl font-bo
               className="mt-3 rounded-xl max-h-60"
             />
           )}
+
+          {/* STATUS PAGAMENTO */}
+          <div className="mt-3">
+            {task.paid ? (
+              <span className="text-green-500 font-semibold">Pago ✅</span>
+            ) : (
+              isAdmin && (
+                <Button size="sm" onClick={() => markAsPaid(task)}>
+                  Marcar como Pago 💸
+                </Button>
+              )
+            )}
+          </div>
         </CardContent>
       </Card>
     ))}
