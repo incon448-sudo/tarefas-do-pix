@@ -535,13 +535,14 @@
         }
         
         // ============================================
-        // TAREFAS
+        // TAREFAS - CORRIGIDO: Uma vez feita, some da aba "Tarefas"
         // ============================================
         function loadTasks() {
             const content = document.getElementById('content');
             content.innerHTML = '<div class="empty-state" style="color: white;"><div class="loading"></div><p>Carregando...</p></div>';
             
             if (currentTab === 'available') {
+                // Carregar tarefas disponíveis (apenas as que o usuário NUNCA fez)
                 database.ref('tasks').on('value', (snapshot) => {
                     const tasks = snapshot.val() || {};
                     database.ref('userTasks/' + currentUser).once('value').then((userSnapshot) => {
@@ -552,19 +553,23 @@
                         Object.keys(tasks).forEach(taskId => {
                             const task = tasks[taskId];
                             const userTask = userTasks[taskId];
-                            if (!userTask || userTask.status === 'rejected') {
+                            
+                            // ✅ CORREÇÃO: Mostrar apenas se NUNCA foi feita (nem pending, nem approved, nem rejected)
+                            // UMA VEZ FEITA = SOME DAQUI
+                            if (!userTask) {
                                 hasTasks = true;
-                                html += createTaskCard(task, taskId, userTask);
+                                html += createTaskCard(task, taskId);
                             }
                         });
                         
                         if (!hasTasks) {
-                            html = `<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 15px;">🎉</div><h3>Você completou todas as tarefas!</h3></div>`;
+                            html = `<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 15px;">🎉</div><h3>Nenhuma tarefa disponível</h3><p style="margin-top: 10px; opacity: 0.8;">Você já fez todas as tarefas!</p></div>`;
                         }
                         content.innerHTML = html;
                     });
                 });
             } else {
+                // Abas "Minhas Tarefas" - mostrar TODAS as tarefas do usuário (pending, approved, rejected)
                 database.ref('userTasks/' + currentUser).on('value', (snapshot) => {
                     const userTasks = snapshot.val() || {};
                     if (Object.keys(userTasks).length === 0) {
@@ -572,12 +577,15 @@
                         return;
                     }
                     let html = '';
+                    let taskCount = 0;
+                    
                     Object.keys(userTasks).forEach(taskId => {
                         const userTask = userTasks[taskId];
                         database.ref('tasks/' + taskId).once('value').then((taskSnap) => {
                             const task = taskSnap.val();
                             if (task) {
                                 html += createMyTaskCard(task, userTask, taskId);
+                                taskCount++;
                                 content.innerHTML = html;
                             }
                         });
@@ -586,7 +594,7 @@
             }
         }
         
-        function createTaskCard(task, taskId, userTask) {
+        function createTaskCard(task, taskId) {
             const hasTutorial = task.tutorialImage ? true : false;
             return `
                 <div class="task-card">
@@ -600,7 +608,7 @@
                     </div>
                     ${hasTutorial ? `<button class="tutorial-btn" onclick="showTutorial('${taskId}')">📖 Ver Tutorial</button>` : ''}
                     <button class="btn-task" onclick="startTask('${taskId}', '${task.link}')">
-                        ${userTask?.status === 'rejected' ? '❌ Rejeitado - Tentar Novamente' : '👉 Fazer Agora'}
+                        👉 Fazer Agora
                     </button>
                 </div>
             `;
