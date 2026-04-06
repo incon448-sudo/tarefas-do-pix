@@ -102,7 +102,8 @@
             transition: transform 0.2s;
         }
 
-        .promo-card {
+        /* ===== CUPOM CARD ===== */
+        .cupom-card {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             margin: 0 20px 20px 20px;
             padding: 20px;
@@ -111,7 +112,7 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
-        .promo-title {
+        .cupom-title {
             font-size: 1.1rem;
             font-weight: bold;
             margin-bottom: 10px;
@@ -120,13 +121,13 @@
             gap: 8px;
         }
 
-        .promo-input-group {
+        .cupom-input-group {
             display: flex;
             gap: 10px;
             margin-bottom: 10px;
         }
 
-        .promo-input {
+        .cupom-input {
             flex: 1;
             padding: 12px;
             border: none;
@@ -135,7 +136,7 @@
             text-transform: uppercase;
         }
 
-        .promo-btn {
+        .cupom-btn {
             background: rgba(255,255,255,0.3);
             color: white;
             border: 2px solid white;
@@ -146,12 +147,12 @@
             transition: all 0.3s;
         }
 
-        .promo-btn:hover {
+        .cupom-btn:hover {
             background: white;
             color: #f5576c;
         }
 
-        .promo-status {
+        .cupom-status {
             font-size: 0.9rem;
             margin-top: 10px;
             padding: 8px;
@@ -160,15 +161,15 @@
             display: none;
         }
 
-        .promo-status.show {
+        .cupom-status.show {
             display: block;
         }
 
-        .promo-status.success {
+        .cupom-status.success {
             background: rgba(40, 167, 69, 0.3);
         }
 
-        .promo-status.error {
+        .cupom-status.error {
             background: rgba(220, 53, 69, 0.3);
         }
 
@@ -465,25 +466,25 @@
         <button class="btn-saque" onclick="openSaqueModal()">💳 Sacar Dinheiro</button>
     </div>
 
-    <!-- NOVO: Card de Código Promocional -->
-    <div class="promo-card">
-        <div class="promo-title">
+    <!-- ===== CUPOM PROMOCIONAL ===== -->
+    <div class="cupom-card">
+        <div class="cupom-title">
             🎁 Código Promocional
         </div>
         <p style="font-size: 0.9rem; margin-bottom: 12px; opacity: 0.9;">
             Digite um código válido e ganhe bônus!
         </p>
-        <div class="promo-input-group">
+        <div class="cupom-input-group">
             <input type="text" 
-                   id="promoCode" 
-                   class="promo-input" 
-                   placeholder="Ex: A18B766"
+                   id="cupomCode" 
+                   class="cupom-input" 
+                   placeholder="Ex: META300"
                    maxlength="10">
-            <button class="promo-btn" onclick="applyPromoCode()">
-                Aplicar
+            <button class="cupom-btn" onclick="resgatarCupom()">
+                Resgatar
             </button>
         </div>
-        <div id="promoStatus" class="promo-status"></div>
+        <div id="cupomStatus" class="cupom-status"></div>
     </div>
 
     <div class="tabs">
@@ -493,7 +494,7 @@
 
     <div class="content" id="content"></div>
 
-    <!-- NOVO: Botão de Suporte Telegram -->
+    <!-- Botão de Suporte Telegram -->
     <a href="https://t.me/+la54Ed6p0wE1Y2Qx" 
        target="_blank" 
        class="support-btn" 
@@ -594,13 +595,13 @@
         // CONFIGURAÇÃO FIREBASE
         // ============================================
         const firebaseConfig = {
-            apiKey: "AIzaSyCVR7V_5zwbCZbyl0P0Xw9-XXXXXXXXXXXX",
+            apiKey: "AIzaSyA1r_PfVzXqDLxI52znZpopBjvlz2W2WzQ",
             authDomain: "tarefa-pix.firebaseapp.com",
             databaseURL: "https://tarefa-pix-default-rtdb.firebaseio.com",
             projectId: "tarefa-pix",
-            storageBucket: "tarefa-pix.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:abcdef123456"
+            storageBucket: "tarefa-pix.firebasestorage.app",
+            messagingSenderId: "16378804197",
+            appId: "1:16378804197:web:0e95c0fd5440ec4e7e2106"
         };
 
         firebase.initializeApp(firebaseConfig);
@@ -647,7 +648,6 @@
             document.getElementById('userIdDisplay').textContent = userId;
             loadBalance();
             loadTasks();
-            checkUsedPromoCodes();
         }
 
         function loadBalance() {
@@ -659,90 +659,77 @@
         }
 
         // ============================================
-        // CÓDIGO PROMOCIONAL - SÓ VOCÊ GERA
+        // SISTEMA DE CUPONS - NOVO!
         // ============================================
-        async function applyPromoCode() {
-            const codeInput = document.getElementById('promoCode');
-            const statusDiv = document.getElementById('promoStatus');
+        async function resgatarCupom() {
+            const codeInput = document.getElementById('cupomCode');
+            const statusDiv = document.getElementById('cupomStatus');
             const code = codeInput.value.trim().toUpperCase();
 
             if (!code) {
-                showPromoStatus('❌ Digite um código!', 'error');
+                showCupomStatus('❌ Digite um código!', 'error');
                 return;
             }
 
             try {
-                // Verificar se código existe e tem vagas
-                const codeSnapshot = await database.ref('promoCodes/' + code).once('value');
-                const codeData = codeSnapshot.val();
+                // Verificar se cupom existe
+                const cupomSnapshot = await database.ref('cupons/' + code).once('value');
+                const cupom = cupomSnapshot.val();
 
-                if (!codeData) {
-                    showPromoStatus('❌ Código inválido!', 'error');
+                if (!cupom) {
+                    showCupomStatus('❌ Código inválido!', 'error');
                     return;
                 }
 
-                // Verificar se usuário já usou este código
-                const userCodeSnapshot = await database.ref('userPromoCodes/' + currentUser + '/' + code).once('value');
-                if (userCodeSnapshot.exists()) {
-                    showPromoStatus('❌ Você já usou este código!', 'error');
+                // Verificar se já foi usado
+                if (cupom.status === 'usado') {
+                    showCupomStatus('❌ Este cupom já foi usado!', 'error');
                     return;
                 }
 
-                // Verificar se código atingiu limite de 8 pessoas
-                const usesSnapshot = await database.ref('promoCodeUses/' + code).once('value');
-                const uses = usesSnapshot.val() || 0;
-
-                if (uses >= 8) {
-                    showPromoStatus('❌ Este código já atingiu o limite de 8 usuários!', 'error');
+                // Verificar se usuário já usou este cupom
+                const userCupomSnapshot = await database.ref('users/' + currentUser + '/cupons/' + code).once('value');
+                if (userCupomSnapshot.exists()) {
+                    showCupomStatus('❌ Você já resgatou este cupom!', 'error');
                     return;
                 }
 
-                // Aplicar bônus (ex: R$ 1,00)
-                const bonus = codeData.bonus || 1.00;
-                const newBalance = saldoAtual + bonus;
+                // Tudo certo! Resgatar cupom
+                const valor = cupom.valor || 1.50;
+                const novoSaldo = saldoAtual + valor;
 
-                // Salvar no banco
-                await database.ref('users/' + currentUser + '/balance').set(newBalance);
-                await database.ref('userPromoCodes/' + currentUser + '/' + code).set({
-                    usedAt: Date.now(),
-                    bonus: bonus
-                });
-                await database.ref('promoCodeUses/' + code).set(uses + 1);
+                // Atualizar tudo no Firebase
+                const updates = {};
+                updates['cupons/' + code + '/status'] = 'usado';
+                updates['cupons/' + code + '/usadoPor'] = currentUser;
+                updates['cupons/' + code + '/dataUso'] = Date.now();
+                updates['users/' + currentUser + '/balance'] = novoSaldo;
+                updates['users/' + currentUser + '/cupons/' + code] = {
+                    codigo: code,
+                    valor: valor,
+                    dataResgate: Date.now()
+                };
 
-                // Registrar no histórico
-                await database.ref('promoCodeHistory/' + code + '/' + currentUser).set({
-                    usedAt: Date.now(),
-                    bonus: bonus
-                });
+                await database.ref().update(updates);
 
-                showPromoStatus(`✅ Código aplicado! +R$ ${bonus.toFixed(2)} adicionados!`, 'success');
+                showCupomStatus(`✅ Cupom resgatado! +R$ ${valor.toFixed(2)} adicionados!`, 'success');
                 codeInput.value = '';
-                showToast(`🎁 +R$ ${bonus.toFixed(2)} de bônus!`);
+                showToast(`🎁 +R$ ${valor.toFixed(2)} de bônus!`);
 
             } catch (error) {
                 console.error('Erro:', error);
-                showPromoStatus('❌ Erro ao aplicar código!', 'error');
+                showCupomStatus('❌ Erro ao resgatar cupom!', 'error');
             }
         }
 
-        function showPromoStatus(message, type) {
-            const statusDiv = document.getElementById('promoStatus');
+        function showCupomStatus(message, type) {
+            const statusDiv = document.getElementById('cupomStatus');
             statusDiv.textContent = message;
-            statusDiv.className = 'promo-status show ' + type;
+            statusDiv.className = 'cupom-status show ' + type;
 
             setTimeout(() => {
                 statusDiv.classList.remove('show');
             }, 5000);
-        }
-
-        async function checkUsedPromoCodes() {
-            // Verificar códigos já usados pelo usuário (para mostrar no futuro)
-            const snapshot = await database.ref('userPromoCodes/' + currentUser).once('value');
-            const usedCodes = snapshot.val() || {};
-
-            if (Object.keys(usedCodes).length > 0) {
-                console.log('Códigos já usados:', usedCodes);
-            }
         }
 
         // ============================================
