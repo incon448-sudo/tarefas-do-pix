@@ -335,7 +335,6 @@
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
         
-        /* ESTILOS DO SAQUE */
         .saque-valor-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -406,13 +405,19 @@
             margin: 5px 0;
         }
         
-        .saldo-insuficiente {
-            background: #f8d7da;
-            color: #721c24;
+        .upload-status {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            color: #1565c0;
             padding: 10px;
-            border-radius: 10px;
+            border-radius: 8px;
             margin-bottom: 15px;
-            text-align: center;
+            font-size: 0.9rem;
+            display: none;
+        }
+        
+        .upload-status.show {
+            display: block;
         }
     </style>
 </head>
@@ -443,6 +448,8 @@
             <h3 class="modal-title">📸 Enviar Comprovante</h3>
             <p style="color: #666; margin-bottom: 15px; text-align: center;">Tire um print da tela confirmando a recarga</p>
             
+            <div id="uploadStatus" class="upload-status"></div>
+            
             <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
                 <div id="uploadText">
                     📷 Clique para tirar foto<br>
@@ -452,7 +459,7 @@
             </div>
             <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
             
-            <button class="btn-submit" onclick="submitComprovante()">Enviar Comprovante</button>
+            <button class="btn-submit" id="btnSubmitComprovante" onclick="submitComprovante()">Enviar Comprovante</button>
             <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
         </div>
     </div>
@@ -474,21 +481,11 @@
                 Saldo disponível: <strong style="color: #667eea;">R$ <span id="saldoDisponivel">0,00</span></strong>
             </p>
             
-            <button class="saque-valor-btn" onclick="selecionarValorSaque(1)">
-                💵 R$ 1,00
-            </button>
-            <button class="saque-valor-btn" onclick="selecionarValorSaque(2)">
-                💵 R$ 2,00
-            </button>
-            <button class="saque-valor-btn" onclick="selecionarValorSaque(3)">
-                💵 R$ 3,00
-            </button>
-            <button class="saque-valor-btn" onclick="selecionarValorSaque(4)">
-                💵 R$ 4,00
-            </button>
-            <button class="saque-valor-btn" onclick="selecionarValorSaque(5)">
-                💵 R$ 5,00
-            </button>
+            <button class="saque-valor-btn" onclick="selecionarValorSaque(1)">💵 R$ 1,00</button>
+            <button class="saque-valor-btn" onclick="selecionarValorSaque(2)">💵 R$ 2,00</button>
+            <button class="saque-valor-btn" onclick="selecionarValorSaque(3)">💵 R$ 3,00</button>
+            <button class="saque-valor-btn" onclick="selecionarValorSaque(4)">💵 R$ 4,00</button>
+            <button class="saque-valor-btn" onclick="selecionarValorSaque(5)">💵 R$ 5,00</button>
             
             <button class="btn-cancel" onclick="closeSaqueModal()">Cancelar</button>
         </div>
@@ -766,10 +763,17 @@
             }, 1000);
         }
         
+        function showUploadStatus(message) {
+            const statusDiv = document.getElementById('uploadStatus');
+            statusDiv.textContent = message;
+            statusDiv.classList.add('show');
+        }
+        
         function handleFileSelect(event) {
             const file = event.target.files[0];
             if (file) {
                 selectedFile = file;
+                console.log('Arquivo selecionado:', file.name, '-', (file.size/1024).toFixed(2), 'KB');
                 
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -777,11 +781,15 @@
                     document.getElementById('previewImage').style.display = 'block';
                     document.getElementById('uploadText').style.display = 'none';
                     document.getElementById('uploadArea').classList.add('has-file');
+                    showUploadStatus('📷 Imagem selecionada: ' + file.name);
                 };
                 reader.readAsDataURL(file);
             }
         }
         
+        // ============================================
+        // SUBMIT COMPROVANTE - CORRIGIDO
+        // ============================================
         async function submitComprovante() {
             if (!selectedFile) {
                 showToast('❌ Selecione uma imagem primeiro!');
@@ -793,16 +801,51 @@
                 return;
             }
             
-            const btn = document.querySelector('#uploadModal .btn-submit');
+            const btn = document.getElementById('btnSubmitComprovante');
             btn.innerHTML = '<span class="loading"></span> Enviando...';
             btn.disabled = true;
+            showUploadStatus('⬆️ Enviando comprovante...');
             
             try {
-                const fileName = `comprovantes/${currentUser}/${currentTask}_${Date.now()}.jpg`;
-                const storageRef = storage.ref(fileName);
-                await storageRef.put(selectedFile);
-                const imageUrl = await storageRef.getDownloadURL();
+                console.log('Iniciando upload do comprovante...');
                 
+                // Verificar storage
+                if (!storage) {
+                    throw new Error('Storage não disponível');
+                }
+                
+                // Criar nome do arquivo
+                const timestamp = Date.now();
+                const safeName = selectedFile.name.replace(/[^a-zA-Z0-9.]/g, '_');
+                const fileName = 'comprovantes/' + currentUser + '/' + currentTask + '_' + timestamp + '_' + safeName;
+                
+                console.log('Caminho:', fileName);
+                showUploadStatus('⬆️ Enviando para o servidor...');
+                
+                const storageRef = storage.ref(fileName);
+                
+                // Metadata
+                const metadata = {
+                    contentType: selectedFile.type,
+                    customMetadata: {
+                        'userId': currentUser,
+                        'taskId': currentTask,
+                        'timestamp': timestamp.toString()
+                    }
+                };
+                
+                // Fazer upload
+                console.log('Fazendo upload...');
+                await storageRef.put(selectedFile, metadata);
+                
+                console.log('Upload completo, obtendo URL...');
+                showUploadStatus('✅ Upload completo! Salvando...');
+                
+                const imageUrl = await storageRef.getDownloadURL();
+                console.log('URL obtida:', imageUrl.substring(0, 50) + '...');
+                
+                // Salvar no database
+                console.log('Salvando no database...');
                 await database.ref('userTasks/' + currentUser + '/' + currentTask).set({
                     taskId: currentTask,
                     status: 'pending',
@@ -818,13 +861,16 @@
                     comprovanteUrl: imageUrl
                 });
                 
+                console.log('Comprovante enviado com sucesso!');
                 showToast('✅ Comprovante enviado! Aguarde aprovação.');
                 closeModal();
                 setTimeout(() => loadTasks(), 500);
                 
             } catch (error) {
                 console.error('Erro ao enviar:', error);
-                showToast('❌ Erro ao enviar. Tente novamente.');
+                showToast('❌ Erro ao enviar: ' + error.message);
+                showUploadStatus('❌ Erro: ' + error.message);
+            } finally {
                 btn.innerHTML = 'Enviar Comprovante';
                 btn.disabled = false;
             }
@@ -837,6 +883,7 @@
             document.getElementById('uploadText').style.display = 'block';
             document.getElementById('uploadArea').classList.remove('has-file');
             document.getElementById('fileInput').value = '';
+            document.getElementById('uploadStatus').classList.remove('show');
         }
         
         function switchTab(tab) {
@@ -847,7 +894,7 @@
         }
         
         // ============================================
-        // SAQUE - NOVO SISTEMA COMPLETO
+        // SAQUE
         // ============================================
         
         function openSaqueModal() {
@@ -858,7 +905,6 @@
             document.getElementById('saqueValorModal').classList.remove('active');
             document.getElementById('saqueDadosModal').classList.remove('active');
             
-            // Limpar formulário
             document.getElementById('tipoChavePix').value = '';
             document.getElementById('chavePix').value = '';
             document.getElementById('nomeTitular').value = '';
@@ -874,7 +920,6 @@
             valorSaqueAtual = valor;
             document.getElementById('valorSaqueSelecionado').textContent = valor.toFixed(2).replace('.', ',');
             
-            // Fechar modal de valor e abrir modal de dados
             document.getElementById('saqueValorModal').classList.remove('active');
             document.getElementById('saqueDadosModal').classList.add('active');
         }
@@ -893,27 +938,22 @@
                 case 'cpf':
                     input.placeholder = '000.000.000-00';
                     label.textContent = '🔑 CPF *';
-                    input.type = 'text';
                     break;
                 case 'cnpj':
                     input.placeholder = '00.000.000/0000-00';
                     label.textContent = '🔑 CNPJ *';
-                    input.type = 'text';
                     break;
                 case 'email':
                     input.placeholder = 'seu@email.com';
                     label.textContent = '📧 E-mail *';
-                    input.type = 'email';
                     break;
                 case 'telefone':
                     input.placeholder = '(00) 00000-0000';
                     label.textContent = '📱 Telefone *';
-                    input.type = 'tel';
                     break;
                 case 'aleatoria':
                     input.placeholder = 'Chave aleatória do Pix';
                     label.textContent = '🔑 Chave Aleatória *';
-                    input.type = 'text';
                     break;
                 default:
                     input.placeholder = 'Digite sua chave Pix...';
@@ -927,7 +967,6 @@
             const nomeTitular = document.getElementById('nomeTitular').value.trim();
             const banco = document.getElementById('banco').value.trim();
             
-            // Validações
             if (!tipoChave) {
                 showToast('❌ Selecione o tipo de chave Pix!');
                 return;
@@ -935,17 +974,6 @@
             
             if (!chavePix) {
                 showToast('❌ Digite sua chave Pix!');
-                return;
-            }
-            
-            // Validação específica por tipo
-            if (tipoChave === 'cpf' && !validarCPF(chavePix)) {
-                showToast('❌ CPF inválido!');
-                return;
-            }
-            
-            if (tipoChave === 'email' && !validarEmail(chavePix)) {
-                showToast('❌ E-mail inválido!');
                 return;
             }
             
@@ -964,14 +992,12 @@
             btn.disabled = true;
             
             try {
-                // Criar solicitação de saque com dados completos
                 const saqueId = 'SAQUE_' + Date.now();
                 await database.ref('saques/' + saqueId).set({
                     userId: currentUser,
                     amount: valorSaqueAtual,
                     status: 'pending',
                     requestedAt: Date.now(),
-                    // Dados do Pix
                     pixData: {
                         tipoChave: tipoChave,
                         chave: chavePix,
@@ -980,7 +1006,6 @@
                     }
                 });
                 
-                // Deduzir saldo
                 const newBalance = saldoAtual - valorSaqueAtual;
                 await database.ref('users/' + currentUser + '/balance').set(newBalance);
                 
@@ -996,43 +1021,6 @@
             }
         }
         
-        // Validações
-        function validarCPF(cpf) {
-            cpf = cpf.replace(/[^\d]/g, '');
-            if (cpf.length !== 11) return false;
-            
-            // Elimina CPFs inválidos conhecidos
-            if (/^(\d)\1{10}$/.test(cpf)) return false;
-            
-            // Validação básica
-            let soma = 0;
-            let resto;
-            
-            for (let i = 1; i <= 9; i++) {
-                soma += parseInt(cpf.substring(i-1, i)) * (11 - i);
-            }
-            
-            resto = (soma * 10) % 11;
-            if ((resto === 10) || (resto === 11)) resto = 0;
-            if (resto !== parseInt(cpf.substring(9, 10))) return false;
-            
-            soma = 0;
-            for (let i = 1; i <= 10; i++) {
-                soma += parseInt(cpf.substring(i-1, i)) * (12 - i);
-            }
-            
-            resto = (soma * 10) % 11;
-            if ((resto === 10) || (resto === 11)) resto = 0;
-            if (resto !== parseInt(cpf.substring(10, 11))) return false;
-            
-            return true;
-        }
-        
-        function validarEmail(email) {
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return re.test(email);
-        }
-        
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -1040,7 +1028,6 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
         
-        // Inicializar
         window.onload = initUser;
     </script>
 </body>
