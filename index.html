@@ -45,6 +45,30 @@
             display: inline-block;
         }
 
+        .support-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #0088cc;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 999;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+
+        .support-btn:hover {
+            transform: scale(1.1);
+        }
+
         .balance-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             margin: 20px;
@@ -76,6 +100,76 @@
             font-weight: bold;
             cursor: pointer;
             transition: transform 0.2s;
+        }
+
+        .promo-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            margin: 0 20px 20px 20px;
+            padding: 20px;
+            border-radius: 15px;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .promo-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .promo-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .promo-input {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+
+        .promo-btn {
+            background: rgba(255,255,255,0.3);
+            color: white;
+            border: 2px solid white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .promo-btn:hover {
+            background: white;
+            color: #f5576c;
+        }
+
+        .promo-status {
+            font-size: 0.9rem;
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.2);
+            display: none;
+        }
+
+        .promo-status.show {
+            display: block;
+        }
+
+        .promo-status.success {
+            background: rgba(40, 167, 69, 0.3);
+        }
+
+        .promo-status.error {
+            background: rgba(220, 53, 69, 0.3);
         }
 
         .tabs {
@@ -371,12 +465,41 @@
         <button class="btn-saque" onclick="openSaqueModal()">💳 Sacar Dinheiro</button>
     </div>
 
+    <!-- NOVO: Card de Código Promocional -->
+    <div class="promo-card">
+        <div class="promo-title">
+            🎁 Código Promocional
+        </div>
+        <p style="font-size: 0.9rem; margin-bottom: 12px; opacity: 0.9;">
+            Digite um código válido e ganhe bônus!
+        </p>
+        <div class="promo-input-group">
+            <input type="text" 
+                   id="promoCode" 
+                   class="promo-input" 
+                   placeholder="Ex: A18B766"
+                   maxlength="10">
+            <button class="promo-btn" onclick="applyPromoCode()">
+                Aplicar
+            </button>
+        </div>
+        <div id="promoStatus" class="promo-status"></div>
+    </div>
+
     <div class="tabs">
         <div class="tab active" onclick="switchTab('available')">📋 Tarefas</div>
         <div class="tab" onclick="switchTab('mytasks')">✅ Minhas Tarefas</div>
     </div>
 
     <div class="content" id="content"></div>
+
+    <!-- NOVO: Botão de Suporte Telegram -->
+    <a href="https://t.me/+la54Ed6p0wE1Y2Qx" 
+       target="_blank" 
+       class="support-btn" 
+       title="Grupo de Suporte">
+        💬
+    </a>
 
     <!-- Modal de Comprovante -->
     <div class="modal" id="uploadModal">
@@ -468,7 +591,7 @@
 
     <script>
         // ============================================
-        // CONFIGURAÇÃO FIREBASE - APENAS REALTIME DATABASE
+        // CONFIGURAÇÃO FIREBASE
         // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyCVR7V_5zwbCZbyl0P0Xw9-XXXXXXXXXXXX",
@@ -524,6 +647,7 @@
             document.getElementById('userIdDisplay').textContent = userId;
             loadBalance();
             loadTasks();
+            checkUsedPromoCodes();
         }
 
         function loadBalance() {
@@ -535,62 +659,155 @@
         }
 
         // ============================================
-        // TAREFAS - CORRIGIDO: Uma vez feita, some da aba "Tarefas"
+        // CÓDIGO PROMOCIONAL - SÓ VOCÊ GERA
         // ============================================
-        function loadTasks() {
+        async function applyPromoCode() {
+            const codeInput = document.getElementById('promoCode');
+            const statusDiv = document.getElementById('promoStatus');
+            const code = codeInput.value.trim().toUpperCase();
+
+            if (!code) {
+                showPromoStatus('❌ Digite um código!', 'error');
+                return;
+            }
+
+            try {
+                // Verificar se código existe e tem vagas
+                const codeSnapshot = await database.ref('promoCodes/' + code).once('value');
+                const codeData = codeSnapshot.val();
+
+                if (!codeData) {
+                    showPromoStatus('❌ Código inválido!', 'error');
+                    return;
+                }
+
+                // Verificar se usuário já usou este código
+                const userCodeSnapshot = await database.ref('userPromoCodes/' + currentUser + '/' + code).once('value');
+                if (userCodeSnapshot.exists()) {
+                    showPromoStatus('❌ Você já usou este código!', 'error');
+                    return;
+                }
+
+                // Verificar se código atingiu limite de 8 pessoas
+                const usesSnapshot = await database.ref('promoCodeUses/' + code).once('value');
+                const uses = usesSnapshot.val() || 0;
+
+                if (uses >= 8) {
+                    showPromoStatus('❌ Este código já atingiu o limite de 8 usuários!', 'error');
+                    return;
+                }
+
+                // Aplicar bônus (ex: R$ 1,00)
+                const bonus = codeData.bonus || 1.00;
+                const newBalance = saldoAtual + bonus;
+
+                // Salvar no banco
+                await database.ref('users/' + currentUser + '/balance').set(newBalance);
+                await database.ref('userPromoCodes/' + currentUser + '/' + code).set({
+                    usedAt: Date.now(),
+                    bonus: bonus
+                });
+                await database.ref('promoCodeUses/' + code).set(uses + 1);
+
+                // Registrar no histórico
+                await database.ref('promoCodeHistory/' + code + '/' + currentUser).set({
+                    usedAt: Date.now(),
+                    bonus: bonus
+                });
+
+                showPromoStatus(`✅ Código aplicado! +R$ ${bonus.toFixed(2)} adicionados!`, 'success');
+                codeInput.value = '';
+                showToast(`🎁 +R$ ${bonus.toFixed(2)} de bônus!`);
+
+            } catch (error) {
+                console.error('Erro:', error);
+                showPromoStatus('❌ Erro ao aplicar código!', 'error');
+            }
+        }
+
+        function showPromoStatus(message, type) {
+            const statusDiv = document.getElementById('promoStatus');
+            statusDiv.textContent = message;
+            statusDiv.className = 'promo-status show ' + type;
+
+            setTimeout(() => {
+                statusDiv.classList.remove('show');
+            }, 5000);
+        }
+
+        async function checkUsedPromoCodes() {
+            // Verificar códigos já usados pelo usuário (para mostrar no futuro)
+            const snapshot = await database.ref('userPromoCodes/' + currentUser).once('value');
+            const usedCodes = snapshot.val() || {};
+
+            if (Object.keys(usedCodes).length > 0) {
+                console.log('Códigos já usados:', usedCodes);
+            }
+        }
+
+        // ============================================
+        // TAREFAS
+        // ============================================
+        async function loadTasks() {
             const content = document.getElementById('content');
             content.innerHTML = '<div class="empty-state" style="color: white;"><div class="loading"></div><p>Carregando...</p></div>';
 
-            if (currentTab === 'available') {
-                // Carregar tarefas disponíveis (apenas as que o usuário NUNCA fez)
-                database.ref('tasks').on('value', (snapshot) => {
-                    const tasks = snapshot.val() || {};
-                    database.ref('userTasks/' + currentUser).once('value').then((userSnapshot) => {
-                        const userTasks = userSnapshot.val() || {};
-                        let html = '';
-                        let hasTasks = false;
+            try {
+                if (currentTab === 'available') {
+                    const tasksSnapshot = await database.ref('tasks').once('value');
+                    const tasks = tasksSnapshot.val() || {};
 
-                        Object.keys(tasks).forEach(taskId => {
-                            const task = tasks[taskId];
-                            const userTask = userTasks[taskId];
+                    const userTasksSnapshot = await database.ref('userTasks/' + currentUser).once('value');
+                    const userTasks = userTasksSnapshot.val() || {};
 
-                            // ✅ CORREÇÃO: Mostrar apenas se NUNCA foi feita (nem pending, nem approved, nem rejected)
-                            // UMA VEZ FEITA = SOME DAQUI
-                            if (!userTask) {
-                                hasTasks = true;
-                                html += createTaskCard(task, taskId);
-                            }
-                        });
+                    let html = '';
+                    let hasTasks = false;
 
-                        if (!hasTasks) {
-                            html = `<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 15px;">🎉</div><h3>Nenhuma tarefa disponível</h3><p style="margin-top: 10px; opacity: 0.8;">Você já fez todas as tarefas!</p></div>`;
+                    Object.keys(tasks).forEach(taskId => {
+                        const task = tasks[taskId];
+                        const userTask = userTasks[taskId];
+
+                        if (!userTask) {
+                            hasTasks = true;
+                            html += createTaskCard(task, taskId);
                         }
-                        content.innerHTML = html;
                     });
-                });
-            } else {
-                // Abas "Minhas Tarefas" - mostrar TODAS as tarefas do usuário (pending, approved, rejected)
-                database.ref('userTasks/' + currentUser).on('value', (snapshot) => {
-                    const userTasks = snapshot.val() || {};
+
+                    if (!hasTasks) {
+                        html = `<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 15px;">🎉</div><h3>Nenhuma tarefa disponível</h3><p style="margin-top: 10px; opacity: 0.8;">Você já fez todas as tarefas!</p></div>`;
+                    }
+                    content.innerHTML = html;
+
+                } else {
+                    const userTasksSnapshot = await database.ref('userTasks/' + currentUser).once('value');
+                    const userTasks = userTasksSnapshot.val() || {};
+
                     if (Object.keys(userTasks).length === 0) {
                         content.innerHTML = `<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 15px;">📋</div><h3>Nenhuma tarefa enviada</h3></div>`;
                         return;
                     }
-                    let html = '';
-                    let taskCount = 0;
 
-                    Object.keys(userTasks).forEach(taskId => {
+                    const taskPromises = Object.keys(userTasks).map(async (taskId) => {
                         const userTask = userTasks[taskId];
-                        database.ref('tasks/' + taskId).once('value').then((taskSnap) => {
-                            const task = taskSnap.val();
-                            if (task) {
-                                html += createMyTaskCard(task, userTask, taskId);
-                                taskCount++;
-                                content.innerHTML = html;
-                            }
-                        });
+                        const taskSnapshot = await database.ref('tasks/' + taskId).once('value');
+                        const task = taskSnapshot.val();
+                        return { taskId, task, userTask };
                     });
-                });
+
+                    const taskData = await Promise.all(taskPromises);
+
+                    let html = '';
+                    taskData.forEach(({ taskId, task, userTask }) => {
+                        if (task) {
+                            html += createMyTaskCard(task, userTask, taskId);
+                        }
+                    });
+
+                    content.innerHTML = html || `<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 15px;">📋</div><h3>Nenhuma tarefa encontrada</h3></div>`;
+                }
+            } catch (error) {
+                console.error('Erro ao carregar tarefas:', error);
+                content.innerHTML = `<div class="empty-state" style="color: white;"><p>❌ Erro ao carregar. Tente novamente.</p></div>`;
             }
         }
 
@@ -643,17 +860,16 @@
             `;
         }
 
-        function showTutorial(taskId) {
-            database.ref('tasks/' + taskId + '/tutorialImage').once('value').then((snapshot) => {
-                const imageUrl = snapshot.val();
-                if (imageUrl) {
-                    document.getElementById('tutorialContent').innerHTML = `
-                        <img src="${imageUrl}" style="max-width: 100%; border-radius: 10px;">
-                        <p style="color: #666; text-align: center; margin-top: 10px;">Siga os passos acima</p>
-                    `;
-                    document.getElementById('tutorialModal').classList.add('active');
-                }
-            });
+        async function showTutorial(taskId) {
+            const snapshot = await database.ref('tasks/' + taskId + '/tutorialImage').once('value');
+            const imageUrl = snapshot.val();
+            if (imageUrl) {
+                document.getElementById('tutorialContent').innerHTML = `
+                    <img src="${imageUrl}" style="max-width: 100%; border-radius: 10px;">
+                    <p style="color: #666; text-align: center; margin-top: 10px;">Siga os passos acima</p>
+                `;
+                document.getElementById('tutorialModal').classList.add('active');
+            }
         }
 
         function closeTutorial() {
@@ -677,7 +893,6 @@
         function handleFileSelect(event) {
             const file = event.target.files[0];
             if (file) {
-                // Verificar tamanho (máximo 500KB para base64 não ficar gigante)
                 if (file.size > 500 * 1024) {
                     showToast('❌ Imagem muito grande! Máximo 500KB');
                     return;
@@ -696,9 +911,6 @@
             }
         }
 
-        // ============================================
-        // SUBMIT COMPROVANTE - COM BASE64 NO DATABASE
-        // ============================================
         async function submitComprovante() {
             if (!selectedFile) {
                 showToast('❌ Selecione uma imagem!');
@@ -716,30 +928,31 @@
             showUploadStatus('⬆️ Processando imagem...');
 
             try {
-                // Converter imagem para base64
                 const base64Image = await fileToBase64(selectedFile);
                 console.log('Imagem convertida para base64, tamanho:', base64Image.length);
 
                 showUploadStatus('💾 Salvando no banco de dados...');
 
-                // Salvar diretamente no Realtime Database
                 await database.ref('userTasks/' + currentUser + '/' + currentTask).set({
                     taskId: currentTask,
                     status: 'pending',
                     submittedAt: Date.now(),
-                    comprovanteImage: base64Image  // IMAGEM EM BASE64!
+                    comprovanteImage: base64Image
                 });
 
                 await database.ref('pendingApprovals/' + currentTask + '_' + currentUser).set({
                     userId: currentUser,
                     taskId: currentTask,
                     submittedAt: Date.now(),
-                    comprovanteImage: base64Image  // IMAGEM EM BASE64!
+                    comprovanteImage: base64Image
                 });
 
                 showToast('✅ Comprovante enviado! Aguarde aprovação.');
                 closeModal();
-                setTimeout(() => loadTasks(), 500);
+
+                setTimeout(() => {
+                    loadTasks();
+                }, 500);
 
             } catch (error) {
                 console.error('Erro:', error);
@@ -750,7 +963,6 @@
             }
         }
 
-        // Função para converter arquivo em base64
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
