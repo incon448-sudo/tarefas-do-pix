@@ -13,13 +13,13 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding-bottom: 80px;
         }
-        
+
         .header {
             background: rgba(255,255,255,0.95);
             padding: 15px;
@@ -29,13 +29,13 @@
             top: 0;
             z-index: 100;
         }
-        
+
         .header h1 {
             color: #667eea;
             font-size: 1.5rem;
             margin-bottom: 5px;
         }
-        
+
         .user-id {
             font-size: 0.8rem;
             color: #666;
@@ -44,7 +44,7 @@
             border-radius: 20px;
             display: inline-block;
         }
-        
+
         .balance-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             margin: 20px;
@@ -54,19 +54,19 @@
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
-        
+
         .balance-label {
             font-size: 0.9rem;
             opacity: 0.9;
             margin-bottom: 10px;
         }
-        
+
         .balance-value {
             font-size: 2.5rem;
             font-weight: bold;
             margin-bottom: 15px;
         }
-        
+
         .btn-saque {
             background: white;
             color: #667eea;
@@ -77,7 +77,7 @@
             cursor: pointer;
             transition: transform 0.2s;
         }
-        
+
         .tabs {
             display: flex;
             background: white;
@@ -86,7 +86,7 @@
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-        
+
         .tab {
             flex: 1;
             padding: 15px;
@@ -96,16 +96,16 @@
             font-weight: 500;
             color: #666;
         }
-        
+
         .tab.active {
             background: #667eea;
             color: white;
         }
-        
+
         .content {
             margin: 20px;
         }
-        
+
         .task-card {
             background: white;
             border-radius: 15px;
@@ -113,20 +113,20 @@
             margin-bottom: 15px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-        
+
         .task-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
         }
-        
+
         .task-title {
             font-weight: bold;
             color: #333;
             font-size: 1.1rem;
         }
-        
+
         .task-reward {
             background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
             color: white;
@@ -135,13 +135,13 @@
             font-weight: bold;
             font-size: 0.9rem;
         }
-        
+
         .task-desc {
             color: #666;
             margin-bottom: 15px;
             line-height: 1.5;
         }
-        
+
         .task-invest {
             background: #f8f9fa;
             padding: 10px;
@@ -150,7 +150,7 @@
             font-size: 0.9rem;
             color: #666;
         }
-        
+
         .btn-task {
             width: 100%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -161,12 +161,12 @@
             font-weight: bold;
             cursor: pointer;
         }
-        
+
         .btn-task:disabled {
             background: #ccc;
             cursor: not-allowed;
         }
-        
+
         .tutorial-btn {
             background: #17a2b8;
             color: white;
@@ -177,13 +177,13 @@
             cursor: pointer;
             margin-left: 10px;
         }
-        
+
         .empty-state {
             text-align: center;
             padding: 40px 20px;
             color: white;
         }
-        
+
         .modal {
             display: none;
             position: fixed;
@@ -197,11 +197,11 @@
             align-items: center;
             padding: 20px;
         }
-        
+
         .modal.active {
             display: flex;
         }
-        
+
         .modal-content {
             background: white;
             border-radius: 20px;
@@ -211,14 +211,14 @@
             max-height: 90vh;
             overflow-y: auto;
         }
-        
+
         .modal-title {
             font-size: 1.3rem;
             margin-bottom: 20px;
             color: #333;
             text-align: center;
         }
-        
+
         .upload-area {
             border: 3px dashed #667eea;
             border-radius: 15px;
@@ -228,19 +228,19 @@
             transition: all 0.3s;
             text-align: center;
         }
-        
+
         .upload-area.has-file {
             border-color: #28a745;
             background: #d4edda;
         }
-        
+
         .upload-preview {
             max-width: 100%;
             max-height: 200px;
             border-radius: 10px;
             margin-top: 10px;
         }
-        
+
         .btn-submit {
             background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
             color: white;
@@ -251,7 +251,7 @@
             cursor: pointer;
             width: 100%;
         }
-        
+
         .btn-cancel {
             background: #f8f9fa;
             color: #666;
@@ -263,7 +263,7 @@
             width: 100%;
             margin-top: 10px;
         }
-        
+
         .loading {
             display: inline-block;
             width: 20px;
@@ -273,11 +273,11 @@
             border-top-color: white;
             animation: spin 1s ease-in-out infinite;
         }
-        
+
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        
+
         .toast {
             position: fixed;
             bottom: 100px;
@@ -290,17 +290,17 @@
             z-index: 2000;
             display: none;
         }
-        
+
         .toast.show {
             display: block;
             animation: fadeIn 0.3s;
         }
-        
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateX(-50%) translateY(20px); }
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
-        
+
         .upload-status {
             background: #e3f2fd;
             border: 1px solid #2196f3;
@@ -311,15 +311,15 @@
             font-size: 0.9rem;
             display: none;
         }
-        
+
         .upload-status.show {
             display: block;
         }
-        
+
         .form-group {
             margin-bottom: 15px;
         }
-        
+
         .form-group label {
             display: block;
             margin-bottom: 5px;
@@ -327,7 +327,7 @@
             font-weight: 500;
             font-size: 0.9rem;
         }
-        
+
         .form-group input,
         .form-group select {
             width: 100%;
@@ -336,7 +336,7 @@
             border-radius: 10px;
             font-size: 1rem;
         }
-        
+
         .pix-info-box {
             background: #f0f8ff;
             border: 1px solid #667eea;
@@ -344,7 +344,7 @@
             padding: 15px;
             margin-bottom: 20px;
         }
-        
+
         .saque-valor-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -364,28 +364,28 @@
         <h1>💰 Tarefa Pix</h1>
         <span class="user-id" id="userIdDisplay">Carregando...</span>
     </div>
-    
+
     <div class="balance-card">
         <div class="balance-label">Seu Saldo</div>
         <div class="balance-value">R$ <span id="balance">0,00</span></div>
         <button class="btn-saque" onclick="openSaqueModal()">💳 Sacar Dinheiro</button>
     </div>
-    
+
     <div class="tabs">
         <div class="tab active" onclick="switchTab('available')">📋 Tarefas</div>
         <div class="tab" onclick="switchTab('mytasks')">✅ Minhas Tarefas</div>
     </div>
-    
+
     <div class="content" id="content"></div>
-    
+
     <!-- Modal de Comprovante -->
     <div class="modal" id="uploadModal">
         <div class="modal-content">
             <h3 class="modal-title">📸 Enviar Comprovante</h3>
             <p style="color: #666; margin-bottom: 15px; text-align: center;">Tire um print da tela confirmando a recarga</p>
-            
+
             <div id="uploadStatus" class="upload-status"></div>
-            
+
             <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
                 <div id="uploadText">
                     📷 Clique para tirar foto<br>
@@ -394,12 +394,12 @@
                 <img id="previewImage" class="upload-preview" style="display:none;">
             </div>
             <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
-            
+
             <button class="btn-submit" id="btnSubmit" onclick="submitComprovante()">Enviar Comprovante</button>
             <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
         </div>
     </div>
-    
+
     <!-- Modal de Tutorial -->
     <div class="modal" id="tutorialModal">
         <div class="modal-content">
@@ -408,7 +408,7 @@
             <button class="btn-submit" onclick="closeTutorial()" style="margin-top: 15px;">Entendi!</button>
         </div>
     </div>
-    
+
     <!-- Modal de Saque -->
     <div class="modal" id="saqueValorModal">
         <div class="modal-content">
@@ -424,14 +424,14 @@
             <button class="btn-cancel" onclick="closeSaqueModal()">Cancelar</button>
         </div>
     </div>
-    
+
     <div class="modal" id="saqueDadosModal">
         <div class="modal-content">
             <h3 class="modal-title">🏦 Dados para Transferência</h3>
             <div class="pix-info-box">
                 <h4 style="color: #667eea; margin-bottom: 10px;">💰 Valor: R$ <span id="valorSaqueSelecionado">0,00</span></h4>
             </div>
-            
+
             <div class="form-group">
                 <label>📱 Tipo de Chave Pix *</label>
                 <select id="tipoChavePix" onchange="atualizarPlaceholder()">
@@ -443,27 +443,27 @@
                     <option value="aleatoria">Chave Aleatória</option>
                 </select>
             </div>
-            
+
             <div class="form-group">
                 <label id="labelChavePix">🔑 Chave Pix *</label>
                 <input type="text" id="chavePix" placeholder="Digite sua chave Pix...">
             </div>
-            
+
             <div class="form-group">
                 <label>👤 Nome do Titular *</label>
                 <input type="text" id="nomeTitular" placeholder="Nome completo do titular">
             </div>
-            
+
             <div class="form-group">
                 <label>🏛️ Banco (Opcional)</label>
                 <input type="text" id="banco" placeholder="Ex: Nubank, Itaú...">
             </div>
-            
+
             <button class="btn-submit" id="btnConfirmarSaque" onclick="confirmarSaque()">✅ Confirmar Saque</button>
             <button class="btn-cancel" onclick="voltarParaValor()">← Voltar</button>
         </div>
     </div>
-    
+
     <div class="toast" id="toast"></div>
 
     <script>
@@ -479,10 +479,10 @@
             messagingSenderId: "123456789",
             appId: "1:123456789:web:abcdef123456"
         };
-        
+
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-        
+
         // ============================================
         // VARIÁVEIS GLOBAIS
         // ============================================
@@ -492,7 +492,7 @@
         let currentTab = 'available';
         let valorSaqueAtual = 0;
         let saldoAtual = 0;
-        
+
         // ============================================
         // INICIALIZAÇÃO
         // ============================================
@@ -504,7 +504,7 @@
             }
             return result;
         }
-        
+
         function initUser() {
             let userId = localStorage.getItem('tarefaPixUserId');
             if (!userId) {
@@ -519,13 +519,13 @@
             } else {
                 database.ref('users/' + userId + '/lastLogin').set(Date.now());
             }
-            
+
             currentUser = userId;
             document.getElementById('userIdDisplay').textContent = userId;
             loadBalance();
             loadTasks();
         }
-        
+
         function loadBalance() {
             database.ref('users/' + currentUser + '/balance').on('value', (snapshot) => {
                 saldoAtual = snapshot.val() || 0;
@@ -533,14 +533,14 @@
                 document.getElementById('saldoDisponivel').textContent = saldoAtual.toFixed(2).replace('.', ',');
             });
         }
-        
+
         // ============================================
         // TAREFAS - CORRIGIDO: Uma vez feita, some da aba "Tarefas"
         // ============================================
         function loadTasks() {
             const content = document.getElementById('content');
             content.innerHTML = '<div class="empty-state" style="color: white;"><div class="loading"></div><p>Carregando...</p></div>';
-            
+
             if (currentTab === 'available') {
                 // Carregar tarefas disponíveis (apenas as que o usuário NUNCA fez)
                 database.ref('tasks').on('value', (snapshot) => {
@@ -549,11 +549,11 @@
                         const userTasks = userSnapshot.val() || {};
                         let html = '';
                         let hasTasks = false;
-                        
+
                         Object.keys(tasks).forEach(taskId => {
                             const task = tasks[taskId];
                             const userTask = userTasks[taskId];
-                            
+
                             // ✅ CORREÇÃO: Mostrar apenas se NUNCA foi feita (nem pending, nem approved, nem rejected)
                             // UMA VEZ FEITA = SOME DAQUI
                             if (!userTask) {
@@ -561,7 +561,7 @@
                                 html += createTaskCard(task, taskId);
                             }
                         });
-                        
+
                         if (!hasTasks) {
                             html = `<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 15px;">🎉</div><h3>Nenhuma tarefa disponível</h3><p style="margin-top: 10px; opacity: 0.8;">Você já fez todas as tarefas!</p></div>`;
                         }
@@ -578,7 +578,7 @@
                     }
                     let html = '';
                     let taskCount = 0;
-                    
+
                     Object.keys(userTasks).forEach(taskId => {
                         const userTask = userTasks[taskId];
                         database.ref('tasks/' + taskId).once('value').then((taskSnap) => {
@@ -593,7 +593,7 @@
                 });
             }
         }
-        
+
         function createTaskCard(task, taskId) {
             const hasTutorial = task.tutorialImage ? true : false;
             return `
@@ -613,7 +613,7 @@
                 </div>
             `;
         }
-        
+
         function createMyTaskCard(task, userTask, taskId) {
             let statusStyle = '';
             let statusText = '';
@@ -642,7 +642,7 @@
                 </div>
             `;
         }
-        
+
         function showTutorial(taskId) {
             database.ref('tasks/' + taskId + '/tutorialImage').once('value').then((snapshot) => {
                 const imageUrl = snapshot.val();
@@ -655,11 +655,11 @@
                 }
             });
         }
-        
+
         function closeTutorial() {
             document.getElementById('tutorialModal').classList.remove('active');
         }
-        
+
         function startTask(taskId, link) {
             currentTask = taskId;
             window.open(link, '_blank');
@@ -667,13 +667,13 @@
                 document.getElementById('uploadModal').classList.add('active');
             }, 1000);
         }
-        
+
         function showUploadStatus(message) {
             const statusDiv = document.getElementById('uploadStatus');
             statusDiv.textContent = message;
             statusDiv.classList.add('show');
         }
-        
+
         function handleFileSelect(event) {
             const file = event.target.files[0];
             if (file) {
@@ -682,7 +682,7 @@
                     showToast('❌ Imagem muito grande! Máximo 500KB');
                     return;
                 }
-                
+
                 selectedFile = file;
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -695,7 +695,7 @@
                 reader.readAsDataURL(file);
             }
         }
-        
+
         // ============================================
         // SUBMIT COMPROVANTE - COM BASE64 NO DATABASE
         // ============================================
@@ -704,24 +704,24 @@
                 showToast('❌ Selecione uma imagem!');
                 return;
             }
-            
+
             if (!currentTask) {
                 showToast('❌ Erro: Tarefa não encontrada');
                 return;
             }
-            
+
             const btn = document.getElementById('btnSubmit');
             btn.innerHTML = '<span class="loading"></span> Enviando...';
             btn.disabled = true;
             showUploadStatus('⬆️ Processando imagem...');
-            
+
             try {
                 // Converter imagem para base64
                 const base64Image = await fileToBase64(selectedFile);
                 console.log('Imagem convertida para base64, tamanho:', base64Image.length);
-                
+
                 showUploadStatus('💾 Salvando no banco de dados...');
-                
+
                 // Salvar diretamente no Realtime Database
                 await database.ref('userTasks/' + currentUser + '/' + currentTask).set({
                     taskId: currentTask,
@@ -729,18 +729,18 @@
                     submittedAt: Date.now(),
                     comprovanteImage: base64Image  // IMAGEM EM BASE64!
                 });
-                
+
                 await database.ref('pendingApprovals/' + currentTask + '_' + currentUser).set({
                     userId: currentUser,
                     taskId: currentTask,
                     submittedAt: Date.now(),
                     comprovanteImage: base64Image  // IMAGEM EM BASE64!
                 });
-                
+
                 showToast('✅ Comprovante enviado! Aguarde aprovação.');
                 closeModal();
                 setTimeout(() => loadTasks(), 500);
-                
+
             } catch (error) {
                 console.error('Erro:', error);
                 showToast('❌ Erro: ' + error.message);
@@ -749,7 +749,7 @@
                 btn.disabled = false;
             }
         }
-        
+
         // Função para converter arquivo em base64
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
@@ -759,7 +759,7 @@
                 reader.onerror = error => reject(error);
             });
         }
-        
+
         function closeModal() {
             document.getElementById('uploadModal').classList.remove('active');
             selectedFile = null;
@@ -769,21 +769,21 @@
             document.getElementById('fileInput').value = '';
             document.getElementById('uploadStatus').classList.remove('show');
         }
-        
+
         function switchTab(tab) {
             currentTab = tab;
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
             loadTasks();
         }
-        
+
         // ============================================
         // SAQUE
         // ============================================
         function openSaqueModal() {
             document.getElementById('saqueValorModal').classList.add('active');
         }
-        
+
         function closeSaqueModal() {
             document.getElementById('saqueValorModal').classList.remove('active');
             document.getElementById('saqueDadosModal').classList.remove('active');
@@ -792,7 +792,7 @@
             document.getElementById('nomeTitular').value = '';
             document.getElementById('banco').value = '';
         }
-        
+
         function selecionarValorSaque(valor) {
             if (saldoAtual < valor) {
                 showToast('❌ Saldo insuficiente!');
@@ -803,17 +803,17 @@
             document.getElementById('saqueValorModal').classList.remove('active');
             document.getElementById('saqueDadosModal').classList.add('active');
         }
-        
+
         function voltarParaValor() {
             document.getElementById('saqueDadosModal').classList.remove('active');
             document.getElementById('saqueValorModal').classList.add('active');
         }
-        
+
         function atualizarPlaceholder() {
             const tipo = document.getElementById('tipoChavePix').value;
             const input = document.getElementById('chavePix');
             const label = document.getElementById('labelChavePix');
-            
+
             const placeholders = {
                 'cpf': '000.000.000-00',
                 'cnpj': '00.000.000/0000-00',
@@ -821,33 +821,33 @@
                 'telefone': '(00) 00000-0000',
                 'aleatoria': 'Chave aleatória'
             };
-            
+
             input.placeholder = placeholders[tipo] || 'Digite sua chave Pix...';
             label.textContent = tipo === 'email' ? '📧 E-mail *' : 
                                tipo === 'telefone' ? '📱 Telefone *' : 
                                '🔑 Chave Pix *';
         }
-        
+
         async function confirmarSaque() {
             const tipoChave = document.getElementById('tipoChavePix').value;
             const chavePix = document.getElementById('chavePix').value.trim();
             const nomeTitular = document.getElementById('nomeTitular').value.trim();
             const banco = document.getElementById('banco').value.trim();
-            
+
             if (!tipoChave || !chavePix || !nomeTitular) {
                 showToast('❌ Preencha todos os campos obrigatórios!');
                 return;
             }
-            
+
             if (saldoAtual < valorSaqueAtual) {
                 showToast('❌ Saldo insuficiente!');
                 return;
             }
-            
+
             const btn = document.getElementById('btnConfirmarSaque');
             btn.innerHTML = '<span class="loading"></span> Processando...';
             btn.disabled = true;
-            
+
             try {
                 const saqueId = 'SAQUE_' + Date.now();
                 await database.ref('saques/' + saqueId).set({
@@ -862,9 +862,9 @@
                         banco: banco || 'Não informado'
                     }
                 });
-                
+
                 await database.ref('users/' + currentUser + '/balance').set(saldoAtual - valorSaqueAtual);
-                
+
                 showToast(`✅ Saque solicitado!`);
                 closeSaqueModal();
             } catch (error) {
@@ -874,14 +874,14 @@
                 btn.disabled = false;
             }
         }
-        
+
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
-        
+
         window.onload = initUser;
     </script>
 </body>
