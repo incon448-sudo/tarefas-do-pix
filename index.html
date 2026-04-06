@@ -6,7 +6,6 @@
     <title>Tarefa Pix - Ganhe Dinheiro</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     <style>
         * {
             margin: 0;
@@ -68,11 +67,6 @@
             margin-bottom: 15px;
         }
         
-        .balance-value span {
-            font-size: 1.2rem;
-            opacity: 0.8;
-        }
-        
         .btn-saque {
             background: white;
             color: #667eea;
@@ -82,10 +76,6 @@
             font-weight: bold;
             cursor: pointer;
             transition: transform 0.2s;
-        }
-        
-        .btn-saque:hover {
-            transform: scale(1.05);
         }
         
         .tabs {
@@ -122,11 +112,6 @@
             padding: 20px;
             margin-bottom: 15px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: transform 0.2s;
-        }
-        
-        .task-card:hover {
-            transform: translateY(-2px);
         }
         
         .task-header {
@@ -166,10 +151,6 @@
             color: #666;
         }
         
-        .task-invest strong {
-            color: #667eea;
-        }
-        
         .btn-task {
             width: 100%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -179,11 +160,6 @@
             border-radius: 10px;
             font-weight: bold;
             cursor: pointer;
-            transition: opacity 0.2s;
-        }
-        
-        .btn-task:hover {
-            opacity: 0.9;
         }
         
         .btn-task:disabled {
@@ -200,12 +176,6 @@
             font-size: 0.8rem;
             cursor: pointer;
             margin-left: 10px;
-        }
-        
-        .tutorial-image {
-            max-width: 100%;
-            border-radius: 10px;
-            margin: 15px 0;
         }
         
         .empty-state {
@@ -257,10 +227,6 @@
             cursor: pointer;
             transition: all 0.3s;
             text-align: center;
-        }
-        
-        .upload-area:hover {
-            background: #f8f9fa;
         }
         
         .upload-area.has-file {
@@ -335,28 +301,19 @@
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
         
-        .saque-valor-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
-            transition: transform 0.2s;
+        .upload-status {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            color: #1565c0;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            display: none;
         }
         
-        .saque-valor-btn:hover {
-            transform: scale(1.02);
-        }
-        
-        .saque-valor-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
+        .upload-status.show {
+            display: block;
         }
         
         .form-group {
@@ -380,12 +337,6 @@
             font-size: 1rem;
         }
         
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
         .pix-info-box {
             background: #f0f8ff;
             border: 1px solid #667eea;
@@ -394,30 +345,17 @@
             margin-bottom: 20px;
         }
         
-        .pix-info-box h4 {
-            color: #667eea;
+        .saque-valor-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
             margin-bottom: 10px;
-        }
-        
-        .pix-info-box p {
-            color: #666;
-            font-size: 0.9rem;
-            margin: 5px 0;
-        }
-        
-        .upload-status {
-            background: #e3f2fd;
-            border: 1px solid #2196f3;
-            color: #1565c0;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 0.9rem;
-            display: none;
-        }
-        
-        .upload-status.show {
-            display: block;
+            font-size: 1.1rem;
         }
     </style>
 </head>
@@ -438,9 +376,7 @@
         <div class="tab" onclick="switchTab('mytasks')">✅ Minhas Tarefas</div>
     </div>
     
-    <div class="content" id="content">
-        <!-- Conteúdo dinâmico -->
-    </div>
+    <div class="content" id="content"></div>
     
     <!-- Modal de Comprovante -->
     <div class="modal" id="uploadModal">
@@ -459,7 +395,7 @@
             </div>
             <input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
             
-            <button class="btn-submit" id="btnSubmitComprovante" onclick="submitComprovante()">Enviar Comprovante</button>
+            <button class="btn-submit" id="btnSubmit" onclick="submitComprovante()">Enviar Comprovante</button>
             <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
         </div>
     </div>
@@ -473,32 +409,27 @@
         </div>
     </div>
     
-    <!-- MODAL DE SAQUE - ESCOLHER VALOR -->
+    <!-- Modal de Saque -->
     <div class="modal" id="saqueValorModal">
         <div class="modal-content">
             <h3 class="modal-title">💸 Quanto deseja sacar?</h3>
             <p style="color: #666; margin-bottom: 20px; text-align: center;">
-                Saldo disponível: <strong style="color: #667eea;">R$ <span id="saldoDisponivel">0,00</span></strong>
+                Saldo: <strong style="color: #667eea;">R$ <span id="saldoDisponivel">0,00</span></strong>
             </p>
-            
             <button class="saque-valor-btn" onclick="selecionarValorSaque(1)">💵 R$ 1,00</button>
             <button class="saque-valor-btn" onclick="selecionarValorSaque(2)">💵 R$ 2,00</button>
             <button class="saque-valor-btn" onclick="selecionarValorSaque(3)">💵 R$ 3,00</button>
             <button class="saque-valor-btn" onclick="selecionarValorSaque(4)">💵 R$ 4,00</button>
             <button class="saque-valor-btn" onclick="selecionarValorSaque(5)">💵 R$ 5,00</button>
-            
             <button class="btn-cancel" onclick="closeSaqueModal()">Cancelar</button>
         </div>
     </div>
     
-    <!-- MODAL DE SAQUE - DADOS DO PIX -->
     <div class="modal" id="saqueDadosModal">
         <div class="modal-content">
             <h3 class="modal-title">🏦 Dados para Transferência</h3>
-            
             <div class="pix-info-box">
-                <h4>💰 Valor do Saque: R$ <span id="valorSaqueSelecionado">0,00</span></h4>
-                <p>Informe seus dados do Pix para receber:</p>
+                <h4 style="color: #667eea; margin-bottom: 10px;">💰 Valor: R$ <span id="valorSaqueSelecionado">0,00</span></h4>
             </div>
             
             <div class="form-group">
@@ -520,17 +451,15 @@
             
             <div class="form-group">
                 <label>👤 Nome do Titular *</label>
-                <input type="text" id="nomeTitular" placeholder="Nome completo do titular da conta">
+                <input type="text" id="nomeTitular" placeholder="Nome completo do titular">
             </div>
             
             <div class="form-group">
                 <label>🏛️ Banco (Opcional)</label>
-                <input type="text" id="banco" placeholder="Ex: Nubank, Itaú, Bradesco...">
+                <input type="text" id="banco" placeholder="Ex: Nubank, Itaú...">
             </div>
             
-            <button class="btn-submit" id="btnConfirmarSaque" onclick="confirmarSaque()">
-                ✅ Confirmar Saque
-            </button>
+            <button class="btn-submit" id="btnConfirmarSaque" onclick="confirmarSaque()">✅ Confirmar Saque</button>
             <button class="btn-cancel" onclick="voltarParaValor()">← Voltar</button>
         </div>
     </div>
@@ -539,7 +468,7 @@
 
     <script>
         // ============================================
-        // CONFIGURAÇÃO FIREBASE
+        // CONFIGURAÇÃO FIREBASE - APENAS REALTIME DATABASE
         // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyCVR7V_5zwbCZbyl0P0Xw9-XXXXXXXXXXXX",
@@ -553,7 +482,6 @@
         
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-        const storage = firebase.storage();
         
         // ============================================
         // VARIÁVEIS GLOBAIS
@@ -582,7 +510,6 @@
             if (!userId) {
                 userId = generateUserId();
                 localStorage.setItem('tarefaPixUserId', userId);
-                
                 database.ref('users/' + userId).set({
                     id: userId,
                     balance: 0,
@@ -595,7 +522,6 @@
             
             currentUser = userId;
             document.getElementById('userIdDisplay').textContent = userId;
-            
             loadBalance();
             loadTasks();
         }
@@ -618,18 +544,14 @@
             if (currentTab === 'available') {
                 database.ref('tasks').on('value', (snapshot) => {
                     const tasks = snapshot.val() || {};
-                    const userTasksRef = database.ref('userTasks/' + currentUser);
-                    
-                    userTasksRef.once('value').then((userSnapshot) => {
+                    database.ref('userTasks/' + currentUser).once('value').then((userSnapshot) => {
                         const userTasks = userSnapshot.val() || {};
-                        
                         let html = '';
                         let hasTasks = false;
                         
                         Object.keys(tasks).forEach(taskId => {
                             const task = tasks[taskId];
                             const userTask = userTasks[taskId];
-                            
                             if (!userTask || userTask.status === 'rejected') {
                                 hasTasks = true;
                                 html += createTaskCard(task, taskId, userTask);
@@ -637,33 +559,18 @@
                         });
                         
                         if (!hasTasks) {
-                            html = `
-                                <div class="empty-state">
-                                    <div style="font-size: 3rem; margin-bottom: 15px;">🎉</div>
-                                    <h3>Você completou todas as tarefas!</h3>
-                                    <p>Volte mais tarde para novas oportunidades.</p>
-                                </div>
-                            `;
+                            html = `<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 15px;">🎉</div><h3>Você completou todas as tarefas!</h3></div>`;
                         }
-                        
                         content.innerHTML = html;
                     });
                 });
             } else {
                 database.ref('userTasks/' + currentUser).on('value', (snapshot) => {
                     const userTasks = snapshot.val() || {};
-                    
                     if (Object.keys(userTasks).length === 0) {
-                        content.innerHTML = `
-                            <div class="empty-state">
-                                <div style="font-size: 3rem; margin-bottom: 15px;">📋</div>
-                                <h3>Nenhuma tarefa enviada</h3>
-                                <p>Vá para "Tarefas" e comece a ganhar!</p>
-                            </div>
-                        `;
+                        content.innerHTML = `<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 15px;">📋</div><h3>Nenhuma tarefa enviada</h3></div>`;
                         return;
                     }
-                    
                     let html = '';
                     Object.keys(userTasks).forEach(taskId => {
                         const userTask = userTasks[taskId];
@@ -681,8 +588,6 @@
         
         function createTaskCard(task, taskId, userTask) {
             const hasTutorial = task.tutorialImage ? true : false;
-            const status = userTask ? userTask.status : null;
-            
             return `
                 <div class="task-card">
                     <div class="task-header">
@@ -691,49 +596,41 @@
                     </div>
                     <div class="task-desc">${task.description}</div>
                     <div class="task-invest">
-                        💰 Você investe: <strong>R$ ${task.invest.toFixed(2)}</strong> 
-                        → Recebe: <strong>R$ ${task.reward.toFixed(2)}</strong>
-                        <br>
-                        📊 Lucro: <strong>R$ ${(task.reward - task.invest).toFixed(2)}</strong>
+                        💰 Investe: <strong>R$ ${task.invest.toFixed(2)}</strong> → Recebe: <strong>R$ ${task.reward.toFixed(2)}</strong>
                     </div>
                     ${hasTutorial ? `<button class="tutorial-btn" onclick="showTutorial('${taskId}')">📖 Ver Tutorial</button>` : ''}
                     <button class="btn-task" onclick="startTask('${taskId}', '${task.link}')">
-                        ${status === 'rejected' ? '❌ Rejeitado - Tentar Novamente' : '👉 Fazer Agora'}
+                        ${userTask?.status === 'rejected' ? '❌ Rejeitado - Tentar Novamente' : '👉 Fazer Agora'}
                     </button>
                 </div>
             `;
         }
         
         function createMyTaskCard(task, userTask, taskId) {
-            let statusClass = '';
+            let statusStyle = '';
             let statusText = '';
-            
             switch(userTask.status) {
                 case 'pending':
-                    statusClass = 'background: #ffc107; color: #333;';
-                    statusText = '⏳ Aguardando Aprovação';
+                    statusStyle = 'background: #ffc107; color: #333;';
+                    statusText = '⏳ Aguardando';
                     break;
                 case 'approved':
-                    statusClass = 'background: #28a745;';
-                    statusText = '✅ Aprovado - Recebido!';
+                    statusStyle = 'background: #28a745;';
+                    statusText = '✅ Aprovado';
                     break;
                 case 'rejected':
-                    statusClass = 'background: #dc3545;';
+                    statusStyle = 'background: #dc3545;';
                     statusText = '❌ Rejeitado';
                     break;
             }
-            
             return `
                 <div class="task-card">
                     <div class="task-header">
                         <div class="task-title">${task.title}</div>
-                        <div class="task-reward" style="${statusClass}">${statusText}</div>
+                        <div class="task-reward" style="${statusStyle}">${statusText}</div>
                     </div>
                     <div class="task-desc">${task.description}</div>
-                    <div style="margin-top: 10px; font-size: 0.85rem; color: #999;">
-                        Enviado em: ${new Date(userTask.submittedAt).toLocaleString()}
-                    </div>
-                    ${userTask.comprovanteUrl ? `<img src="${userTask.comprovanteUrl}" style="max-width: 100%; margin-top: 10px; border-radius: 10px;">` : ''}
+                    ${userTask.comprovanteImage ? `<img src="${userTask.comprovanteImage}" style="max-width: 100%; margin-top: 10px; border-radius: 10px;">` : ''}
                 </div>
             `;
         }
@@ -743,8 +640,8 @@
                 const imageUrl = snapshot.val();
                 if (imageUrl) {
                     document.getElementById('tutorialContent').innerHTML = `
-                        <img src="${imageUrl}" class="tutorial-image" alt="Tutorial">
-                        <p style="color: #666; text-align: center;">Siga os passos da imagem acima</p>
+                        <img src="${imageUrl}" style="max-width: 100%; border-radius: 10px;">
+                        <p style="color: #666; text-align: center; margin-top: 10px;">Siga os passos acima</p>
                     `;
                     document.getElementById('tutorialModal').classList.add('active');
                 }
@@ -772,27 +669,31 @@
         function handleFileSelect(event) {
             const file = event.target.files[0];
             if (file) {
-                selectedFile = file;
-                console.log('Arquivo selecionado:', file.name, '-', (file.size/1024).toFixed(2), 'KB');
+                // Verificar tamanho (máximo 500KB para base64 não ficar gigante)
+                if (file.size > 500 * 1024) {
+                    showToast('❌ Imagem muito grande! Máximo 500KB');
+                    return;
+                }
                 
+                selectedFile = file;
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     document.getElementById('previewImage').src = e.target.result;
                     document.getElementById('previewImage').style.display = 'block';
                     document.getElementById('uploadText').style.display = 'none';
                     document.getElementById('uploadArea').classList.add('has-file');
-                    showUploadStatus('📷 Imagem selecionada: ' + file.name);
+                    showUploadStatus('📷 Imagem pronta para envio');
                 };
                 reader.readAsDataURL(file);
             }
         }
         
         // ============================================
-        // SUBMIT COMPROVANTE - CORRIGIDO
+        // SUBMIT COMPROVANTE - COM BASE64 NO DATABASE
         // ============================================
         async function submitComprovante() {
             if (!selectedFile) {
-                showToast('❌ Selecione uma imagem primeiro!');
+                showToast('❌ Selecione uma imagem!');
                 return;
             }
             
@@ -801,79 +702,54 @@
                 return;
             }
             
-            const btn = document.getElementById('btnSubmitComprovante');
+            const btn = document.getElementById('btnSubmit');
             btn.innerHTML = '<span class="loading"></span> Enviando...';
             btn.disabled = true;
-            showUploadStatus('⬆️ Enviando comprovante...');
+            showUploadStatus('⬆️ Processando imagem...');
             
             try {
-                console.log('Iniciando upload do comprovante...');
+                // Converter imagem para base64
+                const base64Image = await fileToBase64(selectedFile);
+                console.log('Imagem convertida para base64, tamanho:', base64Image.length);
                 
-                // Verificar storage
-                if (!storage) {
-                    throw new Error('Storage não disponível');
-                }
+                showUploadStatus('💾 Salvando no banco de dados...');
                 
-                // Criar nome do arquivo
-                const timestamp = Date.now();
-                const safeName = selectedFile.name.replace(/[^a-zA-Z0-9.]/g, '_');
-                const fileName = 'comprovantes/' + currentUser + '/' + currentTask + '_' + timestamp + '_' + safeName;
-                
-                console.log('Caminho:', fileName);
-                showUploadStatus('⬆️ Enviando para o servidor...');
-                
-                const storageRef = storage.ref(fileName);
-                
-                // Metadata
-                const metadata = {
-                    contentType: selectedFile.type,
-                    customMetadata: {
-                        'userId': currentUser,
-                        'taskId': currentTask,
-                        'timestamp': timestamp.toString()
-                    }
-                };
-                
-                // Fazer upload
-                console.log('Fazendo upload...');
-                await storageRef.put(selectedFile, metadata);
-                
-                console.log('Upload completo, obtendo URL...');
-                showUploadStatus('✅ Upload completo! Salvando...');
-                
-                const imageUrl = await storageRef.getDownloadURL();
-                console.log('URL obtida:', imageUrl.substring(0, 50) + '...');
-                
-                // Salvar no database
-                console.log('Salvando no database...');
+                // Salvar diretamente no Realtime Database
                 await database.ref('userTasks/' + currentUser + '/' + currentTask).set({
                     taskId: currentTask,
                     status: 'pending',
                     submittedAt: Date.now(),
-                    comprovanteUrl: imageUrl,
-                    comprovantePath: fileName
+                    comprovanteImage: base64Image  // IMAGEM EM BASE64!
                 });
                 
                 await database.ref('pendingApprovals/' + currentTask + '_' + currentUser).set({
                     userId: currentUser,
                     taskId: currentTask,
                     submittedAt: Date.now(),
-                    comprovanteUrl: imageUrl
+                    comprovanteImage: base64Image  // IMAGEM EM BASE64!
                 });
                 
-                console.log('Comprovante enviado com sucesso!');
                 showToast('✅ Comprovante enviado! Aguarde aprovação.');
                 closeModal();
                 setTimeout(() => loadTasks(), 500);
                 
             } catch (error) {
-                console.error('Erro ao enviar:', error);
-                showToast('❌ Erro ao enviar: ' + error.message);
-                showUploadStatus('❌ Erro: ' + error.message);
+                console.error('Erro:', error);
+                showToast('❌ Erro: ' + error.message);
             } finally {
                 btn.innerHTML = 'Enviar Comprovante';
                 btn.disabled = false;
             }
+        }
+        
+        // Função para converter arquivo em base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
         }
         
         function closeModal() {
@@ -896,7 +772,6 @@
         // ============================================
         // SAQUE
         // ============================================
-        
         function openSaqueModal() {
             document.getElementById('saqueValorModal').classList.add('active');
         }
@@ -904,7 +779,6 @@
         function closeSaqueModal() {
             document.getElementById('saqueValorModal').classList.remove('active');
             document.getElementById('saqueDadosModal').classList.remove('active');
-            
             document.getElementById('tipoChavePix').value = '';
             document.getElementById('chavePix').value = '';
             document.getElementById('nomeTitular').value = '';
@@ -916,10 +790,8 @@
                 showToast('❌ Saldo insuficiente!');
                 return;
             }
-            
             valorSaqueAtual = valor;
             document.getElementById('valorSaqueSelecionado').textContent = valor.toFixed(2).replace('.', ',');
-            
             document.getElementById('saqueValorModal').classList.remove('active');
             document.getElementById('saqueDadosModal').classList.add('active');
         }
@@ -934,31 +806,18 @@
             const input = document.getElementById('chavePix');
             const label = document.getElementById('labelChavePix');
             
-            switch(tipo) {
-                case 'cpf':
-                    input.placeholder = '000.000.000-00';
-                    label.textContent = '🔑 CPF *';
-                    break;
-                case 'cnpj':
-                    input.placeholder = '00.000.000/0000-00';
-                    label.textContent = '🔑 CNPJ *';
-                    break;
-                case 'email':
-                    input.placeholder = 'seu@email.com';
-                    label.textContent = '📧 E-mail *';
-                    break;
-                case 'telefone':
-                    input.placeholder = '(00) 00000-0000';
-                    label.textContent = '📱 Telefone *';
-                    break;
-                case 'aleatoria':
-                    input.placeholder = 'Chave aleatória do Pix';
-                    label.textContent = '🔑 Chave Aleatória *';
-                    break;
-                default:
-                    input.placeholder = 'Digite sua chave Pix...';
-                    label.textContent = '🔑 Chave Pix *';
-            }
+            const placeholders = {
+                'cpf': '000.000.000-00',
+                'cnpj': '00.000.000/0000-00',
+                'email': 'seu@email.com',
+                'telefone': '(00) 00000-0000',
+                'aleatoria': 'Chave aleatória'
+            };
+            
+            input.placeholder = placeholders[tipo] || 'Digite sua chave Pix...';
+            label.textContent = tipo === 'email' ? '📧 E-mail *' : 
+                               tipo === 'telefone' ? '📱 Telefone *' : 
+                               '🔑 Chave Pix *';
         }
         
         async function confirmarSaque() {
@@ -967,18 +826,8 @@
             const nomeTitular = document.getElementById('nomeTitular').value.trim();
             const banco = document.getElementById('banco').value.trim();
             
-            if (!tipoChave) {
-                showToast('❌ Selecione o tipo de chave Pix!');
-                return;
-            }
-            
-            if (!chavePix) {
-                showToast('❌ Digite sua chave Pix!');
-                return;
-            }
-            
-            if (!nomeTitular) {
-                showToast('❌ Digite o nome do titular!');
+            if (!tipoChave || !chavePix || !nomeTitular) {
+                showToast('❌ Preencha todos os campos obrigatórios!');
                 return;
             }
             
@@ -1006,15 +855,12 @@
                     }
                 });
                 
-                const newBalance = saldoAtual - valorSaqueAtual;
-                await database.ref('users/' + currentUser + '/balance').set(newBalance);
+                await database.ref('users/' + currentUser + '/balance').set(saldoAtual - valorSaqueAtual);
                 
-                showToast(`✅ Saque de R$ ${valorSaqueAtual.toFixed(2)} solicitado!`);
+                showToast(`✅ Saque solicitado!`);
                 closeSaqueModal();
-                
             } catch (error) {
-                console.error('Erro ao solicitar saque:', error);
-                showToast('❌ Erro ao solicitar saque: ' + error.message);
+                showToast('❌ Erro: ' + error.message);
             } finally {
                 btn.innerHTML = '✅ Confirmar Saque';
                 btn.disabled = false;
