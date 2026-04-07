@@ -863,12 +863,54 @@
             document.getElementById('tutorialModal').classList.remove('active');
         }
 
-        function startTask(taskId, link) {
+        async function startTask(taskId, link) {
             currentTask = taskId;
+            
+            // Verificar se a tarefa exige comprovante
+            const taskSnapshot = await database.ref('tasks/' + taskId).once('value');
+            const task = taskSnapshot.val();
+            
             window.open(link, '_blank');
+            
             setTimeout(() => {
-                document.getElementById('uploadModal').classList.add('active');
+                if (task && task.exigirComprovante) {
+                    // Exige comprovante - mostrar modal de upload
+                    document.getElementById('uploadModal').classList.add('active');
+                } else {
+                    // Não exige comprovante - enviar direto para aprovação
+                    enviarSemComprovante(taskId);
+                }
             }, 1000);
+        }
+        
+        async function enviarSemComprovante(taskId) {
+            try {
+                await database.ref('userTasks/' + currentUser + '/' + taskId).set({
+                    taskId: taskId,
+                    status: 'pending',
+                    submittedAt: Date.now(),
+                    comprovanteImage: null,
+                    semComprovante: true
+                });
+
+                await database.ref('pendingApprovals/' + taskId + '_' + currentUser).set({
+                    userId: currentUser,
+                    taskId: taskId,
+                    submittedAt: Date.now(),
+                    comprovanteImage: null,
+                    semComprovante: true
+                });
+
+                showToast('✅ Tarefa enviada! Aguarde aprovação do ADM.');
+                
+                setTimeout(() => {
+                    loadTasks();
+                }, 500);
+
+            } catch (error) {
+                console.error('Erro:', error);
+                showToast('❌ Erro: ' + error.message);
+            }
         }
 
         function showUploadStatus(message) {
