@@ -452,6 +452,51 @@
             margin-bottom: 10px;
             font-size: 1.1rem;
         }
+            .task-timer {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .task-timer.expiring {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .btn-enviar-comprovante {
+            width: 100%;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .task-invest {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -648,6 +693,9 @@
             document.getElementById('userIdDisplay').textContent = userId;
             loadBalance();
             loadTasks();
+
+            // Iniciar verificação de tarefas expiradas a cada 1 minuto
+            setInterval(verificarTarefasExpiradas, 60000);
         }
 
         function loadBalance() {
@@ -821,20 +869,68 @@
         function createMyTaskCard(task, userTask, taskId) {
             let statusStyle = '';
             let statusText = '';
+            let acaoHtml = '';
+            let timerHtml = '';
+
+            const agora = Date.now();
+            const tempoRestante = userTask.expiresAt ? userTask.expiresAt - agora : 0;
+
             switch(userTask.status) {
+                case 'in_progress':
+                    statusStyle = 'background: #17a2b8;';
+                    statusText = '🔄 Em Andamento';
+
+                    // Calcular tempo restante
+                    if (tempoRestante > 0) {
+                        const horas = Math.floor(tempoRestante / (1000 * 60 * 60));
+                        const minutos = Math.floor((tempoRestante % (1000 * 60 * 60)) / (1000 * 60));
+                        const expirando = tempoRestante < (1000 * 60 * 30); // Menos de 30 min
+
+                        timerHtml = `
+                            <div class="task-timer ${expirando ? 'expiring' : ''}">
+                                ⏰ ${expirando ? '⚠️ ' : ''}Tempo restante: ${horas}h ${minutos}m
+                            </div>
+                        `;
+                    }
+
+                    acaoHtml = `
+                        <button class="btn-enviar-comprovante" onclick="openComprovanteModal('${taskId}')">
+                            📸 Enviar Comprovante
+                        </button>
+                    `;
+                    break;
+
                 case 'pending':
                     statusStyle = 'background: #ffc107; color: #333;';
-                    statusText = '⏳ Aguardando';
+                    statusText = '⏳ Aguardando Aprovação';
                     break;
+
                 case 'approved':
                     statusStyle = 'background: #28a745;';
-                    statusText = '✅ Aprovado';
+                    statusText = '✅ Concluído';
                     break;
+
                 case 'rejected':
                     statusStyle = 'background: #dc3545;';
                     statusText = '❌ Rejeitado';
+                    acaoHtml = `
+                        <button class="btn-task" onclick="startTask('${taskId}', '${task.link}')">
+                            🔄 Tentar Novamente
+                        </button>
+                    `;
+                    break;
+
+                case 'expired':
+                    statusStyle = 'background: #6c757d;';
+                    statusText = '⌛ Expirado';
+                    acaoHtml = `
+                        <button class="btn-task" onclick="startTask('${taskId}', '${task.link}')">
+                            🔄 Refazer Tarefa
+                        </button>
+                    `;
                     break;
             }
+
             return `
                 <div class="task-card">
                     <div class="task-header">
@@ -842,7 +938,12 @@
                         <div class="task-reward" style="${statusStyle}">${statusText}</div>
                     </div>
                     <div class="task-desc">${task.description}</div>
+                    <div class="task-invest">
+                        💰 Investe: <strong>R$ ${task.invest.toFixed(2)}</strong> → Recebe: <strong>R$ ${task.reward.toFixed(2)}</strong>
+                    </div>
+                    ${timerHtml}
                     ${userTask.comprovanteImage ? `<img src="${userTask.comprovanteImage}" style="max-width: 100%; margin-top: 10px; border-radius: 10px;">` : ''}
+                    ${acaoHtml}
                 </div>
             `;
         }
@@ -883,23 +984,7 @@
             }, 1000);
         }
         
-        async function enviarSemComprovante(taskId) {
-            try {
-                await database.ref('userTasks/' + currentUser + '/' + taskId).set({
-                    taskId: taskId,
-                    status: 'pending',
-                    submittedAt: Date.now(),
-                    comprovanteImage: null,
-                    semComprovante: true
-                });
-
-                await database.ref('pendingApprovals/' + taskId + '_' + currentUser).set({
-                    userId: currentUser,
-                    taskId: taskId,
-                    submittedAt: Date.now(),
-                    comprovanteImage: null,
-                    semComprovante: true
-                });
+        );
 
                 showToast('✅ Tarefa enviada! Aguarde aprovação do ADM.');
                 
@@ -1009,6 +1094,7 @@
             document.getElementById('uploadArea').classList.remove('has-file');
             document.getElementById('fileInput').value = '';
             document.getElementById('uploadStatus').classList.remove('show');
+            currentTask = null;
         }
 
         function switchTab(tab) {
