@@ -184,12 +184,13 @@
 
         .tab {
             flex: 1;
-            padding: 15px;
+            padding: 15px 10px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
             font-weight: 500;
             color: #666;
+            font-size: 0.85rem;
         }
 
         .tab.active {
@@ -271,6 +272,52 @@
             font-size: 0.8rem;
             cursor: pointer;
             margin-left: 10px;
+        }
+
+        /* ===== TIMER STYLES ===== */
+        .timer-box {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .timer-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .timer-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        .timer-warning {
+            background: linear-gradient(135deg, #ffa726 0%, #ff7043 100%) !important;
+        }
+
+        .btn-enviar-comprovante {
+            width: 100%;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-enviar-comprovante:hover {
+            transform: scale(1.02);
         }
 
         .empty-state {
@@ -452,6 +499,30 @@
             margin-bottom: 10px;
             font-size: 1.1rem;
         }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .status-approved {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-rejected {
+            background: #dc3545;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -489,7 +560,8 @@
 
     <div class="tabs">
         <div class="tab active" onclick="switchTab('available')">📋 Tarefas</div>
-        <div class="tab" onclick="switchTab('mytasks')">✅ Minhas Tarefas</div>
+        <div class="tab" onclick="switchTab('inprogress')">🔄 Em Andamento</div>
+        <div class="tab" onclick="switchTab('mytasks')">✅ Minhas</div>
     </div>
 
     <div class="content" id="content"></div>
@@ -616,6 +688,8 @@
         let currentTab = 'available';
         let valorSaqueAtual = 0;
         let saldoAtual = 0;
+        let timerInterval = null;
+        let inProgressTasks = []; // Array para armazenar tarefas em andamento
 
         // ============================================
         // INICIALIZAÇÃO
@@ -648,6 +722,9 @@
             document.getElementById('userIdDisplay').textContent = userId;
             loadBalance();
             loadTasks();
+            
+            // Iniciar atualização do timer a cada 1 minuto
+            iniciarAtualizacaoTimer();
         }
 
         function loadBalance() {
@@ -659,7 +736,59 @@
         }
 
         // ============================================
-        // SISTEMA DE CUPONS - NOVO!
+        // SISTEMA DE TIMER - ATUALIZA A CADA 1 MINUTO
+        // ============================================
+        function iniciarAtualizacaoTimer() {
+            // Atualizar imediatamente
+            atualizarTimersNaTela();
+            
+            // Depois a cada 1 minuto (60000 ms)
+            timerInterval = setInterval(() => {
+                atualizarTimersNaTela();
+            }, 60000);
+        }
+
+        function atualizarTimersNaTela() {
+            // Só atualiza se estiver na aba "Em Andamento"
+            if (currentTab !== 'inprogress') return;
+            
+            inProgressTasks.forEach(taskData => {
+                const timerElement = document.querySelector(`[data-task-id="${taskData.taskId}"] .timer-value`);
+                if (timerElement) {
+                    const tempoRestante = calcularTempoRestante(taskData.startedAt);
+                    timerElement.textContent = tempoRestante;
+                    
+                    // Adicionar classe de aviso se faltar menos de 1 hora
+                    const timerBox = document.querySelector(`[data-task-id="${taskData.taskId}"] .timer-box`);
+                    if (timerBox && tempoRestante.includes('min')) {
+                        timerBox.classList.add('timer-warning');
+                    }
+                }
+            });
+        }
+
+        function calcularTempoRestante(startedAt) {
+            const agora = Date.now();
+            const tempoPassado = agora - startedAt;
+            const tempoTotal = 24 * 60 * 60 * 1000; // 24 horas em ms
+            const tempoRestante = tempoTotal - tempoPassado;
+            
+            if (tempoRestante <= 0) {
+                return '⏰ Expirado';
+            }
+            
+            const horas = Math.floor(tempoRestante / (1000 * 60 * 60));
+            const minutos = Math.floor((tempoRestante % (1000 * 60 * 60)) / (1000 * 60));
+            
+            if (horas > 0) {
+                return `${horas}h ${minutos}m`;
+            } else {
+                return `${minutos}min`;
+            }
+        }
+
+        // ============================================
+        // SISTEMA DE CUPONS
         // ============================================
         async function resgatarCupom() {
             const codeInput = document.getElementById('cupomCode');
@@ -672,7 +801,6 @@
             }
 
             try {
-                // Verificar se cupom existe
                 const cupomSnapshot = await database.ref('cupons/' + code).once('value');
                 const cupom = cupomSnapshot.val();
 
@@ -681,24 +809,20 @@
                     return;
                 }
 
-                // Verificar se já foi usado
                 if (cupom.status === 'usado') {
                     showCupomStatus('❌ Este cupom já foi usado!', 'error');
                     return;
                 }
 
-                // Verificar se usuário já usou este cupom
                 const userCupomSnapshot = await database.ref('users/' + currentUser + '/cupons/' + code).once('value');
                 if (userCupomSnapshot.exists()) {
                     showCupomStatus('❌ Você já resgatou este cupom!', 'error');
                     return;
                 }
 
-                // Tudo certo! Resgatar cupom
                 const valor = cupom.valor || 1.50;
                 const novoSaldo = saldoAtual + valor;
 
-                // Atualizar tudo no Firebase
                 const updates = {};
                 updates['cupons/' + code + '/status'] = 'usado';
                 updates['cupons/' + code + '/usadoPor'] = currentUser;
@@ -733,7 +857,7 @@
         }
 
         // ============================================
-        // TAREFAS
+        // TAREFAS - SISTEMA ATUALIZADO COM "EM ANDAMENTO"
         // ============================================
         async function loadTasks() {
             const content = document.getElementById('content');
@@ -741,6 +865,7 @@
 
             try {
                 if (currentTab === 'available') {
+                    // ABA TAREFAS: Só mostra tarefas NUNCA iniciadas (sem registro em userTasks)
                     const tasksSnapshot = await database.ref('tasks').once('value');
                     const tasks = tasksSnapshot.val() || {};
 
@@ -754,6 +879,7 @@
                         const task = tasks[taskId];
                         const userTask = userTasks[taskId];
 
+                        // Só mostra se NUNCA foi iniciada (não existe em userTasks)
                         if (!userTask) {
                             hasTasks = true;
                             html += createTaskCard(task, taskId);
@@ -761,21 +887,69 @@
                     });
 
                     if (!hasTasks) {
-                        html = `<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 15px;">🎉</div><h3>Nenhuma tarefa disponível</h3><p style="margin-top: 10px; opacity: 0.8;">Você já fez todas as tarefas!</p></div>`;
+                        html = `<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 15px;">🎉</div><h3>Nenhuma tarefa disponível</h3><p style="margin-top: 10px; opacity: 0.8;">Você já iniciou todas as tarefas!</p></div>`;
                     }
                     content.innerHTML = html;
 
-                } else {
+                } else if (currentTab === 'inprogress') {
+                    // ABA EM ANDAMENTO: Tarefas iniciadas mas sem comprovante enviado
+                    const tasksSnapshot = await database.ref('tasks').once('value');
+                    const tasks = tasksSnapshot.val() || {};
+
                     const userTasksSnapshot = await database.ref('userTasks/' + currentUser).once('value');
                     const userTasks = userTasksSnapshot.val() || {};
 
-                    if (Object.keys(userTasks).length === 0) {
-                        content.innerHTML = `<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 15px;">📋</div><h3>Nenhuma tarefa enviada</h3></div>`;
+                    // Limpar array de tarefas em andamento
+                    inProgressTasks = [];
+                    
+                    let html = '';
+                    let hasInProgress = false;
+
+                    Object.keys(userTasks).forEach(taskId => {
+                        const userTask = userTasks[taskId];
+                        const task = tasks[taskId];
+
+                        // Só mostra se está "in_progress" (iniciada mas sem comprovante)
+                        if (userTask && userTask.status === 'in_progress' && task) {
+                            hasInProgress = true;
+                            inProgressTasks.push({
+                                taskId: taskId,
+                                task: task,
+                                userTask: userTask,
+                                startedAt: userTask.startedAt
+                            });
+                            html += createInProgressTaskCard(task, userTask, taskId);
+                        }
+                    });
+
+                    if (!hasInProgress) {
+                        html = `<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 15px;">🔄</div><h3>Nenhuma tarefa em andamento</h3><p style="margin-top: 10px; opacity: 0.8;">Clique em "Fazer Agora" para iniciar uma tarefa!</p></div>`;
+                    }
+                    content.innerHTML = html;
+                    
+                    // Atualizar timers imediatamente
+                    atualizarTimersNaTela();
+
+                } else {
+                    // ABA MINHAS TAREFAS: Tarefas com comprovante enviado (pending, approved, rejected)
+                    const userTasksSnapshot = await database.ref('userTasks/' + currentUser).once('value');
+                    const userTasks = userTasksSnapshot.val() || {};
+
+                    // Filtrar só tarefas que já enviaram comprovante (não in_progress)
+                    const completedTasks = {};
+                    Object.keys(userTasks).forEach(taskId => {
+                        if (userTasks[taskId].status !== 'in_progress') {
+                            completedTasks[taskId] = userTasks[taskId];
+                        }
+                    });
+
+                    if (Object.keys(completedTasks).length === 0) {
+                        content.innerHTML = `<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 15px;">📋</div><h3>Nenhuma tarefa enviada</h3><p style="margin-top: 10px; opacity: 0.8;">Envie um comprovante primeiro!</p></div>`;
                         return;
                     }
 
-                    const taskPromises = Object.keys(userTasks).map(async (taskId) => {
-                        const userTask = userTasks[taskId];
+                    const taskPromises = Object.keys(completedTasks).map(async (taskId) => {
+                        const userTask = completedTasks[taskId];
                         const taskSnapshot = await database.ref('tasks/' + taskId).once('value');
                         const task = taskSnapshot.val();
                         return { taskId, task, userTask };
@@ -801,7 +975,7 @@
         function createTaskCard(task, taskId) {
             const hasTutorial = task.tutorialImage ? true : false;
             return `
-                <div class="task-card">
+                <div class="task-card" data-task-id="${taskId}">
                     <div class="task-header">
                         <div class="task-title">${task.title}</div>
                         <div class="task-reward">+R$ ${task.reward.toFixed(2)}</div>
@@ -818,20 +992,44 @@
             `;
         }
 
+        function createInProgressTaskCard(task, userTask, taskId) {
+            const tempoRestante = calcularTempoRestante(userTask.startedAt);
+            const isWarning = tempoRestante.includes('min') && !tempoRestante.includes('Expirado');
+            
+            return `
+                <div class="task-card" data-task-id="${taskId}">
+                    <div class="task-header">
+                        <div class="task-title">${task.title}</div>
+                        <div class="task-reward" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">🔄 Em Andamento</div>
+                    </div>
+                    <div class="task-desc">${task.description}</div>
+                    
+                    <div class="timer-box ${isWarning ? 'timer-warning' : ''}">
+                        <div class="timer-label">⏰ Tempo restante para enviar comprovante:</div>
+                        <div class="timer-value">${tempoRestante}</div>
+                    </div>
+                    
+                    <button class="btn-enviar-comprovante" onclick="openUploadModal('${taskId}')">
+                        📷 Enviar Comprovante
+                    </button>
+                </div>
+            `;
+        }
+
         function createMyTaskCard(task, userTask, taskId) {
-            let statusStyle = '';
+            let statusClass = '';
             let statusText = '';
             switch(userTask.status) {
                 case 'pending':
-                    statusStyle = 'background: #ffc107; color: #333;';
-                    statusText = '⏳ Aguardando';
+                    statusClass = 'status-pending';
+                    statusText = '⏳ Aguardando Aprovação';
                     break;
                 case 'approved':
-                    statusStyle = 'background: #28a745;';
+                    statusClass = 'status-approved';
                     statusText = '✅ Aprovado';
                     break;
                 case 'rejected':
-                    statusStyle = 'background: #dc3545;';
+                    statusClass = 'status-rejected';
                     statusText = '❌ Rejeitado';
                     break;
             }
@@ -839,7 +1037,7 @@
                 <div class="task-card">
                     <div class="task-header">
                         <div class="task-title">${task.title}</div>
-                        <div class="task-reward" style="${statusStyle}">${statusText}</div>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
                     </div>
                     <div class="task-desc">${task.description}</div>
                     ${userTask.comprovanteImage ? `<img src="${userTask.comprovanteImage}" style="max-width: 100%; margin-top: 10px; border-radius: 10px;">` : ''}
@@ -863,54 +1061,41 @@
             document.getElementById('tutorialModal').classList.remove('active');
         }
 
+        // ============================================
+        // INICIAR TAREFA - NOVO FLUXO
+        // ============================================
         async function startTask(taskId, link) {
-            currentTask = taskId;
-            
-            // Verificar se a tarefa exige comprovante
-            const taskSnapshot = await database.ref('tasks/' + taskId).once('value');
-            const task = taskSnapshot.val();
-            
-            window.open(link, '_blank');
-            
-            setTimeout(() => {
-                if (task && task.exigirComprovante) {
-                    // Exige comprovante - mostrar modal de upload
-                    document.getElementById('uploadModal').classList.add('active');
-                } else {
-                    // Não exige comprovante - enviar direto para aprovação
-                    enviarSemComprovante(taskId);
-                }
-            }, 1000);
-        }
-        
-        async function enviarSemComprovante(taskId) {
             try {
+                // Marcar tarefa como "in_progress" no Firebase
                 await database.ref('userTasks/' + currentUser + '/' + taskId).set({
                     taskId: taskId,
-                    status: 'pending',
-                    submittedAt: Date.now(),
-                    comprovanteImage: null,
-                    semComprovante: true
+                    status: 'in_progress',
+                    startedAt: Date.now(),
+                    comprovanteImage: null
                 });
 
-                await database.ref('pendingApprovals/' + taskId + '_' + currentUser).set({
-                    userId: currentUser,
-                    taskId: taskId,
-                    submittedAt: Date.now(),
-                    comprovanteImage: null,
-                    semComprovante: true
-                });
-
-                showToast('✅ Tarefa enviada! Aguarde aprovação do ADM.');
+                // Abrir link em nova aba
+                window.open(link, '_blank');
                 
+                showToast('🚀 Tarefa iniciada! Envie o comprovante em até 24h.');
+                
+                // Recarregar para atualizar as abas
                 setTimeout(() => {
                     loadTasks();
                 }, 500);
-
+                
             } catch (error) {
-                console.error('Erro:', error);
-                showToast('❌ Erro: ' + error.message);
+                console.error('Erro ao iniciar tarefa:', error);
+                showToast('❌ Erro ao iniciar tarefa');
             }
+        }
+
+        // ============================================
+        // MODAL DE UPLOAD - SEPARADO PARA REUTILIZAÇÃO
+        // ============================================
+        function openUploadModal(taskId) {
+            currentTask = taskId;
+            document.getElementById('uploadModal').classList.add('active');
         }
 
         function showUploadStatus(message) {
@@ -962,8 +1147,8 @@
 
                 showUploadStatus('💾 Salvando no banco de dados...');
 
-                await database.ref('userTasks/' + currentUser + '/' + currentTask).set({
-                    taskId: currentTask,
+                // Atualizar status de "in_progress" para "pending"
+                await database.ref('userTasks/' + currentUser + '/' + currentTask).update({
                     status: 'pending',
                     submittedAt: Date.now(),
                     comprovanteImage: base64Image
