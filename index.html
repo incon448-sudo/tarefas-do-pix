@@ -754,8 +754,7 @@
                         const task = tasks[taskId];
                         const userTask = userTasks[taskId];
 
-                        // Só mostra se NUNCA foi iniciada (não rejeitado, não expirado)
-                        if (!userTask || (userTask.status !== 'rejected' && userTask.status !== 'expired')) {
+                        if (!userTask) {
                             hasTasks = true;
                             html += createTaskCard(task, taskId);
                         }
@@ -833,11 +832,7 @@
                     break;
                 case 'rejected':
                     statusStyle = 'background: #dc3545;';
-                    statusText = '❌ Rejeitado - Não pode refazer';
-                    break;
-                case 'expired':
-                    statusStyle = 'background: #6c757d;';
-                    statusText = '⌛ Expirado - Não pode refazer';
+                    statusText = '❌ Rejeitado';
                     break;
             }
             return `
