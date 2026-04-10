@@ -180,17 +180,19 @@
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
         }
 
         .tab {
             flex: 1;
-            padding: 15px 10px;
+            padding: 15px 8px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
             font-weight: 500;
             color: #666;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
+            min-width: 70px;
         }
 
         .tab.active {
@@ -523,6 +525,100 @@
             background: #dc3545;
             color: white;
         }
+
+        /* ===== HISTÓRICO DE SAQUES ===== */
+        .saque-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .saque-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .saque-valor {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .saque-status-pendente {
+            background: #ffc107;
+            color: #333;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .saque-status-sucesso {
+            background: #28a745;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        .saque-info {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .saque-info strong {
+            color: #333;
+        }
+
+        .saque-data {
+            font-size: 0.8rem;
+            color: #999;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        .saque-chave {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+        }
+
+        /* Debug info */
+        .debug-info {
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            padding: 10px;
+            margin: 10px 20px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-family: monospace;
+            display: none;
+        }
+
+        .debug-info.show {
+            display: block;
+        }
+
+        .btn-retry {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -530,6 +626,9 @@
         <h1>💰 Tarefa Pix</h1>
         <span class="user-id" id="userIdDisplay">Carregando...</span>
     </div>
+
+    <!-- Debug info (só aparece se tiver erro) -->
+    <div id="debugInfo" class="debug-info"></div>
 
     <div class="balance-card">
         <div class="balance-label">Seu Saldo</div>
@@ -559,12 +658,18 @@
     </div>
 
     <div class="tabs">
-        <div class="tab active" onclick="switchTab('available')">📋 Tarefas</div>
-        <div class="tab" onclick="switchTab('inprogress')">🔄 Em Andamento</div>
-        <div class="tab" onclick="switchTab('mytasks')">✅ Minhas</div>
+        <div class="tab active" onclick="switchTab('available', this)">📋 Tarefas</div>
+        <div class="tab" onclick="switchTab('inprogress', this)">🔄 Andamento</div>
+        <div class="tab" onclick="switchTab('mytasks', this)">✅ Minhas</div>
+        <div class="tab" onclick="switchTab('saques', this)">💰 Saques</div>
     </div>
 
-    <div class="content" id="content"></div>
+    <div class="content" id="content">
+        <div class="empty-state" style="color: white;">
+            <div class="loading"></div>
+            <p>Carregando...</p>
+        </div>
+    </div>
 
     <!-- Botão de Suporte Telegram -->
     <a href="https://t.me/+la54Ed6p0wE1Y2Qx" 
@@ -676,9 +781,6 @@
             appId: "1:16378804197:web:0e95c0fd5440ec4e7e2106"
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-
         // ============================================
         // VARIÁVEIS GLOBAIS
         // ============================================
@@ -689,11 +791,74 @@
         let valorSaqueAtual = 0;
         let saldoAtual = 0;
         let timerInterval = null;
-        let inProgressTasks = []; // Array para armazenar tarefas em andamento
+        let inProgressTasks = [];
+        let db = null;
 
         // ============================================
-        // INICIALIZAÇÃO
+        // INICIALIZAÇÃO COM TIMEOUT E TRATAMENTO DE ERRO
         // ============================================
+        function initApp() {
+            console.log('🚀 Iniciando app...');
+            
+            try {
+                // Inicializar Firebase
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.database();
+                console.log('✅ Firebase inicializado');
+                
+                // Testar conexão
+                testarConexao().then(() => {
+                    console.log('✅ Conexão OK, iniciando usuário...');
+                    initUser();
+                }).catch(err => {
+                    console.error('❌ Erro de conexão:', err);
+                    mostrarErro('Erro de conexão com o servidor. Verifique sua internet.');
+                });
+                
+            } catch (error) {
+                console.error('❌ Erro ao inicializar Firebase:', error);
+                mostrarErro('Erro ao iniciar: ' + error.message);
+            }
+        }
+
+        async function testarConexao() {
+            return new Promise((resolve, reject) => {
+                const timeout = setTimeout(() => {
+                    reject(new Error('Timeout - Firebase não respondeu em 10 segundos'));
+                }, 10000);
+                
+                db.ref('.info/connected').once('value')
+                    .then(() => {
+                        clearTimeout(timeout);
+                        resolve();
+                    })
+                    .catch(err => {
+                        clearTimeout(timeout);
+                        reject(err);
+                    });
+            });
+        }
+
+        function mostrarErro(mensagem) {
+            console.error(mensagem);
+            const debugDiv = document.getElementById('debugInfo');
+            debugDiv.innerHTML = `
+                <strong>⚠️ ERRO:</strong> ${mensagem}<br>
+                <small>Tente recarregar a página</small><br>
+                <button class="btn-retry" onclick="location.reload()">🔄 Recarregar</button>
+            `;
+            debugDiv.classList.add('show');
+            
+            document.getElementById('content').innerHTML = `
+                <div class="empty-state" style="color: white;">
+                    <div style="font-size: 3rem; margin-bottom: 15px;">⚠️</div>
+                    <h3>Erro ao carregar</h3>
+                    <p style="margin-top: 10px; opacity: 0.8;">${mensagem}</p>
+                    <button class="btn-retry" onclick="location.reload()" style="margin-top: 20px;">🔄 Tentar Novamente</button>
+                </div>
+            `;
+        }
+
         function generateUserId() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let result = 'USER_';
@@ -703,53 +868,67 @@
             return result;
         }
 
-        function initUser() {
-            let userId = localStorage.getItem('tarefaPixUserId');
-            if (!userId) {
-                userId = generateUserId();
-                localStorage.setItem('tarefaPixUserId', userId);
-                database.ref('users/' + userId).set({
-                    id: userId,
-                    balance: 0,
-                    createdAt: Date.now(),
-                    lastLogin: Date.now()
-                });
-            } else {
-                database.ref('users/' + userId + '/lastLogin').set(Date.now());
-            }
+        async function initUser() {
+            try {
+                let userId = localStorage.getItem('tarefaPixUserId');
+                console.log('👤 UserID do localStorage:', userId);
+                
+                if (!userId) {
+                    userId = generateUserId();
+                    localStorage.setItem('tarefaPixUserId', userId);
+                    console.log('🆕 Novo usuário criado:', userId);
+                    
+                    // Criar usuário no Firebase
+                    await db.ref('users/' + userId).set({
+                        id: userId,
+                        balance: 0,
+                        createdAt: Date.now(),
+                        lastLogin: Date.now()
+                    });
+                    console.log('✅ Usuário salvo no Firebase');
+                } else {
+                    console.log('👤 Usuário existente:', userId);
+                    await db.ref('users/' + userId + '/lastLogin').set(Date.now());
+                }
 
-            currentUser = userId;
-            document.getElementById('userIdDisplay').textContent = userId;
-            loadBalance();
-            loadTasks();
-            
-            // Iniciar atualização do timer a cada 1 minuto
-            iniciarAtualizacaoTimer();
+                currentUser = userId;
+                document.getElementById('userIdDisplay').textContent = userId;
+                
+                // Carregar saldo e tarefas em paralelo
+                loadBalance();
+                await loadTasks();
+                
+                iniciarAtualizacaoTimer();
+                
+            } catch (error) {
+                console.error('❌ Erro ao inicializar usuário:', error);
+                mostrarErro('Erro ao carregar dados do usuário: ' + error.message);
+            }
         }
 
         function loadBalance() {
-            database.ref('users/' + currentUser + '/balance').on('value', (snapshot) => {
+            if (!currentUser || !db) return;
+            
+            db.ref('users/' + currentUser + '/balance').on('value', (snapshot) => {
                 saldoAtual = snapshot.val() || 0;
                 document.getElementById('balance').textContent = saldoAtual.toFixed(2).replace('.', ',');
                 document.getElementById('saldoDisponivel').textContent = saldoAtual.toFixed(2).replace('.', ',');
+            }, (error) => {
+                console.error('❌ Erro ao carregar saldo:', error);
             });
         }
 
         // ============================================
-        // SISTEMA DE TIMER - ATUALIZA A CADA 1 MINUTO
+        // SISTEMA DE TIMER
         // ============================================
         function iniciarAtualizacaoTimer() {
-            // Atualizar imediatamente
             atualizarTimersNaTela();
-            
-            // Depois a cada 1 minuto (60000 ms)
             timerInterval = setInterval(() => {
                 atualizarTimersNaTela();
             }, 60000);
         }
 
         function atualizarTimersNaTela() {
-            // Só atualiza se estiver na aba "Em Andamento"
             if (currentTab !== 'inprogress') return;
             
             inProgressTasks.forEach(taskData => {
@@ -758,7 +937,6 @@
                     const tempoRestante = calcularTempoRestante(taskData.startedAt);
                     timerElement.textContent = tempoRestante;
                     
-                    // Adicionar classe de aviso se faltar menos de 1 hora
                     const timerBox = document.querySelector(`[data-task-id="${taskData.taskId}"] .timer-box`);
                     if (timerBox && tempoRestante.includes('min')) {
                         timerBox.classList.add('timer-warning');
@@ -770,7 +948,7 @@
         function calcularTempoRestante(startedAt) {
             const agora = Date.now();
             const tempoPassado = agora - startedAt;
-            const tempoTotal = 24 * 60 * 60 * 1000; // 24 horas em ms
+            const tempoTotal = 24 * 60 * 60 * 1000;
             const tempoRestante = tempoTotal - tempoPassado;
             
             if (tempoRestante <= 0) {
@@ -801,7 +979,7 @@
             }
 
             try {
-                const cupomSnapshot = await database.ref('cupons/' + code).once('value');
+                const cupomSnapshot = await db.ref('cupons/' + code).once('value');
                 const cupom = cupomSnapshot.val();
 
                 if (!cupom) {
@@ -814,7 +992,7 @@
                     return;
                 }
 
-                const userCupomSnapshot = await database.ref('users/' + currentUser + '/cupons/' + code).once('value');
+                const userCupomSnapshot = await db.ref('users/' + currentUser + '/cupons/' + code).once('value');
                 if (userCupomSnapshot.exists()) {
                     showCupomStatus('❌ Você já resgatou este cupom!', 'error');
                     return;
@@ -834,7 +1012,7 @@
                     dataResgate: Date.now()
                 };
 
-                await database.ref().update(updates);
+                await db.ref().update(updates);
 
                 showCupomStatus(`✅ Cupom resgatado! +R$ ${valor.toFixed(2)} adicionados!`, 'success');
                 codeInput.value = '';
@@ -857,19 +1035,43 @@
         }
 
         // ============================================
-        // TAREFAS - SISTEMA ATUALIZADO COM "EM ANDAMENTO"
+        // TAREFAS - COM TIMEOUT E TRATAMENTO DE ERRO
         // ============================================
         async function loadTasks() {
             const content = document.getElementById('content');
             content.innerHTML = '<div class="empty-state" style="color: white;"><div class="loading"></div><p>Carregando...</p></div>';
 
+            // Timeout de 15 segundos
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error('Timeout - Demorou mais de 15s')), 15000);
+            });
+
+            try {
+                await Promise.race([carregarConteudo(), timeoutPromise]);
+            } catch (error) {
+                console.error('❌ Erro ou timeout:', error);
+                content.innerHTML = `
+                    <div class="empty-state" style="color: white;">
+                        <div style="font-size: 3rem; margin-bottom: 15px;">⚠️</div>
+                        <h3>Erro ao carregar</h3>
+                        <p style="margin-top: 10px; opacity: 0.8;">${error.message}</p>
+                        <button class="btn-retry" onclick="loadTasks()" style="margin-top: 20px;">🔄 Tentar Novamente</button>
+                    </div>
+                `;
+            }
+        }
+
+        async function carregarConteudo() {
+            const content = document.getElementById('content');
+
             try {
                 if (currentTab === 'available') {
-                    // ABA TAREFAS: Só mostra tarefas NUNCA iniciadas (sem registro em userTasks)
-                    const tasksSnapshot = await database.ref('tasks').once('value');
+                    console.log('📋 Carregando tarefas disponíveis...');
+                    const tasksSnapshot = await db.ref('tasks').once('value');
                     const tasks = tasksSnapshot.val() || {};
+                    console.log('📋 Tarefas encontradas:', Object.keys(tasks).length);
 
-                    const userTasksSnapshot = await database.ref('userTasks/' + currentUser).once('value');
+                    const userTasksSnapshot = await db.ref('userTasks/' + currentUser).once('value');
                     const userTasks = userTasksSnapshot.val() || {};
 
                     let html = '';
@@ -879,7 +1081,6 @@
                         const task = tasks[taskId];
                         const userTask = userTasks[taskId];
 
-                        // Só mostra se NUNCA foi iniciada (não existe em userTasks)
                         if (!userTask) {
                             hasTasks = true;
                             html += createTaskCard(task, taskId);
@@ -892,14 +1093,13 @@
                     content.innerHTML = html;
 
                 } else if (currentTab === 'inprogress') {
-                    // ABA EM ANDAMENTO: Tarefas iniciadas mas sem comprovante enviado
-                    const tasksSnapshot = await database.ref('tasks').once('value');
+                    console.log('🔄 Carregando tarefas em andamento...');
+                    const tasksSnapshot = await db.ref('tasks').once('value');
                     const tasks = tasksSnapshot.val() || {};
 
-                    const userTasksSnapshot = await database.ref('userTasks/' + currentUser).once('value');
+                    const userTasksSnapshot = await db.ref('userTasks/' + currentUser).once('value');
                     const userTasks = userTasksSnapshot.val() || {};
 
-                    // Limpar array de tarefas em andamento
                     inProgressTasks = [];
                     
                     let html = '';
@@ -909,7 +1109,6 @@
                         const userTask = userTasks[taskId];
                         const task = tasks[taskId];
 
-                        // Só mostra se está "in_progress" (iniciada mas sem comprovante)
                         if (userTask && userTask.status === 'in_progress' && task) {
                             hasInProgress = true;
                             inProgressTasks.push({
@@ -926,16 +1125,17 @@
                         html = `<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 15px;">🔄</div><h3>Nenhuma tarefa em andamento</h3><p style="margin-top: 10px; opacity: 0.8;">Clique em "Fazer Agora" para iniciar uma tarefa!</p></div>`;
                     }
                     content.innerHTML = html;
-                    
-                    // Atualizar timers imediatamente
                     atualizarTimersNaTela();
 
+                } else if (currentTab === 'saques') {
+                    console.log('💰 Carregando histórico de saques...');
+                    await loadSaquesHistory();
+                    
                 } else {
-                    // ABA MINHAS TAREFAS: Tarefas com comprovante enviado (pending, approved, rejected)
-                    const userTasksSnapshot = await database.ref('userTasks/' + currentUser).once('value');
+                    console.log('✅ Carregando minhas tarefas...');
+                    const userTasksSnapshot = await db.ref('userTasks/' + currentUser).once('value');
                     const userTasks = userTasksSnapshot.val() || {};
 
-                    // Filtrar só tarefas que já enviaram comprovante (não in_progress)
                     const completedTasks = {};
                     Object.keys(userTasks).forEach(taskId => {
                         if (userTasks[taskId].status !== 'in_progress') {
@@ -950,7 +1150,7 @@
 
                     const taskPromises = Object.keys(completedTasks).map(async (taskId) => {
                         const userTask = completedTasks[taskId];
-                        const taskSnapshot = await database.ref('tasks/' + taskId).once('value');
+                        const taskSnapshot = await db.ref('tasks/' + taskId).once('value');
                         const task = taskSnapshot.val();
                         return { taskId, task, userTask };
                     });
@@ -967,8 +1167,85 @@
                     content.innerHTML = html || `<div class="empty-state"><div style="font-size: 3rem; margin-bottom: 15px;">📋</div><h3>Nenhuma tarefa encontrada</h3></div>`;
                 }
             } catch (error) {
-                console.error('Erro ao carregar tarefas:', error);
-                content.innerHTML = `<div class="empty-state" style="color: white;"><p>❌ Erro ao carregar. Tente novamente.</p></div>`;
+                console.error('❌ Erro ao carregar conteúdo:', error);
+                throw error;
+            }
+        }
+
+        // ===== HISTÓRICO DE SAQUES =====
+        async function loadSaquesHistory() {
+            const content = document.getElementById('content');
+            
+            try {
+                const saquesSnapshot = await db.ref('saques').orderByChild('userId').equalTo(currentUser).once('value');
+                const saques = saquesSnapshot.val() || {};
+                
+                if (Object.keys(saques).length === 0) {
+                    content.innerHTML = `
+                        <div class="empty-state">
+                            <div style="font-size: 3rem; margin-bottom: 15px;">💰</div>
+                            <h3>Nenhum saque realizado</h3>
+                            <p style="margin-top: 10px; opacity: 0.8;">
+                                Clique em "Sacar Dinheiro" no seu saldo para solicitar um saque!
+                            </p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const saquesArray = Object.keys(saques).map(key => ({
+                    id: key,
+                    ...saques[key]
+                })).sort((a, b) => b.requestedAt - a.requestedAt);
+                
+                let html = '';
+                
+                saquesArray.forEach(saque => {
+                    const data = new Date(saque.requestedAt).toLocaleString('pt-BR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    const isPendente = saque.status === 'pending';
+                    const statusClass = isPendente ? 'saque-status-pendente' : 'saque-status-sucesso';
+                    const statusText = isPendente ? '⏳ PENDENTE' : '✅ SUCESSO';
+                    const tipoChave = saque.pixData?.tipoChave || 'cpf';
+                    const chave = saque.pixData?.chave || 'Não informado';
+                    const nomeTitular = saque.pixData?.nomeTitular || 'Não informado';
+                    
+                    html += `
+                        <div class="saque-card">
+                            <div class="saque-header">
+                                <div class="saque-valor">R$ ${saque.amount.toFixed(2).replace('.', ',')}</div>
+                                <div class="${statusClass}">${statusText}</div>
+                            </div>
+                            <div class="saque-info">
+                                <strong>👤 Titular:</strong> ${nomeTitular}<br>
+                                <strong>📱 Tipo:</strong> ${tipoChave.toUpperCase()}<br>
+                                <strong>🔑 Chave:</strong>
+                                <div class="saque-chave">${chave}</div>
+                            </div>
+                            <div class="saque-data">
+                                🕐 Solicitado em: ${data}
+                                ${isPendente ? '<br><small style="color: #ff9800;">💬 O pagamento será processado em breve</small>' : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                content.innerHTML = html;
+                
+            } catch (error) {
+                console.error('❌ Erro ao carregar saques:', error);
+                content.innerHTML = `
+                    <div class="empty-state" style="color: white;">
+                        <p>❌ Erro ao carregar histórico de saques.</p>
+                        <button class="btn-retry" onclick="loadSaquesHistory()" style="margin-top: 10px;">🔄 Tentar Novamente</button>
+                    </div>
+                `;
             }
         }
 
@@ -977,15 +1254,15 @@
             return `
                 <div class="task-card" data-task-id="${taskId}">
                     <div class="task-header">
-                        <div class="task-title">${task.title}</div>
-                        <div class="task-reward">+R$ ${task.reward.toFixed(2)}</div>
+                        <div class="task-title">${task.title || 'Sem título'}</div>
+                        <div class="task-reward">+R$ ${(task.reward || 0).toFixed(2)}</div>
                     </div>
-                    <div class="task-desc">${task.description}</div>
+                    <div class="task-desc">${task.description || 'Sem descrição'}</div>
                     <div class="task-invest">
-                        💰 Investe: <strong>R$ ${task.invest.toFixed(2)}</strong> → Recebe: <strong>R$ ${task.reward.toFixed(2)}</strong>
+                        💰 Investe: <strong>R$ ${(task.invest || 0).toFixed(2)}</strong> → Recebe: <strong>R$ ${(task.reward || 0).toFixed(2)}</strong>
                     </div>
                     ${hasTutorial ? `<button class="tutorial-btn" onclick="showTutorial('${taskId}')">📖 Ver Tutorial</button>` : ''}
-                    <button class="btn-task" onclick="startTask('${taskId}', '${task.link}')">
+                    <button class="btn-task" onclick="startTask('${taskId}', '${task.link || '#'}')">
                         👉 Fazer Agora
                     </button>
                 </div>
@@ -999,10 +1276,10 @@
             return `
                 <div class="task-card" data-task-id="${taskId}">
                     <div class="task-header">
-                        <div class="task-title">${task.title}</div>
+                        <div class="task-title">${task.title || 'Sem título'}</div>
                         <div class="task-reward" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">🔄 Em Andamento</div>
                     </div>
-                    <div class="task-desc">${task.description}</div>
+                    <div class="task-desc">${task.description || 'Sem descrição'}</div>
                     
                     <div class="timer-box ${isWarning ? 'timer-warning' : ''}">
                         <div class="timer-label">⏰ Tempo restante para enviar comprovante:</div>
@@ -1036,24 +1313,31 @@
             return `
                 <div class="task-card">
                     <div class="task-header">
-                        <div class="task-title">${task.title}</div>
+                        <div class="task-title">${task.title || 'Sem título'}</div>
                         <span class="status-badge ${statusClass}">${statusText}</span>
                     </div>
-                    <div class="task-desc">${task.description}</div>
+                    <div class="task-desc">${task.description || 'Sem descrição'}</div>
                     ${userTask.comprovanteImage ? `<img src="${userTask.comprovanteImage}" style="max-width: 100%; margin-top: 10px; border-radius: 10px;">` : ''}
                 </div>
             `;
         }
 
         async function showTutorial(taskId) {
-            const snapshot = await database.ref('tasks/' + taskId + '/tutorialImage').once('value');
-            const imageUrl = snapshot.val();
-            if (imageUrl) {
-                document.getElementById('tutorialContent').innerHTML = `
-                    <img src="${imageUrl}" style="max-width: 100%; border-radius: 10px;">
-                    <p style="color: #666; text-align: center; margin-top: 10px;">Siga os passos acima</p>
-                `;
-                document.getElementById('tutorialModal').classList.add('active');
+            try {
+                const snapshot = await db.ref('tasks/' + taskId + '/tutorialImage').once('value');
+                const imageUrl = snapshot.val();
+                if (imageUrl) {
+                    document.getElementById('tutorialContent').innerHTML = `
+                        <img src="${imageUrl}" style="max-width: 100%; border-radius: 10px;">
+                        <p style="color: #666; text-align: center; margin-top: 10px;">Siga os passos acima</p>
+                    `;
+                    document.getElementById('tutorialModal').classList.add('active');
+                } else {
+                    showToast('❌ Tutorial não encontrado');
+                }
+            } catch (error) {
+                console.error('Erro ao carregar tutorial:', error);
+                showToast('❌ Erro ao carregar tutorial');
             }
         }
 
@@ -1062,24 +1346,22 @@
         }
 
         // ============================================
-        // INICIAR TAREFA - NOVO FLUXO
+        // INICIAR TAREFA
         // ============================================
         async function startTask(taskId, link) {
             try {
-                // Marcar tarefa como "in_progress" no Firebase
-                await database.ref('userTasks/' + currentUser + '/' + taskId).set({
+                await db.ref('userTasks/' + currentUser + '/' + taskId).set({
                     taskId: taskId,
                     status: 'in_progress',
                     startedAt: Date.now(),
                     comprovanteImage: null
                 });
 
-                // Abrir link em nova aba
-                window.open(link, '_blank');
-                
+                if (link && link !== '#') {
+                    window.open(link, '_blank');
+                }
                 showToast('🚀 Tarefa iniciada! Envie o comprovante em até 24h.');
                 
-                // Recarregar para atualizar as abas
                 setTimeout(() => {
                     loadTasks();
                 }, 500);
@@ -1091,7 +1373,7 @@
         }
 
         // ============================================
-        // MODAL DE UPLOAD - SEPARADO PARA REUTILIZAÇÃO
+        // MODAL DE UPLOAD
         // ============================================
         function openUploadModal(taskId) {
             currentTask = taskId;
@@ -1147,14 +1429,13 @@
 
                 showUploadStatus('💾 Salvando no banco de dados...');
 
-                // Atualizar status de "in_progress" para "pending"
-                await database.ref('userTasks/' + currentUser + '/' + currentTask).update({
+                await db.ref('userTasks/' + currentUser + '/' + currentTask).update({
                     status: 'pending',
                     submittedAt: Date.now(),
                     comprovanteImage: base64Image
                 });
 
-                await database.ref('pendingApprovals/' + currentTask + '_' + currentUser).set({
+                await db.ref('pendingApprovals/' + currentTask + '_' + currentUser).set({
                     userId: currentUser,
                     taskId: currentTask,
                     submittedAt: Date.now(),
@@ -1196,10 +1477,10 @@
             document.getElementById('uploadStatus').classList.remove('show');
         }
 
-        function switchTab(tab) {
+        function switchTab(tab, element) {
             currentTab = tab;
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
+            element.classList.add('active');
             loadTasks();
         }
 
@@ -1276,7 +1557,7 @@
 
             try {
                 const saqueId = 'SAQUE_' + Date.now();
-                await database.ref('saques/' + saqueId).set({
+                await db.ref('saques/' + saqueId).set({
                     userId: currentUser,
                     amount: valorSaqueAtual,
                     status: 'pending',
@@ -1289,10 +1570,15 @@
                     }
                 });
 
-                await database.ref('users/' + currentUser + '/balance').set(saldoAtual - valorSaqueAtual);
+                await db.ref('users/' + currentUser + '/balance').set(saldoAtual - valorSaqueAtual);
 
                 showToast(`✅ Saque solicitado!`);
                 closeSaqueModal();
+                
+                if (currentTab === 'saques') {
+                    loadSaquesHistory();
+                }
+                
             } catch (error) {
                 showToast('❌ Erro: ' + error.message);
             } finally {
@@ -1308,7 +1594,8 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        window.onload = initUser;
+        // Iniciar app quando DOM estiver pronto
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
