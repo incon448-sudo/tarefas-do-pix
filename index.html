@@ -102,7 +102,6 @@
             transition: transform 0.2s;
         }
 
-        /* ===== CUPOM CARD ===== */
         .cupom-card {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             margin: 0 20px 20px 20px;
@@ -276,7 +275,6 @@
             margin-left: 10px;
         }
 
-        /* ===== TIMER STYLES ===== */
         .timer-box {
             background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
             color: white;
@@ -502,7 +500,6 @@
             font-size: 1.1rem;
         }
 
-        /* Status badges */
         .status-badge {
             display: inline-block;
             padding: 5px 12px;
@@ -526,7 +523,6 @@
             color: white;
         }
 
-        /* ===== HISTÓRICO DE SAQUES ===== */
         .saque-card {
             background: white;
             border-radius: 15px;
@@ -594,7 +590,6 @@
             word-break: break-all;
         }
 
-        /* Debug info */
         .debug-info {
             background: rgba(255,255,255,0.9);
             color: #333;
@@ -627,7 +622,6 @@
         <span class="user-id" id="userIdDisplay">Carregando...</span>
     </div>
 
-    <!-- Debug info (só aparece se tiver erro) -->
     <div id="debugInfo" class="debug-info"></div>
 
     <div class="balance-card">
@@ -636,7 +630,6 @@
         <button class="btn-saque" onclick="openSaqueModal()">💳 Sacar Dinheiro</button>
     </div>
 
-    <!-- ===== CUPOM PROMOCIONAL ===== -->
     <div class="cupom-card">
         <div class="cupom-title">
             🎁 Código Promocional
@@ -671,7 +664,6 @@
         </div>
     </div>
 
-    <!-- Botão de Suporte Telegram -->
     <a href="https://t.me/+la54Ed6p0wE1Y2Qx" 
        target="_blank" 
        class="support-btn" 
@@ -679,7 +671,6 @@
         💬
     </a>
 
-    <!-- Modal de Comprovante -->
     <div class="modal" id="uploadModal">
         <div class="modal-content">
             <h3 class="modal-title">📸 Enviar Comprovante</h3>
@@ -701,7 +692,6 @@
         </div>
     </div>
 
-    <!-- Modal de Tutorial -->
     <div class="modal" id="tutorialModal">
         <div class="modal-content">
             <h3 class="modal-title">📖 Como Completar</h3>
@@ -710,7 +700,6 @@
         </div>
     </div>
 
-    <!-- Modal de Saque -->
     <div class="modal" id="saqueValorModal">
         <div class="modal-content">
             <h3 class="modal-title">💸 Quanto deseja sacar?</h3>
@@ -768,9 +757,6 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // ============================================
-        // CONFIGURAÇÃO FIREBASE
-        // ============================================
         const firebaseConfig = {
             apiKey: "AIzaSyA1r_PfVzXqDLxI52znZpopBjvlz2W2WzQ",
             authDomain: "tarefa-pix.firebaseapp.com",
@@ -781,9 +767,6 @@
             appId: "1:16378804197:web:0e95c0fd5440ec4e7e2106"
         };
 
-        // ============================================
-        // VARIÁVEIS GLOBAIS
-        // ============================================
         let currentUser = null;
         let currentTask = null;
         let selectedFile = null;
@@ -794,19 +777,14 @@
         let inProgressTasks = [];
         let db = null;
 
-        // ============================================
-        // INICIALIZAÇÃO COM TIMEOUT E TRATAMENTO DE ERRO
-        // ============================================
         function initApp() {
             console.log('🚀 Iniciando app...');
             
             try {
-                // Inicializar Firebase
                 firebase.initializeApp(firebaseConfig);
                 db = firebase.database();
                 console.log('✅ Firebase inicializado');
                 
-                // Testar conexão
                 testarConexao().then(() => {
                     console.log('✅ Conexão OK, iniciando usuário...');
                     initUser();
@@ -878,7 +856,6 @@
                     localStorage.setItem('tarefaPixUserId', userId);
                     console.log('🆕 Novo usuário criado:', userId);
                     
-                    // Criar usuário no Firebase
                     await db.ref('users/' + userId).set({
                         id: userId,
                         balance: 0,
@@ -894,7 +871,6 @@
                 currentUser = userId;
                 document.getElementById('userIdDisplay').textContent = userId;
                 
-                // Carregar saldo e tarefas em paralelo
                 loadBalance();
                 await loadTasks();
                 
@@ -918,9 +894,6 @@
             });
         }
 
-        // ============================================
-        // SISTEMA DE TIMER
-        // ============================================
         function iniciarAtualizacaoTimer() {
             atualizarTimersNaTela();
             timerInterval = setInterval(() => {
@@ -965,9 +938,6 @@
             }
         }
 
-        // ============================================
-        // SISTEMA DE CUPONS
-        // ============================================
         async function resgatarCupom() {
             const codeInput = document.getElementById('cupomCode');
             const statusDiv = document.getElementById('cupomStatus');
@@ -1034,14 +1004,10 @@
             }, 5000);
         }
 
-        // ============================================
-        // TAREFAS - COM TIMEOUT E TRATAMENTO DE ERRO
-        // ============================================
         async function loadTasks() {
             const content = document.getElementById('content');
             content.innerHTML = '<div class="empty-state" style="color: white;"><div class="loading"></div><p>Carregando...</p></div>';
 
-            // Timeout de 15 segundos
             const timeoutPromise = new Promise((_, reject) => {
                 setTimeout(() => reject(new Error('Timeout - Demorou mais de 15s')), 15000);
             });
@@ -1172,15 +1138,32 @@
             }
         }
 
-        // ===== HISTÓRICO DE SAQUES =====
+        // ===== CORREÇÃO: FILTRAR APENAS SAQUES DO USUÁRIO LOGADO =====
         async function loadSaquesHistory() {
             const content = document.getElementById('content');
             
             try {
-                const saquesSnapshot = await db.ref('saques').orderByChild('userId').equalTo(currentUser).once('value');
-                const saques = saquesSnapshot.val() || {};
+                console.log('💰 Carregando saques do usuário:', currentUser);
                 
-                if (Object.keys(saques).length === 0) {
+                // Carregar todos e filtrar no JS (mais confiável que query com índice)
+                const saquesSnapshot = await db.ref('saques').once('value');
+                const todosSaques = saquesSnapshot.val() || {};
+                
+                console.log('📊 Total de saques no sistema:', Object.keys(todosSaques).length);
+                
+                // 🔒 FILTRAR SÓ OS SAQUES DO USUÁRIO ATUAL
+                const meusSaques = {};
+                Object.keys(todosSaques).forEach(key => {
+                    const saque = todosSaques[key];
+                    // Verificar se o saque pertence ao usuário logado
+                    if (saque && saque.userId === currentUser) {
+                        meusSaques[key] = saque;
+                    }
+                });
+                
+                console.log('👤 Meus saques:', Object.keys(meusSaques).length);
+                
+                if (Object.keys(meusSaques).length === 0) {
                     content.innerHTML = `
                         <div class="empty-state">
                             <div style="font-size: 3rem; margin-bottom: 15px;">💰</div>
@@ -1193,9 +1176,10 @@
                     return;
                 }
                 
-                const saquesArray = Object.keys(saques).map(key => ({
+                // Converter para array e ordenar por data (mais recente primeiro)
+                const saquesArray = Object.keys(meusSaques).map(key => ({
                     id: key,
-                    ...saques[key]
+                    ...meusSaques[key]
                 })).sort((a, b) => b.requestedAt - a.requestedAt);
                 
                 let html = '';
@@ -1345,9 +1329,6 @@
             document.getElementById('tutorialModal').classList.remove('active');
         }
 
-        // ============================================
-        // INICIAR TAREFA
-        // ============================================
         async function startTask(taskId, link) {
             try {
                 await db.ref('userTasks/' + currentUser + '/' + taskId).set({
@@ -1372,9 +1353,6 @@
             }
         }
 
-        // ============================================
-        // MODAL DE UPLOAD
-        // ============================================
         function openUploadModal(taskId) {
             currentTask = taskId;
             document.getElementById('uploadModal').classList.add('active');
@@ -1484,9 +1462,6 @@
             loadTasks();
         }
 
-        // ============================================
-        // SAQUE
-        // ============================================
         function openSaqueModal() {
             document.getElementById('saqueValorModal').classList.add('active');
         }
@@ -1594,7 +1569,6 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        // Iniciar app quando DOM estiver pronto
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
